@@ -246,7 +246,7 @@ package StreamTransactionPkg is
   -- GetErrors:  
   --    For non-osvvm testbenches, returns error count for this model
   --    If Error Count is also non-zero, also prints error counts
-  procedure GetErrors (
+  procedure GetErrorCount (
   ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     variable  ErrorCount      : out   natural
@@ -532,7 +532,7 @@ package body StreamTransactionPkg is
   -- GetErrors:  
   --    For non-osvvm testbenches, returns error count for this model
   --    If Error Count is also non-zero, also prints error counts
-  procedure GetErrors (
+  procedure GetErrorCount (
   ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     variable  ErrorCount      : out   natural
@@ -542,7 +542,7 @@ package body StreamTransactionPkg is
     GetAlertLogID(TransactionRec, AlertLogID) ;
     ReportNonZeroAlerts(AlertLogID => AlertLogID) ;
     ErrorCount := GetAlertCount(AlertLogID => AlertLogID) ;
-  end procedure GetErrors ; 
+  end procedure GetErrorCount ; 
   
   ------------------------------------------------------------
   -- GetTransactionCount:  Directive, get model transaction count
