@@ -1,2 +1,2 @@
-# OSVVM-VIP
-Shared packages for OSVVM VIP
+# OSVVM-Common
+Shared packages for OSVVM Common
