@@ -1,6 +1,6 @@
 --
---  File Name:         OsvvmVipContext.vhd
---  Design Unit Name:  OsvvmVipContext
+--  File Name:         OsvvmCommonContext.vhd
+--  Design Unit Name:  OsvvmCommonContext
 --  Revision:          STANDARD VERSION
 --
 --  Maintainer:        Jim Lewis      email:  jim@synthworks.com
@@ -40,8 +40,8 @@
 --  limitations under the License.
 --
 
-context OsvvmVipContext is
-    library osvvm_vip ;  
-    use osvvm_vip.StreamTransactionPkg.all ; 
-end context OsvvmVipContext ; 
+context OsvvmCommonContext is
+    library osvvm_common ;  
+    use osvvm_common.StreamTransactionPkg.all ; 
+end context OsvvmCommonContext ; 
 
