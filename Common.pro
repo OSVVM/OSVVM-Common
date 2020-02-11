@@ -40,3 +40,5 @@
 library OSVVM_Common
 analyze ./src/StreamTransactionPkg.vhd
 analyze ./src/OsvvmCommonContext.vhd
+analyze ./src/AddressBusMasterTransactionGenericPkg.vhd
+analyze ./src/AddressBusMasterTransactionCommonPkg.vhd
