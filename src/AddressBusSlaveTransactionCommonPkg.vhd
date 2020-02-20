@@ -1,6 +1,6 @@
 --
---  File Name:         AddressBusMasterTransactionCommonPkg.vhd
---  Design Unit Name:  AddressBusMasterTransactionCommonPkg
+--  File Name:         AddressBusSlaveTransactionCommonPkg.vhd
+--  Design Unit Name:  AddressBusSlaveTransactionCommonPkg
 --  Revision:          STANDARD VERSION
 --
 --  Maintainer:        Jim Lewis      email:  jim@synthworks.com
@@ -9,7 +9,7 @@
 --
 --
 --  Description:
---    Instance of AddressBusMasterTransactionGenericPkg for integer
+--    Instance of AddressBusSlaveTransactionGenericPkg for integer
 --
 --  Developed for:
 --        SynthWorks Design Inc.
@@ -40,7 +40,7 @@
 --  
 
 
-package AddressBusMasterTransactionCommonPkg is new work.AddressBusMasterTransactionGenericPkg
+package AddressBusSlaveTransactionCommonPkg is new work.AddressBusSlaveTransactionGenericPkg
   generic map (
     ModelOptionsType    => integer    
   ) ;  

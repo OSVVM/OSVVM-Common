@@ -22,6 +22,7 @@
 --    Date      Version    Description
 --    09/2017   2017       Initial revision
 --    01/2020   2020.01    Updated license notice
+--    02/2020   2020.02    Refactored from Axi4LiteMasterTransactionPkg
 --
 --
 --  This file is part of OSVVM.
@@ -57,13 +58,13 @@ package AddressBusMasterTransactionGenericPkg is
 
 
   -- Address Master Common Operations
-  type UnresolvedMasterOperationType is (
+  type UnresolvedAddressBusMasterOperationType is (
     -- Model Directives
     WAIT_CLOCK, 
     GET_ALERTLOG_ID, 
-    GET_TRANSACTION_COUNT, GET_WRITE_TRANSACTION_COUNT, GET_READ_TRANSACTION_COUNT,
+    GET_TRANSACTION_COUNT, 
+    GET_WRITE_TRANSACTION_COUNT, GET_READ_TRANSACTION_COUNT,
     SET_MODEL_OPTIONS, GET_MODEL_OPTIONS,
-    GET_ERRORS, -- Deprecate
     --  bus operations
     --                       -- Master
     --                       ----------------------------
@@ -81,19 +82,19 @@ package AddressBusMasterTransactionGenericPkg is
     TRY_READ_DATA_CHECK,     -- Non-blocking read check
     THE_END
   ) ;
-  type UnresolvedMasterOperationVectorType is array (natural range <>) of UnresolvedMasterOperationType ;
---  alias resolved_max is maximum[ UnresolvedMasterOperationVectorType return UnresolvedMasterOperationType] ;
+  type UnresolvedAddressBusMasterOperationVectorType is array (natural range <>) of UnresolvedAddressBusMasterOperationType ;
+--  alias resolved_max is maximum[ UnresolvedAddressBusMasterOperationVectorType return UnresolvedAddressBusMasterOperationType] ;
   -- Maximum is implicitly defined for any array type in VHDL-2008.   Function resolved_max is a fall back.
-  function resolved_max ( s : UnresolvedMasterOperationVectorType) return UnresolvedMasterOperationType ;
-  subtype MasterOperationType is resolved_max UnresolvedMasterOperationType ;
+  function resolved_max ( s : UnresolvedAddressBusMasterOperationVectorType) return UnresolvedAddressBusMasterOperationType ;
+  subtype AddressBusMasterOperationType is resolved_max UnresolvedAddressBusMasterOperationType ;
 
 
   -- Record creates a channel for communicating transactions to the model.
-  type MasterTransactionRecType is record
+  type AddressBusMasterTransactionRecType is record
     -- All Address Bus Masters
     Rdy                : bit_max ;
     Ack                : bit_max ;
-    Operation          : MasterOperationType ;
+    Operation          : AddressBusMasterOperationType ;
     Address            : std_logic_vector_max_c ;
     AddrWidth          : integer_max ;
     DataToModel        : std_logic_vector_max_c ;
@@ -103,11 +104,11 @@ package AddressBusMasterTransactionGenericPkg is
     -- Model Options 
     Options            : ModelOptionsType ;
     -- Optional parameter handling
-    BoolFromModel      : boolean_max ;
-    IntFromModel       : integer_max ; 
-    BoolToModel        : boolean_max ; 
     IntToModel         : integer_max ;
-  end record MasterTransactionRecType ;
+    BoolToModel        : boolean_max ; 
+    IntFromModel       : integer_max ; 
+    BoolFromModel      : boolean_max ;
+  end record AddressBusMasterTransactionRecType ;
 
 --!TODO add VHDL-2018 Interfaces
 
@@ -116,16 +117,16 @@ package AddressBusMasterTransactionGenericPkg is
   procedure WaitForClock (
   -- Directive:  Wait for NumberOfClocks number of clocks
   ------------------------------------------------------------
-    signal   TransRec        : InOut MasterTransactionRecType ;
+    signal   TransRec        : InOut AddressBusMasterTransactionRecType ;
              NumberOfClocks  : In    natural := 1
   ) ;
 
-  alias NoOp is WaitForClock [MasterTransactionRecType, natural] ;
+  alias NoOp is WaitForClock [AddressBusMasterTransactionRecType, natural] ;
 
   ------------------------------------------------------------
   procedure GetAlertLogID (
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
     variable AlertLogID  : Out   AlertLogIDType
   ) ;
 
@@ -134,28 +135,28 @@ package AddressBusMasterTransactionGenericPkg is
   -- Error reporting for testbenches that do not use AlertLogPkg
   -- Returns error count.  If an error count /= 0, also print it
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
     variable ErrCnt      : Out   natural
   ) ;
 
   ------------------------------------------------------------
   procedure GetTransactionCount (
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
     variable Count       : Out   integer
   ) ;
 
   ------------------------------------------------------------
   procedure GetWriteTransactionCount (
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
     variable Count       : Out   integer
   ) ;
 
   ------------------------------------------------------------
   procedure GetReadTransactionCount (
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
     variable Count       : Out   integer
   ) ;
 
@@ -163,7 +164,7 @@ package AddressBusMasterTransactionGenericPkg is
   procedure MasterWrite (
   -- do CPU Write Cycle
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
              iAddr       : In    std_logic_vector ;
              iData       : In    std_logic_vector ;
              StatusMsgOn : In    boolean := false
@@ -173,7 +174,7 @@ package AddressBusMasterTransactionGenericPkg is
   procedure MasterWriteAsync (
   -- dispatch CPU Write Cycle
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
              iAddr       : In    std_logic_vector ;
              iData       : In    std_logic_vector ;
              StatusMsgOn : In    boolean := false
@@ -183,7 +184,7 @@ package AddressBusMasterTransactionGenericPkg is
   procedure MasterWriteAddressAsync (
   -- dispatch CPU Write Address Cycle
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
              iAddr       : In    std_logic_vector ;
              StatusMsgOn : In    boolean := false
   ) ;
@@ -192,7 +193,7 @@ package AddressBusMasterTransactionGenericPkg is
   procedure MasterWriteDataAsync (
   -- dispatch CPU Write Data Cycle
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
              iAddr       : In    std_logic_vector ;
              iData       : In    std_logic_vector ;
              StatusMsgOn : In    boolean := false
@@ -202,7 +203,7 @@ package AddressBusMasterTransactionGenericPkg is
   procedure MasterWriteDataAsync (
   -- dispatch CPU Write Data Cycle
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
              iData       : In    std_logic_vector ;
              StatusMsgOn : In    boolean := false
   ) ;
@@ -211,7 +212,7 @@ package AddressBusMasterTransactionGenericPkg is
   procedure MasterRead (
   -- do CPU Read Cycle and return data
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
              iAddr       : In    std_logic_vector ;
     variable oData       : Out   std_logic_vector ;
              StatusMsgOn : In    boolean := false
@@ -221,7 +222,7 @@ package AddressBusMasterTransactionGenericPkg is
   procedure MasterReadCheck (
   -- do CPU Read Cycle and check supplied data
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
              iAddr       : In    std_logic_vector ;
              iData       : In    std_logic_vector ;
              StatusMsgOn : In    boolean := false
@@ -231,7 +232,7 @@ package AddressBusMasterTransactionGenericPkg is
   procedure MasterReadAddressAsync (
   -- dispatch CPU Read Address Cycle
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
              iAddr       : In    std_logic_vector ;
              StatusMsgOn : In    boolean := false
   ) ;
@@ -240,7 +241,7 @@ package AddressBusMasterTransactionGenericPkg is
   procedure MasterReadData (
   -- Do CPU Read Data Cycle
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
     variable oData       : Out   std_logic_vector ;
              StatusMsgOn : In    boolean := false
   ) ;
@@ -249,7 +250,7 @@ package AddressBusMasterTransactionGenericPkg is
   procedure MasterReadDataCheck (
   -- Do CPU Read Data Cycle and check received Data
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
              iData       : In    std_logic_vector ;
              StatusMsgOn : In    boolean := false
   ) ;
@@ -260,7 +261,7 @@ package AddressBusMasterTransactionGenericPkg is
   -- If data is available, get it and return available TRUE.
   -- Otherwise Return Available FALSE.
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
     variable oData       : Out   std_logic_vector ;
     variable Available   : Out   boolean ;
              StatusMsgOn : In    boolean := false
@@ -272,7 +273,7 @@ package AddressBusMasterTransactionGenericPkg is
   -- If data is available, check it and return available TRUE.
   -- Otherwise Return Available FALSE.
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
              iData       : In    std_logic_vector ;
     variable Available   : Out   boolean ;
              StatusMsgOn : In    boolean := false
@@ -282,7 +283,7 @@ package AddressBusMasterTransactionGenericPkg is
   procedure MasterReadPoll (
   -- Read location (iAddr) until Data(IndexI) = ValueI
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
              iAddr       : In    std_logic_vector ;
              Index       : In    Integer ;
              BitValue    : In    std_logic ;
@@ -293,49 +294,49 @@ package AddressBusMasterTransactionGenericPkg is
   ------------------------------------------------------------
   function IsWriteAddress (
   -----------------------------------------------------------
-    constant Operation     : in MasterOperationType
+    constant Operation     : in AddressBusMasterOperationType
   ) return boolean ;
 
   ------------------------------------------------------------
   function IsBlockOnWriteAddress (
   -----------------------------------------------------------
-    constant Operation     : in MasterOperationType
+    constant Operation     : in AddressBusMasterOperationType
   ) return boolean ;
 
   ------------------------------------------------------------
   function IsWriteData (
   -----------------------------------------------------------
-    constant Operation     : in MasterOperationType
+    constant Operation     : in AddressBusMasterOperationType
   ) return boolean ;
 
   ------------------------------------------------------------
   function IsBlockOnWriteData (
   -----------------------------------------------------------
-    constant Operation     : in MasterOperationType
+    constant Operation     : in AddressBusMasterOperationType
   ) return boolean ;
 
   ------------------------------------------------------------
   function IsReadAddress (
   -----------------------------------------------------------
-    constant Operation     : in MasterOperationType
+    constant Operation     : in AddressBusMasterOperationType
   ) return boolean ;
 
   ------------------------------------------------------------
   function IsReadData (
   -----------------------------------------------------------
-    constant Operation     : in MasterOperationType
+    constant Operation     : in AddressBusMasterOperationType
   ) return boolean ;
 
   ------------------------------------------------------------
   function IsReadCheck (
   -----------------------------------------------------------
-    constant Operation     : in MasterOperationType
+    constant Operation     : in AddressBusMasterOperationType
   ) return boolean ;
 
   ------------------------------------------------------------
   function IsTryReadData (
   -----------------------------------------------------------
-    constant Operation     : in MasterOperationType
+    constant Operation     : in AddressBusMasterOperationType
   ) return boolean ;
 
   --
@@ -345,7 +346,7 @@ package AddressBusMasterTransactionGenericPkg is
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
     constant Option      : In    ModelOptionsType ;
     constant OptVal      : In    boolean
   ) ;
@@ -353,7 +354,7 @@ package AddressBusMasterTransactionGenericPkg is
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
     constant Option      : In    ModelOptionsType ;
     constant OptVal      : In    integer
   ) ;
@@ -361,11 +362,35 @@ package AddressBusMasterTransactionGenericPkg is
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
     constant Option      : In    ModelOptionsType ;
     constant OptVal      : In    std_logic_vector
   ) ;
+  
+  ------------------------------------------------------------
+  procedure GetModelOptions (
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
+    constant Option      : In    ModelOptionsType ;
+    variable OptVal      : Out   boolean
+  ) ;
 
+  ------------------------------------------------------------
+  procedure GetModelOptions (
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
+    constant Option      : In    ModelOptionsType ;
+    variable OptVal      : Out   integer
+  ) ;
+
+  ------------------------------------------------------------
+  procedure GetModelOptions (
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
+    constant Option      : In    ModelOptionsType ;
+    variable OptVal      : Out   std_logic_vector
+  ) ;
+  
 end package AddressBusMasterTransactionGenericPkg ;
 
 -- /////////////////////////////////////////////////////////////////////////////////////////
@@ -373,7 +398,7 @@ end package AddressBusMasterTransactionGenericPkg ;
 
 package body AddressBusMasterTransactionGenericPkg is
 
-  function resolved_max ( s : UnresolvedMasterOperationVectorType) return UnresolvedMasterOperationType is
+  function resolved_max ( s : UnresolvedAddressBusMasterOperationVectorType) return UnresolvedAddressBusMasterOperationType is
   begin
     return maximum(s) ;
   end function resolved_max ;
@@ -383,7 +408,7 @@ package body AddressBusMasterTransactionGenericPkg is
   procedure WaitForClock (
   -- Directive:  Wait for NumberOfClocks number of clocks in the model
   ------------------------------------------------------------
-    signal   TransRec        : InOut MasterTransactionRecType ;
+    signal   TransRec        : InOut AddressBusMasterTransactionRecType ;
              NumberOfClocks  : In    natural := 1
   ) is
   begin
@@ -395,7 +420,7 @@ package body AddressBusMasterTransactionGenericPkg is
   ------------------------------------------------------------
   procedure GetAlertLogID (
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
     variable AlertLogID  : Out   AlertLogIDType
   ) is
   begin
@@ -411,7 +436,7 @@ package body AddressBusMasterTransactionGenericPkg is
   -- Error reporting for testbenches that do not use AlertLogPkg
   -- Returns error count.  If an error count /= 0, also print it
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
     variable ErrCnt      : Out   natural
   ) is
     variable ModelID : AlertLogIDType ;
@@ -424,7 +449,7 @@ package body AddressBusMasterTransactionGenericPkg is
   ------------------------------------------------------------
   procedure GetTransactionCount (
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
     variable Count       : Out   integer
   ) is
   begin
@@ -438,7 +463,7 @@ package body AddressBusMasterTransactionGenericPkg is
   ------------------------------------------------------------
   procedure GetWriteTransactionCount (
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
     variable Count       : Out   integer
   ) is
   begin
@@ -452,7 +477,7 @@ package body AddressBusMasterTransactionGenericPkg is
   ------------------------------------------------------------
   procedure GetReadTransactionCount (
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
     variable Count       : Out   integer
   ) is
   begin
@@ -467,7 +492,7 @@ package body AddressBusMasterTransactionGenericPkg is
   procedure MasterWrite (
   -- do CPU Write Cycle
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
              iAddr       : In    std_logic_vector ;
              iData       : In    std_logic_vector ;
              StatusMsgOn : In    boolean := false
@@ -488,7 +513,7 @@ package body AddressBusMasterTransactionGenericPkg is
   procedure MasterWriteAsync (
   -- dispatch CPU Write Cycle
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
              iAddr       : In    std_logic_vector ;
              iData       : In    std_logic_vector ;
              StatusMsgOn : In    boolean := false
@@ -509,7 +534,7 @@ package body AddressBusMasterTransactionGenericPkg is
   procedure MasterWriteAddressAsync (
   -- dispatch CPU Write Address Cycle
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
              iAddr       : In    std_logic_vector ;
              StatusMsgOn : In    boolean := false
   ) is
@@ -529,7 +554,7 @@ package body AddressBusMasterTransactionGenericPkg is
   procedure MasterWriteDataAsync (
   -- dispatch CPU Write Data Cycle
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
              iAddr       : In    std_logic_vector ;
              iData       : In    std_logic_vector ;
              StatusMsgOn : In    boolean := false
@@ -549,7 +574,7 @@ package body AddressBusMasterTransactionGenericPkg is
   ------------------------------------------------------------
   procedure MasterWriteDataAsync (
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
              iData       : In    std_logic_vector ;
              StatusMsgOn : In    boolean := false
   ) is
@@ -561,7 +586,7 @@ package body AddressBusMasterTransactionGenericPkg is
   procedure MasterRead (
   -- do CPU Read Cycle and return data
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
              iAddr       : In    std_logic_vector ;
     variable oData       : Out   std_logic_vector ;
              StatusMsgOn : In    boolean := false
@@ -583,7 +608,7 @@ package body AddressBusMasterTransactionGenericPkg is
   procedure MasterReadCheck (
   -- do CPU Read Cycle and check supplied data
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
              iAddr       : In    std_logic_vector ;
              iData       : In    std_logic_vector ;
              StatusMsgOn : In    boolean := false
@@ -604,7 +629,7 @@ package body AddressBusMasterTransactionGenericPkg is
   procedure MasterReadAddressAsync (
   -- dispatch CPU Read Address Cycle
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
              iAddr       : In    std_logic_vector ;
              StatusMsgOn : In    boolean := false
   ) is
@@ -624,7 +649,7 @@ package body AddressBusMasterTransactionGenericPkg is
   procedure MasterReadData (
   -- Do CPU Read Data Cycle
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
     variable oData       : Out   std_logic_vector ;
              StatusMsgOn : In    boolean := false
   ) is
@@ -644,7 +669,7 @@ package body AddressBusMasterTransactionGenericPkg is
   procedure MasterReadDataCheck (
   -- Do CPU Read Data Cycle and check received Data
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
              iData       : In    std_logic_vector ;
              StatusMsgOn : In    boolean := false
   ) is
@@ -665,7 +690,7 @@ package body AddressBusMasterTransactionGenericPkg is
   -- If data is available, get it and return available TRUE.
   -- Otherwise Return Available FALSE.
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
     variable oData       : Out   std_logic_vector ;
     variable Available   : Out   boolean ;
              StatusMsgOn : In    boolean := false
@@ -689,7 +714,7 @@ package body AddressBusMasterTransactionGenericPkg is
   -- If data is available, check it and return available TRUE.
   -- Otherwise Return Available FALSE.
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
              iData       : In    std_logic_vector ;
     variable Available   : Out   boolean ;
              StatusMsgOn : In    boolean := false
@@ -710,7 +735,7 @@ package body AddressBusMasterTransactionGenericPkg is
   procedure MasterReadPoll (
   -- Read location (iAddr) until Data(IndexI) = ValueI
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
              iAddr       : In    std_logic_vector ;
              Index       : In    Integer ;
              BitValue    : In    std_logic ;
@@ -734,7 +759,7 @@ package body AddressBusMasterTransactionGenericPkg is
   ------------------------------------------------------------
   function IsWriteAddress (
   -----------------------------------------------------------
-    constant Operation     : in MasterOperationType
+    constant Operation     : in AddressBusMasterOperationType
   ) return boolean is
   begin
     return
@@ -746,7 +771,7 @@ package body AddressBusMasterTransactionGenericPkg is
   ------------------------------------------------------------
   function IsBlockOnWriteAddress (
   -----------------------------------------------------------
-    constant Operation     : in MasterOperationType
+    constant Operation     : in AddressBusMasterOperationType
   ) return boolean is
   begin
     return (Operation = WRITE) ;
@@ -755,7 +780,7 @@ package body AddressBusMasterTransactionGenericPkg is
   ------------------------------------------------------------
   function IsWriteData (
   -----------------------------------------------------------
-    constant Operation     : in MasterOperationType
+    constant Operation     : in AddressBusMasterOperationType
   ) return boolean is
   begin
     return
@@ -767,7 +792,7 @@ package body AddressBusMasterTransactionGenericPkg is
   ------------------------------------------------------------
   function IsBlockOnWriteData (
   -----------------------------------------------------------
-    constant Operation     : in MasterOperationType
+    constant Operation     : in AddressBusMasterOperationType
   ) return boolean is
   begin
     return (Operation = WRITE) ;
@@ -776,7 +801,7 @@ package body AddressBusMasterTransactionGenericPkg is
   ------------------------------------------------------------
   function IsReadAddress (
   -----------------------------------------------------------
-    constant Operation     : in MasterOperationType
+    constant Operation     : in AddressBusMasterOperationType
   ) return boolean is
   begin
     return
@@ -788,7 +813,7 @@ package body AddressBusMasterTransactionGenericPkg is
   ------------------------------------------------------------
   function IsReadData (
   -----------------------------------------------------------
-    constant Operation     : in MasterOperationType
+    constant Operation     : in AddressBusMasterOperationType
   ) return boolean is
   begin
     return
@@ -803,7 +828,7 @@ package body AddressBusMasterTransactionGenericPkg is
   ------------------------------------------------------------
   function IsTryReadData (
   -----------------------------------------------------------
-    constant Operation     : in MasterOperationType
+    constant Operation     : in AddressBusMasterOperationType
   ) return boolean is
   begin
     return (Operation = TRY_READ_DATA) or (Operation = TRY_READ_DATA_CHECK)  ;
@@ -812,7 +837,7 @@ package body AddressBusMasterTransactionGenericPkg is
   ------------------------------------------------------------
   function IsReadCheck (
   -----------------------------------------------------------
-    constant Operation     : in MasterOperationType
+    constant Operation     : in AddressBusMasterOperationType
   ) return boolean is
   begin
     return
@@ -828,7 +853,7 @@ package body AddressBusMasterTransactionGenericPkg is
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
     constant Option      : In    ModelOptionsType ;
     constant OptVal      : In    boolean
   ) is
@@ -842,7 +867,7 @@ package body AddressBusMasterTransactionGenericPkg is
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
     constant Option      : In    ModelOptionsType ;
     constant OptVal      : In    integer
   ) is
@@ -856,7 +881,7 @@ package body AddressBusMasterTransactionGenericPkg is
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut MasterTransactionRecType ;
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
     constant Option      : In    ModelOptionsType ;
     constant OptVal      : In    std_logic_vector
   ) is
@@ -866,4 +891,46 @@ package body AddressBusMasterTransactionGenericPkg is
     TransRec.IntToModel    <= to_integer(OptVal) ;
     RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
   end procedure SetModelOptions ;
+  
+  ------------------------------------------------------------
+  procedure GetModelOptions (
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
+    constant Option      : In    ModelOptionsType ;
+    variable OptVal      : Out   boolean
+  ) is
+  begin
+    TransRec.Operation     <= GET_MODEL_OPTIONS ;
+    TransRec.Options       <= Option ;
+    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    OptVal := TransRec.BoolFromModel    ;
+  end procedure GetModelOptions ;
+
+  ------------------------------------------------------------
+  procedure GetModelOptions (
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
+    constant Option      : In    ModelOptionsType ;
+    variable OptVal      : Out   integer
+  ) is
+  begin
+    TransRec.Operation     <= GET_MODEL_OPTIONS ;
+    TransRec.Options       <= Option ;
+    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    OptVal := TransRec.IntFromModel ; 
+  end procedure GetModelOptions ;
+
+  ------------------------------------------------------------
+  procedure GetModelOptions (
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
+    constant Option      : In    ModelOptionsType ;
+    variable OptVal      : Out   std_logic_vector
+  ) is
+  begin
+    TransRec.Operation     <= GET_MODEL_OPTIONS ;
+    TransRec.Options       <= Option ;
+    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    OptVal := to_slv(TransRec.IntFromModel, OptVal'length) ; 
+  end procedure GetModelOptions ;
 end package body AddressBusMasterTransactionGenericPkg ;
