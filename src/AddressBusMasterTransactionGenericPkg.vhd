@@ -59,18 +59,19 @@ package AddressBusMasterTransactionGenericPkg is
 
   -- Address Master Common Operations
   type UnresolvedAddressBusMasterOperationType is (
+    --
     -- Model Directives
+    --
     WAIT_CLOCK, 
     GET_ALERTLOG_ID, 
     GET_TRANSACTION_COUNT, 
     GET_WRITE_TRANSACTION_COUNT, GET_READ_TRANSACTION_COUNT,
     SET_MODEL_OPTIONS, GET_MODEL_OPTIONS,
+    --
     --  bus operations
-    --                       -- Master
     --                       ----------------------------
     WRITE,                   -- Blocking (Tx Addr & Data)
     READ,                    -- Blocking(Tx Addr, Rx Data)
-    --  Master Only
     READ_CHECK,              -- Blocking (Tx Addr & Data)
     ASYNC_WRITE,             -- Non-blocking (Tx Addr & Data)
     ASYNC_WRITE_ADDRESS,     -- Non-blocking (Tx Addr)
@@ -80,6 +81,13 @@ package AddressBusMasterTransactionGenericPkg is
     READ_DATA_CHECK,         -- Blocking (Tx Data)
     TRY_READ_DATA,           -- Non-blocking try & get
     TRY_READ_DATA_CHECK,     -- Non-blocking read check
+    --
+    --  burst operations
+    --                       ----------------------------
+    WRITE_BURST,             -- Blocking BURST (Tx Addr & Data)
+    ASYNC_WRITE_BURST,       -- Non-blocking BURST (Tx Addr & Data)
+    READ_BURST,              -- Blocking BURST (Tx Addr, Rx Data)
+
     THE_END
   ) ;
   type UnresolvedAddressBusMasterOperationVectorType is array (natural range <>) of UnresolvedAddressBusMasterOperationType ;
@@ -207,6 +215,26 @@ package AddressBusMasterTransactionGenericPkg is
              iData       : In    std_logic_vector ;
              StatusMsgOn : In    boolean := false
   ) ;
+  
+  ------------------------------------------------------------
+  procedure MasterWriteBurst (
+  -- do CPU Write Cycle
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
+             iAddr       : In    std_logic_vector ;
+             NumBytes    : In    integer ;
+             StatusMsgOn : In    boolean := false
+  ) ;
+
+  ------------------------------------------------------------
+  procedure MasterWriteBurstAsync (
+  -- dispatch CPU Write Cycle
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
+             iAddr       : In    std_logic_vector ;
+             NumBytes    : In    integer ;
+             StatusMsgOn : In    boolean := false
+  ) ;
 
   ------------------------------------------------------------
   procedure MasterRead (
@@ -290,6 +318,17 @@ package AddressBusMasterTransactionGenericPkg is
              StatusMsgOn : In    boolean := false ;
              WaitTime    : In    natural := 10
   ) ;
+  
+  ------------------------------------------------------------
+  procedure MasterReadBurst (
+  -- do CPU Read Cycle and return data
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
+             iAddr       : In    std_logic_vector ;
+             NumBytes    : In    integer ;
+--??    variable NumBytes    : Out   integer ;
+             StatusMsgOn : In    boolean := false
+  ) ;
 
   ------------------------------------------------------------
   function IsWriteAddress (
@@ -328,16 +367,23 @@ package AddressBusMasterTransactionGenericPkg is
   ) return boolean ;
 
   ------------------------------------------------------------
+  function IsTryReadData (
+  -----------------------------------------------------------
+    constant Operation     : in AddressBusMasterOperationType
+  ) return boolean ;
+
+  ------------------------------------------------------------
   function IsReadCheck (
   -----------------------------------------------------------
     constant Operation     : in AddressBusMasterOperationType
   ) return boolean ;
 
   ------------------------------------------------------------
-  function IsTryReadData (
+  function IsBurst (
   -----------------------------------------------------------
     constant Operation     : in AddressBusMasterOperationType
   ) return boolean ;
+
 
   --
   --  Extensions to support model customizations
@@ -570,7 +616,7 @@ package body AddressBusMasterTransactionGenericPkg is
     -- Start Transaction
     RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
   end procedure MasterWriteDataAsync ;
-
+  
   ------------------------------------------------------------
   procedure MasterWriteDataAsync (
   ------------------------------------------------------------
@@ -582,6 +628,52 @@ package body AddressBusMasterTransactionGenericPkg is
     MasterWriteDataAsync(TransRec, X"00", iData, StatusMsgOn) ;
   end procedure MasterWriteDataAsync ;
 
+  ------------------------------------------------------------
+  procedure MasterWriteBurst (
+  -- do CPU Write Cycle
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
+             iAddr       : In    std_logic_vector ;
+             NumBytes    : In    integer ;
+             StatusMsgOn : In    boolean := false
+  ) is
+  begin
+    -- Put values in record
+    TransRec.Operation        <= WRITE_BURST ;
+    TransRec.Address          <= ToTransaction(iAddr) ;
+    TransRec.AddrWidth        <= iAddr'length ;
+--    TransRec.DataToModel      <= (TransRec.DataToModel'range => 'X') ;
+    TransRec.DataWidth        <= NumBytes ;
+--    TransRec.DataToModel      <= ToTransaction(to_slv(NumBytes, TransRec.DataToModel'length)) ;
+--    TransRec.DataWidth        <= 0 ;
+    TransRec.StatusMsgOn      <= StatusMsgOn ;
+    -- Start Transaction
+    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+  end procedure MasterWriteBurst ;
+
+  ------------------------------------------------------------
+  procedure MasterWriteBurstAsync (
+  -- dispatch CPU Write Cycle
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
+             iAddr       : In    std_logic_vector ;
+             NumBytes    : In    integer ;
+             StatusMsgOn : In    boolean := false
+  ) is
+  begin
+    -- Put values in record
+    TransRec.Operation        <= ASYNC_WRITE_BURST ;
+    TransRec.Address          <= ToTransaction(iAddr) ;
+    TransRec.AddrWidth        <= iAddr'length ;
+--    TransRec.DataToModel      <= (TransRec.DataToModel'range => 'X') ;
+    TransRec.DataWidth        <= NumBytes ;
+--    TransRec.DataToModel      <= ToTransaction(to_slv(NumBytes, TransRec.DataToModel'length)) ;
+--    TransRec.DataWidth        <= 0 ;
+    TransRec.StatusMsgOn      <= StatusMsgOn ;
+    -- Start Transaction
+    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+  end procedure MasterWriteBurstAsync ;
+  
   ------------------------------------------------------------
   procedure MasterRead (
   -- do CPU Read Cycle and return data
@@ -757,6 +849,30 @@ package body AddressBusMasterTransactionGenericPkg is
   end procedure MasterReadPoll ;
 
   ------------------------------------------------------------
+  procedure MasterReadBurst (
+  -- do CPU Read Cycle and return data
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusMasterTransactionRecType ;
+             iAddr       : In    std_logic_vector ;
+             NumBytes    : In    integer ;
+--??    variable NumBytes    : Out   integer ;
+             StatusMsgOn : In    boolean := false
+  ) is
+  begin
+    -- Put values in record
+    TransRec.Operation          <= READ_BURST ;
+    TransRec.Address            <= ToTransaction(iAddr) ;
+    TransRec.AddrWidth          <= iAddr'length ;
+    TransRec.DataWidth          <= NumBytes ;
+--??    TransRec.DataWidth          <= 0 ;
+    TransRec.StatusMsgOn        <= StatusMsgOn ;
+    -- Start Transaction
+    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+--??    -- Return Results
+--??    NumBytes := to_integer(Reduce(FromTransaction(TransRec.DataFromModel), 31)) ;
+  end procedure MasterReadBurst ;
+  
+  ------------------------------------------------------------
   function IsWriteAddress (
   -----------------------------------------------------------
     constant Operation     : in AddressBusMasterOperationType
@@ -765,7 +881,9 @@ package body AddressBusMasterTransactionGenericPkg is
     return
       (Operation = WRITE) or
       (Operation = ASYNC_WRITE) or
-      (Operation = ASYNC_WRITE_ADDRESS) ;
+      (Operation = ASYNC_WRITE_ADDRESS) or 
+      (Operation = WRITE_BURST) or
+      (Operation = ASYNC_WRITE_BURST) ;
   end function IsWriteAddress ;
 
   ------------------------------------------------------------
@@ -774,7 +892,7 @@ package body AddressBusMasterTransactionGenericPkg is
     constant Operation     : in AddressBusMasterOperationType
   ) return boolean is
   begin
-    return (Operation = WRITE) ;
+    return (Operation = WRITE) or (Operation = WRITE_BURST) ;
   end function IsBlockOnWriteAddress ;
 
   ------------------------------------------------------------
@@ -786,7 +904,9 @@ package body AddressBusMasterTransactionGenericPkg is
     return
       (Operation = WRITE) or
       (Operation = ASYNC_WRITE) or
-      (Operation = ASYNC_WRITE_DATA) ;
+      (Operation = ASYNC_WRITE_DATA) or 
+      (Operation = WRITE_BURST) or
+      (Operation = ASYNC_WRITE_BURST) ;
   end function IsWriteData ;
 
   ------------------------------------------------------------
@@ -795,7 +915,7 @@ package body AddressBusMasterTransactionGenericPkg is
     constant Operation     : in AddressBusMasterOperationType
   ) return boolean is
   begin
-    return (Operation = WRITE) ;
+    return (Operation = WRITE) or (Operation = WRITE_BURST) ;
   end function IsBlockOnWriteData ;
 
   ------------------------------------------------------------
@@ -807,7 +927,8 @@ package body AddressBusMasterTransactionGenericPkg is
     return
       (Operation = READ) or
       (Operation = READ_CHECK) or
-      (Operation = ASYNC_READ_ADDRESS) ;
+      (Operation = ASYNC_READ_ADDRESS) or
+      (Operation = READ_BURST) ;
   end function IsReadAddress ;
 
   ------------------------------------------------------------
@@ -822,7 +943,8 @@ package body AddressBusMasterTransactionGenericPkg is
       (Operation = READ_DATA) or
       (Operation = TRY_READ_DATA) or
       (Operation = READ_DATA_CHECK) or
-      (Operation = TRY_READ_DATA_CHECK) ;
+      (Operation = TRY_READ_DATA_CHECK) or
+      (Operation = READ_BURST) ;
   end function IsReadData ;
 
   ------------------------------------------------------------
@@ -845,6 +967,18 @@ package body AddressBusMasterTransactionGenericPkg is
       (Operation = READ_DATA_CHECK) or
       (Operation = TRY_READ_DATA_CHECK) ;
   end function IsReadCheck ;
+
+  ------------------------------------------------------------
+  function IsBurst (
+  -----------------------------------------------------------
+    constant Operation     : in AddressBusMasterOperationType
+  ) return boolean is
+  begin
+    return
+      (Operation = WRITE_BURST) or
+      (Operation = ASYNC_WRITE_BURST) or
+      (Operation = READ_BURST) ;
+  end function IsBurst ;
 
   --
   --  Extensions to support model customizations
