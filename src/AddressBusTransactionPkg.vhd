@@ -54,6 +54,8 @@ library osvvm ;
     
 package AddressBusTransactionPkg is
 
+  alias ModelOptionsType is integer_max ; 
+
   -- Address Bus Common Operations
   type UnresolvedAddressBusOperationType is (
     --
@@ -128,7 +130,7 @@ package AddressBusTransactionPkg is
     IntFromModel       : integer_max ; 
     BoolFromModel      : boolean_max ;
     -- Model Options 
-    Options            : integer_max ;   -- Mentor Fails to update items after this field - so keep it last 2019.4
+    Options            : ModelOptionsType ;   -- Mentor Fails to update items after this field - so keep it last 2019.4
   end record AddressBusTransactionRecType ;
   
   
