@@ -130,7 +130,7 @@ package AddressBusTransactionPkg is
     IntFromModel       : integer_max ; 
     BoolFromModel      : boolean_max ;
     -- Model Options 
-    Options            : ModelOptionsType ;   -- Mentor Fails to update items after this field - so keep it last 2019.4
+    Options            : ModelOptionsType ;  
   end record AddressBusTransactionRecType ;
   
   
