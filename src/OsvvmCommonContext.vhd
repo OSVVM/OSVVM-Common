@@ -42,7 +42,7 @@ context OsvvmCommonContext is
     library osvvm_common ;  
     use osvvm_common.StreamTransactionPkg.all ; 
     use OSVVM_Common.AddressBusTransactionPkg.all ; 
-    use OSVVM_Common.AddressBusSlaveTransactionPkg.all ;
+    use OSVVM_Common.AddressBusResponderTransactionPkg.all ;
     use OSVVM_Common.AddressBusVersionCompatibilityPkg.all ;     
     use OSVVM_Common.ModelParametersPkg.all ; 
     use OSVVM_Common.FifoFillPkg_slv.all ; 

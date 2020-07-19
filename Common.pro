@@ -40,7 +40,7 @@
 library OSVVM_Common
 analyze ./src/StreamTransactionPkg.vhd
 analyze ./src/AddressBusTransactionPkg.vhd
-analyze ./src/AddressBusSlaveTransactionPkg.vhd
+analyze ./src/AddressBusResponderTransactionPkg.vhd
 analyze ./src/AddressBusVersionCompatibilityPkg.vhd
 analyze ./src/ModelParametersPkg.vhd
 analyze ./src/FifoFillPkg_slv.vhd

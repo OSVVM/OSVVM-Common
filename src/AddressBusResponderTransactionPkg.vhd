@@ -1,6 +1,6 @@
 --
---  File Name:         AddressBusSlaveTransactionPkg.vhd
---  Design Unit Name:  AddressBusSlaveTransactionPkg
+--  File Name:         AddressBusResponderTransactionPkg.vhd
+--  Design Unit Name:  AddressBusResponderTransactionPkg
 --  Revision:          OSVVM MODELS STANDARD VERSION
 --
 --  Maintainer:        Jim Lewis      email:  jim@synthworks.com
@@ -54,7 +54,7 @@ library osvvm ;
     
   use work.AddressBusTransactionPkg.all; 
 
-package AddressBusSlaveTransactionPkg is
+package AddressBusResponderTransactionPkg is
   
   ------------------------------------------------------------
   procedure GetWrite (
@@ -194,12 +194,12 @@ package AddressBusSlaveTransactionPkg is
     constant StatusMsgOn : In    boolean := false
   ) ;   
   
-end package AddressBusSlaveTransactionPkg ;
+end package AddressBusResponderTransactionPkg ;
 
 -- /////////////////////////////////////////////////////////////////////////////////////////
 -- /////////////////////////////////////////////////////////////////////////////////////////
 
-package body AddressBusSlaveTransactionPkg is
+package body AddressBusResponderTransactionPkg is
 
   ------------------------------------------------------------
   procedure GetWrite (
@@ -460,4 +460,4 @@ package body AddressBusSlaveTransactionPkg is
     RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
   end procedure AsyncSendReadData ;  
   
-end package body AddressBusSlaveTransactionPkg ;
+end package body AddressBusResponderTransactionPkg ;
