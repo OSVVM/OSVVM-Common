@@ -53,7 +53,7 @@ library osvvm ;
     context osvvm.OsvvmContext ;
     
 use work.AddressBusTransactionPkg.all ; 
-use work.AddressBusSlaveTransactionPkg.all ; 
+use work.AddressBusResponderTransactionPkg.all ; 
     
 package AddressBusVersionCompatibilityPkg is
 
