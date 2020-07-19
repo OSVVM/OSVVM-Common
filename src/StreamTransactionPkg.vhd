@@ -56,20 +56,21 @@ package StreamTransactionPkg is
   -- OSVVM Stream Operations
   ------------------------------------------------------------
   type StreamUnresolvedOperationType is (
-    --  bus operations
-    SEND,            -- Master
+   --  Transmitter
+    SEND, 
     SEND_ASYNC,
-    GET,             -- Slave
+    -- Receiver
+    GET,             
     TRY_GET,
     CHECK,
     TRY_CHECK,
-    WAIT_FOR_TRANSACTION,
     -- Model Directives
     WAIT_FOR_CLOCK, 
-    GET_ALERT_LOG_ID,
-    -- GET_ERRORS, 
+    GET_ALERTLOG_ID,
     GET_TRANSACTION_COUNT,
-    SET_OPTIONS,
+    SET_MODEL_OPTIONS,
+    GET_MODEL_OPTIONS,
+    WAIT_FOR_TRANSACTION,
     THE_END
   ) ;
   type StreamUnresolvedOperationVectorType is array (natural range <>) of StreamUnresolvedOperationType ;
@@ -79,7 +80,6 @@ package StreamTransactionPkg is
   function resolved_max ( s : StreamUnresolvedOperationVectorType) return StreamUnresolvedOperationType ;
   subtype StreamOperationType is resolved_max StreamUnresolvedOperationType ;
 
-  
   ------------------------------------------------------------
   -- The Record for Communication 
   ------------------------------------------------------------
@@ -88,37 +88,24 @@ package StreamTransactionPkg is
     Ack             : bit_max ;
     Operation       : StreamOperationType ;
     DataToModel     : std_logic_vector_max_c ; 
-    ErrorToModel    : std_logic_vector_max_c ; 
+    ParamToModel    : std_logic_vector_max_c ; 
     DataFromModel   : std_logic_vector_max_c ; 
-    ErrorFromModel  : std_logic_vector_max_c ; 
-    Option          : integer_max ;
-    IntToModel      : integer_max ; 
-    TimeToModel     : time_max ; 
-    BoolToModel     : boolean_max ; 
-    IntFromModel    : integer_max ; 
-    AlertLogID      : integer_max ; 
+    ParamFromModel  : std_logic_vector_max_c ; 
+    -- Optional parameter handling
+    IntToModel         : integer_max ;
+    BoolToModel        : boolean_max ; 
+    IntFromModel       : integer_max ; 
+    BoolFromModel      : boolean_max ;
+    TimeToModel        : time_max ; 
+    TimeFromModel      : time_max ; 
+    -- Model Options 
+    Options            : integer_max ; 
   end record ; 
 
---  -- Older Methodology used initializations similar to the following
---  constant INIT_STREAM_REC : StreamRecType := 
---    ( Rdy             => '0', 
---      Ack             => '0',
---      Operation       => StreamUnresolvedOperationType'left,
---      DataToModel     => (others => 'U'),
---      ErrorToModel    => (others => 'U'),
---      DataFromModel   => (others => 'U'),
---      ErrorFromModel  => (others => 'U'),
---      Option          => integer'left,
---      IntToModel      => integer'left, 
---      TimeToModel     => time'left,
---      BoolToModel     => boolean'left, 
---      IntFromModel    => integer'left, 
---      AlertLogID      => integer'left
---    ) ; 
     
     
   ------------------------------------------------------------
-  -- OSVVM Standard Transactions
+  -- OSVVM Model Independent Transactions
   ------------------------------------------------------------
   ------------------------------------------------------------
   -- Send: Transaction Transmit Data Procedure
@@ -126,7 +113,7 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     constant  Data            : in    std_logic_vector ;
-    constant  ErrorMode       : in    std_logic_vector ;
+    constant  Param           : in    std_logic_vector ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) ; 
 
@@ -142,7 +129,7 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     constant  Data            : in    std_logic_vector ;
-    constant  ErrorMode       : in    std_logic_vector ;
+    constant  Param           : in    std_logic_vector ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) ; 
 
@@ -158,7 +145,7 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     variable  Data            : out   std_logic_vector ;
-    variable  ErrorMode       : out   std_logic_vector ;
+    variable  Param           : out   std_logic_vector ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) ; 
 
@@ -181,7 +168,7 @@ package StreamTransactionPkg is
   procedure TryGet (
     signal    TransactionRec  : inout StreamRecType ;
     variable  Data            : out   std_logic_vector ;
-    variable  ErrorMode       : out   std_logic_vector ;
+    variable  Param           : out   std_logic_vector ;
     variable  Available       : out   boolean ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) ;  
@@ -192,7 +179,7 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     constant  Data            : in    std_logic_vector ;
-    constant  ErrorMode       : in    std_logic_vector ;
+    constant  Param           : in    std_logic_vector ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) ; 
 
@@ -209,7 +196,7 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     constant  Data            : in    std_logic_vector ;
-    constant  ErrorMode       : in    std_logic_vector ;
+    constant  Param           : in    std_logic_vector ;
     variable  Available       : out   boolean ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) ; 
@@ -265,22 +252,71 @@ package StreamTransactionPkg is
   ) ; 
 
   ------------------------------------------------------------
-  -- SetOption:  Directive, set model options
-  procedure SetOption (
+  procedure SetModelOptions (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Option          : in    integer ; 
-    constant  TimeVal         : in    time 
-  ) ; 
-  
-  procedure SetOption (
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Option          : in    integer ; 
-    constant  IntVal          : in    integer 
-  ) ; 
+    signal   TransRec    : InOut StreamRecType ;
+    constant Option      : In    integer ;
+    constant OptVal      : In    boolean
+  ) ;
 
   ------------------------------------------------------------
-  -- OSVVM Standard Model Support
+  procedure SetModelOptions (
+  ------------------------------------------------------------
+    signal   TransRec    : InOut StreamRecType ;
+    constant Option      : In    integer ;
+    constant OptVal      : In    integer
+  ) ;
+
+  ------------------------------------------------------------
+  procedure SetModelOptions (
+  ------------------------------------------------------------
+    signal   TransRec    : InOut StreamRecType ;
+    constant Option      : In    integer ;
+    constant OptVal      : In    std_logic_vector
+  ) ;
+  
+  ------------------------------------------------------------
+  procedure SetModelOptions (
+  ------------------------------------------------------------
+    signal   TransRec    : InOut StreamRecType ;
+    constant Option      : In    integer ;
+    constant OptVal      : In    time
+  ) ;
+  
+  ------------------------------------------------------------
+  procedure GetModelOptions (
+  ------------------------------------------------------------
+    signal   TransRec    : InOut StreamRecType ;
+    constant Option      : In    integer ;
+    variable OptVal      : Out   boolean
+  ) ;
+
+  ------------------------------------------------------------
+  procedure GetModelOptions (
+  ------------------------------------------------------------
+    signal   TransRec    : InOut StreamRecType ;
+    constant Option      : In    integer ;
+    variable OptVal      : Out   integer
+  ) ;
+
+  ------------------------------------------------------------
+  procedure GetModelOptions (
+  ------------------------------------------------------------
+    signal   TransRec    : InOut StreamRecType ;
+    constant Option      : In    integer ;
+    variable OptVal      : Out   std_logic_vector
+  ) ;
+  
+  ------------------------------------------------------------
+  procedure GetModelOptions (
+  ------------------------------------------------------------
+    signal   TransRec    : InOut StreamRecType ;
+    constant Option      : In    integer ;
+    variable OptVal      : Out   time
+  ) ;
+
+  ------------------------------------------------------------
+  -- OSVVM Model Support
   ------------------------------------------------------------
   ------------------------------------------------------------
   function IsTry (
@@ -306,7 +342,7 @@ package body StreamTransactionPkg is
   end function resolved_max ; 
 
   ------------------------------------------------------------
-  -- OSVVM Standard Transactions
+  -- OSVVM Model Independent Transactions
   ------------------------------------------------------------
   ------------------------------------------------------------
   -- Send: Transaction Transmit Data Procedure
@@ -315,13 +351,13 @@ package body StreamTransactionPkg is
     signal    TransactionRec  : inout StreamRecType ;
     constant  Operation       : in    StreamOperationType ;
     constant  Data            : in    std_logic_vector ;
-    constant  ErrorMode       : in    std_logic_vector ;
+    constant  Param           : in    std_logic_vector ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) is 
   begin
     TransactionRec.Operation     <= Operation ;
     TransactionRec.DataToModel   <= std_logic_vector_max_c(Data) ; 
-    TransactionRec.ErrorToModel  <= std_logic_vector_max_c(ErrorMode) ; 
+    TransactionRec.ParamToModel  <= std_logic_vector_max_c(Param) ; 
     TransactionRec.IntToModel    <= Data'length ;
     TransactionRec.BoolToModel   <= StatusMsgOn ; 
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
@@ -333,11 +369,11 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     constant  Data            : in    std_logic_vector ;
-    constant  ErrorMode       : in    std_logic_vector ;
+    constant  Param           : in    std_logic_vector ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) is 
   begin
-    LocalSend(TransactionRec, SEND, Data, ErrorMode, StatusMsgOn) ;
+    LocalSend(TransactionRec, SEND, Data, Param, StatusMsgOn) ;
   end procedure Send ; 
 
   procedure Send (
@@ -345,23 +381,22 @@ package body StreamTransactionPkg is
     constant  Data            : in    std_logic_vector ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) is 
-    constant ErrorMode : std_logic_vector(TransactionRec.ErrorToModel'range) := (others => '0') ;
+    constant Param : std_logic_vector(TransactionRec.ParamToModel'range) := (others => '0') ;
   begin
-    LocalSend(TransactionRec, SEND, Data, ErrorMode, StatusMsgOn);
+    LocalSend(TransactionRec, SEND, Data, Param, StatusMsgOn);
   end procedure Send ; 
 
-  
   ------------------------------------------------------------
   -- SendAsync: Transaction Transmit Data Procedure
   procedure SendAsync (
   ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     constant  Data            : in    std_logic_vector ;
-    constant  ErrorMode       : in    std_logic_vector ;
+    constant  Param           : in    std_logic_vector ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) is 
   begin
-    LocalSend(TransactionRec, SEND_ASYNC, Data, ErrorMode, StatusMsgOn) ;
+    LocalSend(TransactionRec, SEND_ASYNC, Data, Param, StatusMsgOn) ;
   end procedure SendAsync ; 
 
   procedure SendAsync (
@@ -369,9 +404,9 @@ package body StreamTransactionPkg is
     constant  Data            : in    std_logic_vector ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) is 
-    constant ErrorMode : std_logic_vector(TransactionRec.ErrorToModel'range) := (others => '0') ;
+    constant Param : std_logic_vector(TransactionRec.ParamToModel'range) := (others => '0') ;
   begin
-    LocalSend(TransactionRec, SEND_ASYNC, Data, ErrorMode, StatusMsgOn);
+    LocalSend(TransactionRec, SEND_ASYNC, Data, Param, StatusMsgOn);
   end procedure SendAsync ; 
 
   ------------------------------------------------------------
@@ -393,14 +428,13 @@ package body StreamTransactionPkg is
   procedure Get (
     signal    TransactionRec  : inout StreamRecType ;
     variable  Data            : out   std_logic_vector ;
-    variable  ErrorMode       : out   std_logic_vector ;
+    variable  Param           : out   std_logic_vector ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) is 
   begin
     Get(TransactionRec, Data, StatusMsgOn) ;
-    ErrorMode := std_logic_vector(TransactionRec.ErrorFromModel) ; 
+    Param := std_logic_vector(TransactionRec.ParamFromModel) ; 
   end procedure Get ;  
-
 
   ------------------------------------------------------------
   -- TryGet: Transaction Receive Data if available Procedure
@@ -423,15 +457,14 @@ package body StreamTransactionPkg is
   procedure TryGet (
     signal    TransactionRec  : inout StreamRecType ;
     variable  Data            : out   std_logic_vector ;
-    variable  ErrorMode       : out   std_logic_vector ;
+    variable  Param           : out   std_logic_vector ;
     variable  Available       : out   boolean ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) is 
   begin
     TryGet(TransactionRec, Data, Available, StatusMsgOn) ;
-    ErrorMode := std_logic_vector(TransactionRec.ErrorFromModel) ; 
+    Param := std_logic_vector(TransactionRec.ParamFromModel) ; 
   end procedure TryGet ;  
-
 
   ------------------------------------------------------------
   -- Check: Transaction Receive and Check Procedure
@@ -439,13 +472,13 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     constant  Data            : in    std_logic_vector ;
-    constant  ErrorMode       : in    std_logic_vector ;
+    constant  Param           : in    std_logic_vector ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) is 
   begin
     TransactionRec.Operation     <= CHECK ;
     TransactionRec.DataToModel   <= std_logic_vector_max_c(Data) ; 
-    TransactionRec.ErrorToModel  <= std_logic_vector_max_c(ErrorMode) ; 
+    TransactionRec.ParamToModel  <= std_logic_vector_max_c(Param) ; 
     TransactionRec.IntToModel    <= Data'length ;
     TransactionRec.BoolToModel   <= StatusMsgOn ;     
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
@@ -456,11 +489,10 @@ package body StreamTransactionPkg is
     constant  Data            : in    std_logic_vector ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) is 
-    constant ErrorMode : std_logic_vector(TransactionRec.ErrorToModel'range) := (others => '0') ;
+    constant Param : std_logic_vector(TransactionRec.ParamToModel'range) := (others => '0') ;
   begin
-    Check(TransactionRec, Data, ErrorMode, StatusMsgOn) ;
+    Check(TransactionRec, Data, Param, StatusMsgOn) ;
   end procedure Check ; 
-
 
   ------------------------------------------------------------
   -- TryCheck: Transaction Receive and Check Data if available Procedure
@@ -468,14 +500,14 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     constant  Data            : in    std_logic_vector ;
-    constant  ErrorMode       : in    std_logic_vector ;
+    constant  Param           : in    std_logic_vector ;
     variable  Available       : out   boolean ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) is 
   begin
     TransactionRec.Operation     <= TRY_CHECK ;
     TransactionRec.DataToModel   <= std_logic_vector_max_c(Data) ; 
-    TransactionRec.ErrorToModel  <= std_logic_vector_max_c(ErrorMode) ; 
+    TransactionRec.ParamToModel  <= std_logic_vector_max_c(Param) ; 
     TransactionRec.IntToModel    <= Data'length ;
     TransactionRec.BoolToModel   <= StatusMsgOn ;     
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
@@ -488,11 +520,10 @@ package body StreamTransactionPkg is
     variable  Available       : out   boolean ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) is 
-    constant ErrorMode : std_logic_vector(TransactionRec.ErrorToModel'range) := (others => '0') ;
+    constant Param : std_logic_vector(TransactionRec.ParamToModel'range) := (others => '0') ;
   begin
-    TryCheck(TransactionRec, Data, ErrorMode, Available, StatusMsgOn) ;
+    TryCheck(TransactionRec, Data, Param, Available, StatusMsgOn) ;
   end procedure TryCheck ; 
-
 
   ------------------------------------------------------------
   -- WaitForTransaction  
@@ -527,7 +558,7 @@ package body StreamTransactionPkg is
     variable  AlertLogID      : out   AlertLogIDType 
   ) is
   begin
-    TransactionRec.Operation   <= GET_ALERT_LOG_ID ;
+    TransactionRec.Operation   <= GET_ALERTLOG_ID ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
     AlertLogID := AlertLogIDType(TransactionRec.IntFromModel) ; 
   end procedure GetAlertLogID ; 
@@ -562,34 +593,119 @@ package body StreamTransactionPkg is
   end procedure GetTransactionCount ; 
 
   ------------------------------------------------------------
-  -- SetOption:  Directive, set model options
-  procedure SetOption (
+  procedure SetModelOptions (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Option          : in    integer ; 
-    constant  TimeVal         : in    time 
-  ) is 
+    signal   TransRec    : InOut StreamRecType ;
+    constant Option      : In    integer ;
+    constant OptVal      : In    boolean
+  ) is
   begin
-    TransactionRec.Operation   <= SET_OPTIONS ;
-    TransactionRec.Option      <= Option ; 
-    TransactionRec.TimeToModel <= TimeVal ; 
-    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
-  end procedure SetOption ; 
-  
-  procedure SetOption (
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Option          : in    integer ; 
-    constant  IntVal          : in    integer 
-  ) is 
-  begin
-    TransactionRec.Operation   <= SET_OPTIONS ;
-    TransactionRec.Option      <= Option ; 
-    TransactionRec.IntToModel  <= IntVal ; 
-    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
-  end procedure SetOption ; 
+    TransRec.Operation     <= SET_MODEL_OPTIONS ;
+    TransRec.Options       <= Option ;
+    TransRec.BoolToModel   <= OptVal ;
+    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+  end procedure SetModelOptions ;
 
   ------------------------------------------------------------
-  -- OSVVM Standard Model Support
+  procedure SetModelOptions (
+  ------------------------------------------------------------
+    signal   TransRec    : InOut StreamRecType ;
+    constant Option      : In    integer ;
+    constant OptVal      : In    integer
+  ) is
+  begin
+    TransRec.Operation     <= SET_MODEL_OPTIONS ;
+    TransRec.Options       <= Option ;
+    TransRec.IntToModel    <= OptVal ;
+    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+  end procedure SetModelOptions ;
+
+  ------------------------------------------------------------
+  procedure SetModelOptions (
+  ------------------------------------------------------------
+    signal   TransRec    : InOut StreamRecType ;
+    constant Option      : In    integer ;
+    constant OptVal      : In    std_logic_vector
+  ) is
+  begin
+    TransRec.Operation     <= SET_MODEL_OPTIONS ;
+    TransRec.Options       <= Option ;
+    TransRec.IntToModel    <= to_integer(OptVal) ;
+    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+  end procedure SetModelOptions ;
+  
+  ------------------------------------------------------------
+  procedure SetModelOptions (
+  ------------------------------------------------------------
+    signal   TransRec    : InOut StreamRecType ;
+    constant Option      : In    integer ;
+    constant OptVal      : In    time
+  ) is
+  begin
+    TransRec.Operation     <= SET_MODEL_OPTIONS ;
+    TransRec.Options       <= Option ;
+    TransRec.TimeToModel   <= OptVal ;
+    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+  end procedure SetModelOptions ;
+
+  ------------------------------------------------------------
+  procedure GetModelOptions (
+  ------------------------------------------------------------
+    signal   TransRec    : InOut StreamRecType ;
+    constant Option      : In    integer ;
+    variable OptVal      : Out   boolean
+  ) is
+  begin
+    TransRec.Operation     <= GET_MODEL_OPTIONS ;
+    TransRec.Options       <= Option ;
+    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    OptVal := TransRec.BoolFromModel    ;
+  end procedure GetModelOptions ;
+
+  ------------------------------------------------------------
+  procedure GetModelOptions (
+  ------------------------------------------------------------
+    signal   TransRec    : InOut StreamRecType ;
+    constant Option      : In    integer ;
+    variable OptVal      : Out   integer
+  ) is
+  begin
+    TransRec.Operation     <= GET_MODEL_OPTIONS ;
+    TransRec.Options       <= Option ;
+    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    OptVal := TransRec.IntFromModel ; 
+  end procedure GetModelOptions ;
+
+  ------------------------------------------------------------
+  procedure GetModelOptions (
+  ------------------------------------------------------------
+    signal   TransRec    : InOut StreamRecType ;
+    constant Option      : In    integer ;
+    variable OptVal      : Out   std_logic_vector
+  ) is
+  begin
+    TransRec.Operation     <= GET_MODEL_OPTIONS ;
+    TransRec.Options       <= Option ;
+    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    OptVal := to_slv(TransRec.IntFromModel, OptVal'length) ; 
+  end procedure GetModelOptions ;
+  
+  ------------------------------------------------------------
+  procedure GetModelOptions (
+  ------------------------------------------------------------
+    signal   TransRec    : InOut StreamRecType ;
+    constant Option      : In    integer ;
+    variable OptVal      : Out   time
+  ) is
+  begin
+    TransRec.Operation     <= GET_MODEL_OPTIONS ;
+    TransRec.Options       <= Option ;
+    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    OptVal := TransRec.TimeFromModel ; 
+  end procedure GetModelOptions ;
+
+  ------------------------------------------------------------
+  -- OSVVM Model Support
   ------------------------------------------------------------
   ------------------------------------------------------------
   function IsTry (
