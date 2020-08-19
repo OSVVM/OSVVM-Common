@@ -101,8 +101,6 @@ package StreamTransactionPkg is
     -- Model Options 
     Options            : integer_max ; 
   end record ; 
-
-    
     
   ------------------------------------------------------------
   -- OSVVM Model Independent Transactions
