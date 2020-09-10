@@ -218,7 +218,7 @@ package AddressBusTransactionPkg is
 
   ------------------------------------------------------------
   procedure GetAlertLogID (
-  -- Get the AlertLogID (type AlertLogIDType) from the verification component.
+  -- Get the AlertLogID from the verification component.
   ------------------------------------------------------------
     signal   TransRec    : InOut AddressBusTransactionRecType ;
     variable AlertLogID  : Out   AlertLogIDType
@@ -226,7 +226,7 @@ package AddressBusTransactionPkg is
 
   ------------------------------------------------------------
   procedure GetErrors (
-  -- Error reporting for testbenches that do not use AlertLogPkg
+  -- Error reporting for testbenches that do not use OSVVM AlertLogPkg
   -- Returns error count.  If an error count /= 0, also print errors
   ------------------------------------------------------------
     signal   TransRec    : InOut AddressBusTransactionRecType ;

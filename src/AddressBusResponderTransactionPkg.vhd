@@ -369,7 +369,7 @@ package body AddressBusResponderTransactionPkg is
     variable oData       : Out   std_logic_vector ;
     constant StatusMsgOn : In    boolean := false
   ) is
-    alias aAddr : std_logic_vector(oAddr'length-1 downto 0) is oAddr ;
+    alias aAddr : std_logic_vector(iAddr'length-1 downto 0) is iAddr ;
     constant ADDR_LEN : integer := minimum(aAddr'left, 30) ;
   begin
     -- Put values in record
@@ -395,7 +395,7 @@ package body AddressBusResponderTransactionPkg is
     variable Available   : Out   boolean ;
     constant StatusMsgOn : In    boolean := false
   ) is
-    alias aAddr : std_logic_vector(oAddr'length-1 downto 0) is oAddr ;
+    alias aAddr : std_logic_vector(iAddr'length-1 downto 0) is iAddr ;
     constant ADDR_LEN : integer := minimum(aAddr'left, 30) ;
   begin
     -- Put values in record
