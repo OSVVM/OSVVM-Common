@@ -22,7 +22,7 @@
 --  Revision History:
 --    Date      Version      Description
 --    05/2020   2020.05     Initial revision
---
+--    09/2020   2020.09     Updating comments to serve as documentation
 --
 --  This file is part of OSVVM.
 --  
@@ -53,11 +53,13 @@ library osvvm ;
   context osvvm.OsvvmContext ;   
   use osvvm.ScoreboardPkg_slv.all ;
 
---!! This should be generic package.   
+--!! Can this be made a generic package.   
 
 package FifoFillPkg_slv is
   ------------------------------------------------------------
   procedure PushBurst (
+  -- Push each value in the Bytes parameter into the FIFO.   
+  -- Only DataWidth bits of each value will be pushed.    
   ------------------------------------------------------------
     variable Fifo      : inout ScoreboardPType ;
     constant Bytes     : in    integer_vector ;
@@ -66,6 +68,10 @@ package FifoFillPkg_slv is
 
   ------------------------------------------------------------
   procedure PushBurstIncrement (
+  -- Push ByteCount number of values into FIFO.  The first value 
+  -- pushed will be Start and following values are one greater 
+  -- than the previous one.  
+  -- Only DataWidth bits of each value will be pushed.    
   ------------------------------------------------------------
     variable Fifo      : inout ScoreboardPType ;
     constant Start     : in    integer ;
@@ -75,6 +81,10 @@ package FifoFillPkg_slv is
   
   ------------------------------------------------------------
   procedure PushBurstRandom (
+  -- Push ByteCount number of values into FIFO.  The first value 
+  -- pushed will be Start and following values are randomly generated 
+  -- using the first value as the randomization seed.
+  -- Only DataWidth bits of each value will be pushed.    
   ------------------------------------------------------------
     variable Fifo      : inout ScoreboardPType ;
     constant Start     : in    integer ;
@@ -84,6 +94,8 @@ package FifoFillPkg_slv is
   
   ------------------------------------------------------------
   procedure PopBurst (
+  -- Pop values from the FIFO into the Bytes parameter.
+  -- Each value popped will be DataWidth bits wide.   
   ------------------------------------------------------------
     variable Fifo      : inout ScoreboardPType ;
     variable Bytes     : out   integer_vector ;
@@ -92,6 +104,9 @@ package FifoFillPkg_slv is
 
   ------------------------------------------------------------
   procedure CheckBurst (
+  -- Pop values from the FIFO and check them against each value 
+  -- in the Bytes parameter.   
+  -- Each value popped will be DataWidth bits wide.   
   ------------------------------------------------------------
     variable Fifo      : inout ScoreboardPType ;
     constant Bytes     : in    integer_vector ;
@@ -100,6 +115,10 @@ package FifoFillPkg_slv is
 
   ------------------------------------------------------------
   procedure CheckBurstIncrement (
+  -- Pop values from the FIFO and check them against values determined 
+  -- by an incrementing pattern.  The first check value will be Start  
+  -- and the following check values are one greater than the previous one.  
+  -- Each value popped will be DataWidth bits wide.   
   ------------------------------------------------------------
     variable Fifo      : inout ScoreboardPType ;
     constant Start     : in    integer ;
@@ -109,6 +128,11 @@ package FifoFillPkg_slv is
   
   ------------------------------------------------------------
   procedure CheckBurstRandom (
+  -- Pop values from the FIFO and check them against values determined 
+  -- by a random pattern.  The first check value will be Start and the
+  -- following check values are randomly generated using the first  
+  -- value as the randomization seed.  
+  -- Each value popped will be DataWidth bits wide.   
   ------------------------------------------------------------
     variable Fifo      : inout ScoreboardPType ;
     constant Start     : in    integer ;

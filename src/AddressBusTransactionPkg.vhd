@@ -25,6 +25,7 @@
 --    01/2020   2020.01    Updated license notice
 --    02/2020   2020.02    Refactored from Axi4LiteMasterTransactionPkg
 --    07/2020   2020.07    Unified M/S packages - dropping M/S terminology
+--    09/2020   2020.09    Updating comments to serve as documentation
 --
 --
 --  This file is part of OSVVM.
@@ -56,7 +57,11 @@ package AddressBusTransactionPkg is
 
   alias ModelOptionsType is integer_max ; 
 
-  -- Address Bus Common Operations
+  -- ========================================================
+  --  AddressBusOperationType 
+  --  Enumeration type used to communication transaction type
+  --  to the model via the transaction interface
+  -- ========================================================
   type UnresolvedAddressBusOperationType is (
     --
     -- Model Directives
@@ -111,35 +116,99 @@ package AddressBusTransactionPkg is
   subtype AddressBusOperationType is resolved_max UnresolvedAddressBusOperationType ;
 
 
-  -- Record creates a channel for communicating transactions to the model.
+  -- ========================================================
+  --  AddressBusTransactionRecType 
+  --  Transaction interface between the test sequencer and the 
+  --  verification component.   As such it is the primary channel 
+  --  for information exchange between the two.
+  --  The types bit_max, std_logic_vector_max_c, integer_max, and 
+  --  boolean_max are defined the OSVVM package, ResolutionPkg.  
+  --  These types allow the record to support multiple drivers and 
+  --  use resolution functions based on function maximum (return largest value)
+  -- ========================================================
   type AddressBusTransactionRecType is record
+    -- Handshaking controls
+    --   Used by RequestTransaction in the Transaction Procedures
+    --   Used by WaitForTransaction in the Verification Component
+    --   RequestTransaction and WaitForTransaction are in osvvm.TbUtilPkg
     Rdy                : bit_max ;
     Ack                : bit_max ;
+    -- Transaction Type
     Operation          : AddressBusOperationType ;
---    AsyncOp            : bit_max ;
---    BurstOp            : bit_max ; 
+    -- Address to verification component and its width
+    -- Width may be smaller than Address
     Address            : std_logic_vector_max_c ;
     AddrWidth          : integer_max ;
+    -- Data to and from the verification component and its width.
+    -- Width will be smaller than Data for byte operations
+    -- Width size requirements are enforced in the verification component
     DataToModel        : std_logic_vector_max_c ;
     DataFromModel      : std_logic_vector_max_c ;
     DataWidth          : integer_max ;
+    -- StatusMsgOn provides transaction messaging override.
+    -- When true, print transaction messaging independent of 
+    -- other verification based based controls.
     StatusMsgOn        : boolean_max ;
-    -- Optional parameter handling
+    -- Verification Component Options Parameters - used by SetModelOptions
     IntToModel         : integer_max ;
     BoolToModel        : boolean_max ; 
     IntFromModel       : integer_max ; 
     BoolFromModel      : boolean_max ;
-    -- Model Options 
+    -- Verification Component Options Type - currently aliased to type integer_max 
     Options            : ModelOptionsType ;  
   end record AddressBusTransactionRecType ;
   
+  -- --------------------------------------------------------
+  -- Usage of the Transaction Interface (AddressBusTransactionRecType)
+  -- The Address and Data fields of AddressBusTransactionRecType are unconstrained.
+  -- Unconstrained objects may be used on component/entity interfaces.    
+  -- These fields will be sized when used as a record signal in the test harness 
+  -- of the testbench.  Such a declaration is shown below:
+  --
+  --   signal AxiInitiatorTransRec : AddressBusTransactionRecType(
+  --           Address      (27 downto 0),
+  --           DataToModel  (31 downto 0),
+  --           DataFromModel(31 downto 0)
+  --         ) ;
+  -- --------------------------------------------------------
   
 --!TODO add VHDL-2018 Interfaces
 
 
+  -- ========================================================
+  --  Types of Transactions
+  --  A transaction may be either a directive or an interface transaction.
+  --
+  --  Directive transactions interact with the verification component 
+  --  without generating any transactions or interface waveforms.
+  --
+  --  An interface transaction results in interface signaling to the DUT.
+  --
+  --  A blocking transaction is an interface transaction that does not 
+  --  does not return (complete) until the interface operation   
+  --  requested by the transaction has completed.
+  --
+  --  An asynchronous transaction is nonblocking interface transaction
+  --  that returns before the transaction has completed - typically 
+  --  immediately and before the transaction has started. 
+  --
+  --  A Try transaction is nonblocking interface transaction that 
+  --  checks to see if transaction information is available, 
+  --  such as read data, and if it is returns it.  
+  --
+  -- ========================================================
+
+
+  -- ========================================================
+  --  Directive Transactions  
+  --  Directive transactions interact with the verification component 
+  --  without generating any transactions or interface waveforms.
+  --  Supported by all verification components
+  -- ========================================================
   ------------------------------------------------------------
   procedure WaitForClock (
-  -- Directive:  Wait for NumberOfClocks number of clocks
+  -- Wait for NumberOfClocks number of clocks 
+  -- relative to the verification component clock
   ------------------------------------------------------------
     signal   TransRec        : InOut AddressBusTransactionRecType ;
              NumberOfClocks  : In    natural := 1
@@ -149,6 +218,7 @@ package AddressBusTransactionPkg is
 
   ------------------------------------------------------------
   procedure GetAlertLogID (
+  -- Get the AlertLogID from the verification component.
   ------------------------------------------------------------
     signal   TransRec    : InOut AddressBusTransactionRecType ;
     variable AlertLogID  : Out   AlertLogIDType
@@ -156,8 +226,8 @@ package AddressBusTransactionPkg is
 
   ------------------------------------------------------------
   procedure GetErrors (
-  -- Error reporting for testbenches that do not use AlertLogPkg
-  -- Returns error count.  If an error count /= 0, also print it
+  -- Error reporting for testbenches that do not use OSVVM AlertLogPkg
+  -- Returns error count.  If an error count /= 0, also print errors
   ------------------------------------------------------------
     signal   TransRec    : InOut AddressBusTransactionRecType ;
     variable ErrCnt      : Out   natural
@@ -165,6 +235,7 @@ package AddressBusTransactionPkg is
 
   ------------------------------------------------------------
   procedure GetTransactionCount (
+  -- Get the number of transactions handled by the model.  
   ------------------------------------------------------------
     signal   TransRec    : InOut AddressBusTransactionRecType ;
     variable Count       : Out   integer
@@ -179,267 +250,20 @@ package AddressBusTransactionPkg is
 
   ------------------------------------------------------------
   procedure GetReadTransactionCount (
+  -- Get the number of read transactions handled by the model.  
   ------------------------------------------------------------
     signal   TransRec    : InOut AddressBusTransactionRecType ;
     variable Count       : Out   integer
   ) ;
 
-  ------------------------------------------------------------
-  procedure Write (
-  -- do CPU Write Cycle
-  ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             iData       : In    std_logic_vector ;
-             StatusMsgOn : In    boolean := false
-  ) ;
 
-  ------------------------------------------------------------
-  procedure WriteAsync (
-  -- dispatch CPU Write Cycle
-  ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             iData       : In    std_logic_vector ;
-             StatusMsgOn : In    boolean := false
-  ) ;
-
-  ------------------------------------------------------------
-  procedure WriteAddressAsync (
-  -- dispatch CPU Write Address Cycle
-  ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             StatusMsgOn : In    boolean := false
-  ) ;
-
-  ------------------------------------------------------------
-  procedure WriteDataAsync (
-  -- dispatch CPU Write Data Cycle
-  ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             iData       : In    std_logic_vector ;
-             StatusMsgOn : In    boolean := false
-  ) ;
-
-  ------------------------------------------------------------
-  procedure WriteDataAsync (
-  -- dispatch CPU Write Data Cycle
-  ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iData       : In    std_logic_vector ;
-             StatusMsgOn : In    boolean := false
-  ) ;
-  
-  ------------------------------------------------------------
-  procedure WriteBurst (
-  -- do CPU Write Cycle
-  ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             NumBytes    : In    integer ;
-             StatusMsgOn : In    boolean := false
-  ) ;
-
-  ------------------------------------------------------------
-  procedure WriteBurstAsync (
-  -- dispatch CPU Write Cycle
-  ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             NumBytes    : In    integer ;
-             StatusMsgOn : In    boolean := false
-  ) ;
-
-  ------------------------------------------------------------
-  procedure Read (
-  -- do CPU Read Cycle and return data
-  ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-    variable oData       : Out   std_logic_vector ;
-             StatusMsgOn : In    boolean := false
-  ) ;
-
-  ------------------------------------------------------------
-  procedure ReadCheck (
-  -- do CPU Read Cycle and check supplied data
-  ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             iData       : In    std_logic_vector ;
-             StatusMsgOn : In    boolean := false
-  ) ;
-
-  ------------------------------------------------------------
-  procedure ReadAddressAsync (
-  -- dispatch CPU Read Address Cycle
-  ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             StatusMsgOn : In    boolean := false
-  ) ;
-
-  ------------------------------------------------------------
-  procedure ReadData (
-  -- Do CPU Read Data Cycle
-  ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    variable oData       : Out   std_logic_vector ;
-             StatusMsgOn : In    boolean := false
-  ) ;
-
-  ------------------------------------------------------------
-  procedure ReadCheckData (
-  -- Do CPU Read Data Cycle and check received Data
-  ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iData       : In    std_logic_vector ;
-             StatusMsgOn : In    boolean := false
-  ) ;
-
-  ------------------------------------------------------------
-  procedure TryReadData (
-  -- Try to Get CPU Read Data Cycle
-  -- If data is available, get it and return available TRUE.
-  -- Otherwise Return Available FALSE.
-  ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    variable oData       : Out   std_logic_vector ;
-    variable Available   : Out   boolean ;
-             StatusMsgOn : In    boolean := false
-  ) ;
-
-  ------------------------------------------------------------
-  procedure TryReadCheckData (
-  -- Try to Get CPU Read Data Cycle
-  -- If data is available, check it and return available TRUE.
-  -- Otherwise Return Available FALSE.
-  ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iData       : In    std_logic_vector ;
-    variable Available   : Out   boolean ;
-             StatusMsgOn : In    boolean := false
-  ) ;
-
-  ------------------------------------------------------------
-  procedure ReadPoll (
-  -- Read location (iAddr) until Data(IndexI) = ValueI
-  ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-    variable oData       : Out   std_logic_vector ;
-             Index       : In    Integer ;
-             BitValue    : In    std_logic ;
-             StatusMsgOn : In    boolean := false ;
-             WaitTime    : In    natural := 10
-  ) ;
-
-  ------------------------------------------------------------
-  procedure ReadPoll (
-  -- Read location (iAddr) until Data(IndexI) = ValueI
-  ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             Index       : In    Integer ;
-             BitValue    : In    std_logic ;
-             StatusMsgOn : In    boolean := false ;
-             WaitTime    : In    natural := 10
-  ) ;
-  
-  ------------------------------------------------------------
-  procedure ReadBurst (
-  -- do CPU Read Cycle and return data
-  ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             NumBytes    : In    integer ;
-             StatusMsgOn : In    boolean := false
-  ) ;
-
-  ------------------------------------------------------------
-  function IsWriteAddress (
-  -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
-  ) return boolean ;
-
-  ------------------------------------------------------------
-  function IsBlockOnWriteAddress (
-  -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
-  ) return boolean ;
-
-  ------------------------------------------------------------
-  function IsTryWriteAddress (
-  -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
-  ) return boolean ;
-
-  ------------------------------------------------------------
-  function IsWriteData (
-  -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
-  ) return boolean ;
-
-  ------------------------------------------------------------
-  function IsBlockOnWriteData (
-  -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
-  ) return boolean ;
-
-  ------------------------------------------------------------
-  function IsTryWriteData (
-  -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
-  ) return boolean ;
-
-  ------------------------------------------------------------
-  function IsReadAddress (
-  -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
-  ) return boolean ;
-
-  ------------------------------------------------------------
-  function IsTryReadAddress (
-  -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
-  ) return boolean ;
-
-  ------------------------------------------------------------
-  function IsReadData (
-  -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
-  ) return boolean ;
-
-  ------------------------------------------------------------
-  function IsBlockOnReadData (
-  -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
-  ) return boolean ;
-
-  ------------------------------------------------------------
-  function IsTryReadData (
-  -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
-  ) return boolean ;
-
-  ------------------------------------------------------------
-  function IsReadCheck (
-  -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
-  ) return boolean ;
-
-  ------------------------------------------------------------
-  function IsBurst (
-  -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
-  ) return boolean ;
-
-  --
-  --  Extensions to support model customizations
-  -- 
-  
+  -- ========================================================
+  --  Set and Get Model Options  
+  --  Model operations are directive transactions that are  
+  --  used to configure the verification component.  
+  --  They can either be used directly or with a model specific
+  --  wrapper around them - see AXI models for examples.
+  -- ========================================================
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
@@ -487,6 +311,321 @@ package AddressBusTransactionPkg is
     constant Option      : In    ModelOptionsType ;
     variable OptVal      : Out   std_logic_vector
   ) ;
+  
+  
+  -- ========================================================
+  --  Master / Initiator Transactions  
+  -- ========================================================
+  -- ========================================================
+  --  Interface Independent Transactions
+  --  These transactions work independent of the interface.
+  --  Recommended for all tests that verify internal design functionality.
+  --  Many are blocking transactions which do not return (complete)
+  --  until the interface operation requested by the transaction  
+  --  has completed.
+  --  Some are asynchronous, which means they return before the
+  --  transaction is complete - typically even before it starts.
+  --  Supported by all verification components
+  -- ========================================================
+  ------------------------------------------------------------
+  procedure Write (
+  -- Blocking Write Transaction. 
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusTransactionRecType ;
+             iAddr       : In    std_logic_vector ;
+             iData       : In    std_logic_vector ;
+             StatusMsgOn : In    boolean := false
+  ) ;
+
+  ------------------------------------------------------------
+  procedure WriteAsync (
+  -- Asynchronous / Non-Blocking Write Transaction
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusTransactionRecType ;
+             iAddr       : In    std_logic_vector ;
+             iData       : In    std_logic_vector ;
+             StatusMsgOn : In    boolean := false
+  ) ;
+
+  ------------------------------------------------------------
+  procedure Read (
+  -- Blocking Read Transaction.
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusTransactionRecType ;
+             iAddr       : In    std_logic_vector ;
+    variable oData       : Out   std_logic_vector ;
+             StatusMsgOn : In    boolean := false
+  ) ;
+
+  ------------------------------------------------------------
+  procedure ReadCheck (
+  -- Blocking Read Transaction and check iData, rather than returning a value.
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusTransactionRecType ;
+             iAddr       : In    std_logic_vector ;
+             iData       : In    std_logic_vector ;
+             StatusMsgOn : In    boolean := false
+  ) ;
+  
+  ------------------------------------------------------------
+  procedure ReadPoll (
+  -- Read location (iAddr) until Data(IndexI) = ValueI
+  -- WaitTime is the number of clocks to wait between reads.
+  -- oData is the value read.
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusTransactionRecType ;
+             iAddr       : In    std_logic_vector ;
+    variable oData       : Out   std_logic_vector ;
+             Index       : In    Integer ;
+             BitValue    : In    std_logic ;
+             StatusMsgOn : In    boolean := false ;
+             WaitTime    : In    natural := 10
+  ) ;
+
+  ------------------------------------------------------------
+  procedure ReadPoll (
+  -- Read location (iAddr) until Data(IndexI) = ValueI
+  -- WaitTime is the number of clocks to wait between reads.
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusTransactionRecType ;
+             iAddr       : In    std_logic_vector ;
+             Index       : In    Integer ;
+             BitValue    : In    std_logic ;
+             StatusMsgOn : In    boolean := false ;
+             WaitTime    : In    natural := 10
+  ) ;
+  
+  
+  -- ========================================================
+  --  Burst Transactions
+  --  Some interfaces support bursting, and some do not.  
+  --  Hence, support for burst transactions is optional.
+  --  However, for an interface that does not support bursting,  
+  --  it is appropriate to implement a burst as multiple single  
+  --  cycle operations.    
+  -- ========================================================
+  
+  ------------------------------------------------------------
+  procedure WriteBurst (
+  -- Blocking Write Burst.   
+  -- Data is provided separately via a WriteBurstFifo.   
+  -- NumBytes specifies the number of bytes to be transferred.
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusTransactionRecType ;
+             iAddr       : In    std_logic_vector ;
+             NumBytes    : In    integer ;
+             StatusMsgOn : In    boolean := false
+  ) ;
+
+  ------------------------------------------------------------
+  procedure WriteBurstAsync (
+  -- Asynchronous / Non-Blocking Write Burst.   
+  -- Data is provided separately via a WriteBurstFifo.   
+  -- NumBytes specifies the number of bytes to be transferred.
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusTransactionRecType ;
+             iAddr       : In    std_logic_vector ;
+             NumBytes    : In    integer ;
+             StatusMsgOn : In    boolean := false
+  ) ;
+  
+  ------------------------------------------------------------
+  procedure ReadBurst (
+  -- Blocking Read Burst.
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusTransactionRecType ;
+             iAddr       : In    std_logic_vector ;
+             NumBytes    : In    integer ;
+             StatusMsgOn : In    boolean := false
+  ) ;
+
+
+  -- ========================================================
+  --  Interface Specific Transactions
+  --  Support split transaction interfaces - such as AXI which
+  --  independently operates the write address, write data, 
+  --  write response, read address, and read data interfaces. 
+  --  For split transaction interfaces, these transactions are 
+  --  required to fully test the interface characteristics.  
+  --  Most of these transactions are asynchronous.  
+  -- ========================================================
+
+  ------------------------------------------------------------
+  procedure WriteAddressAsync (
+  -- Non-blocking Write Address 
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusTransactionRecType ;
+             iAddr       : In    std_logic_vector ;
+             StatusMsgOn : In    boolean := false
+  ) ;
+
+  ------------------------------------------------------------
+  procedure WriteDataAsync (
+  -- Non-blocking Write Data 
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusTransactionRecType ;
+             iAddr       : In    std_logic_vector ;
+             iData       : In    std_logic_vector ;
+             StatusMsgOn : In    boolean := false
+  ) ;
+
+  ------------------------------------------------------------
+  procedure WriteDataAsync (
+  -- Non-blocking Write Data.  iAddr = 0.  
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusTransactionRecType ;
+             iData       : In    std_logic_vector ;
+             StatusMsgOn : In    boolean := false
+  ) ;
+  
+  ------------------------------------------------------------
+  procedure ReadAddressAsync (
+  -- Non-blocking Read Address
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusTransactionRecType ;
+             iAddr       : In    std_logic_vector ;
+             StatusMsgOn : In    boolean := false
+  ) ;
+
+  ------------------------------------------------------------
+  procedure ReadData (
+  -- Blocking Read Data
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    variable oData       : Out   std_logic_vector ;
+             StatusMsgOn : In    boolean := false
+  ) ;
+
+  ------------------------------------------------------------
+  procedure ReadCheckData (
+  -- Blocking Read data and check iData, rather than returning a value.
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusTransactionRecType ;
+             iData       : In    std_logic_vector ;
+             StatusMsgOn : In    boolean := false
+  ) ;
+
+  ------------------------------------------------------------
+  procedure TryReadData (
+  -- Try (non-blocking) read data attempt.   
+  -- If data is available, get it and return available TRUE.
+  -- Otherwise Return Available FALSE.
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    variable oData       : Out   std_logic_vector ;
+    variable Available   : Out   boolean ;
+             StatusMsgOn : In    boolean := false
+  ) ;
+
+  ------------------------------------------------------------
+  procedure TryReadCheckData (
+  -- Try (non-blocking) read data and check attempt.   
+  -- If data is available, check it and return available TRUE.
+  -- Otherwise Return Available FALSE.
+  ------------------------------------------------------------
+    signal   TransRec    : InOut AddressBusTransactionRecType ;
+             iData       : In    std_logic_vector ;
+    variable Available   : Out   boolean ;
+             StatusMsgOn : In    boolean := false
+  ) ;
+
+
+  -- ========================================================
+  --  Verification Component Support Functions
+  --  These help decode the operation value (AddressBusOperationType)  
+  --  to determine properties about the operation
+  -- ========================================================
+  ------------------------------------------------------------
+  function IsWriteAddress (
+  -- TRUE for a transaction includes write address
+  -----------------------------------------------------------
+    constant Operation     : in AddressBusOperationType
+  ) return boolean ;
+
+  ------------------------------------------------------------
+  function IsBlockOnWriteAddress (
+  -- TRUE for blocking transactions that include write address
+  -----------------------------------------------------------
+    constant Operation     : in AddressBusOperationType
+  ) return boolean ;
+
+  ------------------------------------------------------------
+  function IsTryWriteAddress (
+  -- TRUE for asynchronous or try transactions that include write address
+  -----------------------------------------------------------
+    constant Operation     : in AddressBusOperationType
+  ) return boolean ;
+
+  ------------------------------------------------------------
+  function IsWriteData (
+  -- TRUE for a transaction includes write data
+  -----------------------------------------------------------
+    constant Operation     : in AddressBusOperationType
+  ) return boolean ;
+
+  ------------------------------------------------------------
+  function IsBlockOnWriteData (
+  -- TRUE for a blocking transactions that include write data
+  -----------------------------------------------------------
+    constant Operation     : in AddressBusOperationType
+  ) return boolean ;
+
+  ------------------------------------------------------------
+  function IsTryWriteData (
+  -- TRUE for asynchronous or try transactions that include write data
+  -----------------------------------------------------------
+    constant Operation     : in AddressBusOperationType
+  ) return boolean ;
+
+  ------------------------------------------------------------
+  function IsReadAddress (
+  -- TRUE for a transaction includes read address
+  -----------------------------------------------------------
+    constant Operation     : in AddressBusOperationType
+  ) return boolean ;
+
+  ------------------------------------------------------------
+  function IsTryReadAddress (
+  -- TRUE for an asynchronous or try transactions that include read address
+  -----------------------------------------------------------
+    constant Operation     : in AddressBusOperationType
+  ) return boolean ;
+
+  ------------------------------------------------------------
+  function IsReadData (
+  -- TRUE for a transaction includes read data
+  -----------------------------------------------------------
+    constant Operation     : in AddressBusOperationType
+  ) return boolean ;
+
+  ------------------------------------------------------------
+  function IsBlockOnReadData (
+  -- TRUE for a blocking transactions that include read data
+  -----------------------------------------------------------
+    constant Operation     : in AddressBusOperationType
+  ) return boolean ;
+
+  ------------------------------------------------------------
+  function IsTryReadData (
+  -- TRUE for asynchronous or try transactions that include read data
+  -----------------------------------------------------------
+    constant Operation     : in AddressBusOperationType
+  ) return boolean ;
+
+  ------------------------------------------------------------
+  function IsReadCheck (
+  -- TRUE for a transaction includes check information for read data 
+  -----------------------------------------------------------
+    constant Operation     : in AddressBusOperationType
+  ) return boolean ;
+
+  ------------------------------------------------------------
+  function IsBurst (
+  -- TRUE for a transaction includes read or write burst information
+  -----------------------------------------------------------
+    constant Operation     : in AddressBusOperationType
+  ) return boolean ;
+
   
 end package AddressBusTransactionPkg ;
 

@@ -19,7 +19,8 @@
 --
 --  Revision History:
 --    Date      Version    Description
---    06/2019   2019.06    Refactored from UartTbPkg and AxiStreamTransactionPkg
+--    09/2020   2020.09    Updating comments to serve as documentation
+--    07/2019   2019.07    Refactored from UartTbPkg and AxiStreamTransactionPkg
 --    01/2020   2020.01    Updated license notice
 --
 --
@@ -52,9 +53,11 @@ library OSVVM ;
   
 package StreamTransactionPkg is 
 
-  ------------------------------------------------------------
-  -- OSVVM Stream Operations
-  ------------------------------------------------------------
+  -- ========================================================
+  --  StreamOperationType 
+  --  Enumeration type used to communication transaction type
+  --  to the model via the transaction interface
+  -- ========================================================
   type StreamUnresolvedOperationType is (
    --  Transmitter
     SEND, 
@@ -80,177 +83,139 @@ package StreamTransactionPkg is
   function resolved_max ( s : StreamUnresolvedOperationVectorType) return StreamUnresolvedOperationType ;
   subtype StreamOperationType is resolved_max StreamUnresolvedOperationType ;
 
-  ------------------------------------------------------------
-  -- The Record for Communication 
-  ------------------------------------------------------------
+  -- ========================================================
+  --  StreamRecType 
+  --  Transaction interface between the test sequencer and the 
+  --  verification component.   As such it is the primary channel 
+  --  for information exchange between the two. The types bit_max,
+  --   std_logic_vector_max_c, integer_max, time_max, and 
+  --  boolean_max are defined the OSVVM package, ResolutionPkg.  
+  --  These types allow the record to support multiple drivers and 
+  --  use resolution functions based on function maximum (return largest value)
+  -- ========================================================
   type StreamRecType is record
+    -- Handshaking controls
+    --   Used by RequestTransaction in the Transaction Procedures
+    --   Used by WaitForTransaction in the Verification Component
+    --   RequestTransaction and WaitForTransaction are in osvvm.TbUtilPkg
     Rdy             : bit_max ;
     Ack             : bit_max ;
+    -- Transaction Type
     Operation       : StreamOperationType ;
+    -- Data and Transaction Parameter to and from verification component 
     DataToModel     : std_logic_vector_max_c ; 
     ParamToModel    : std_logic_vector_max_c ; 
     DataFromModel   : std_logic_vector_max_c ; 
     ParamFromModel  : std_logic_vector_max_c ; 
-    -- Optional parameter handling
-    IntToModel         : integer_max ;
-    BoolToModel        : boolean_max ; 
-    IntFromModel       : integer_max ; 
-    BoolFromModel      : boolean_max ;
-    TimeToModel        : time_max ; 
-    TimeFromModel      : time_max ; 
-    -- Model Options 
-    Options            : integer_max ; 
-  end record ; 
-
+    -- Verification Component Options Parameters - used by SetModelOptions
+    IntToModel      : integer_max ;
+    BoolToModel     : boolean_max ; 
+    IntFromModel    : integer_max ; 
+    BoolFromModel   : boolean_max ;
+    TimeToModel     : time_max ; 
+    TimeFromModel   : time_max ; 
+    -- Verification Component Options Type - currently aliased to type integer_max 
+    Options         : integer_max ; 
+  end record StreamRecType ; 
     
-    
-  ------------------------------------------------------------
-  -- OSVVM Model Independent Transactions
-  ------------------------------------------------------------
-  ------------------------------------------------------------
-  -- Send: Transaction Transmit Data Procedure
-  procedure Send (
-  ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  Param           : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
-  ) ; 
-
-  procedure Send (
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
-  ) ; 
+  -- --------------------------------------------------------
+  -- Usage of the Transaction Interface (StreamRecType)
+  -- The Data and Parameter fields of StreamRecType are unconstrained.
+  -- Unconstrained objects may be used on component/entity interfaces.    
+  -- These fields will be sized when used as a record signal in the test harness 
+  -- of the testbench.  Such a declaration is shown below:
+  --
+  --   signal AxiStreamTransmitterTransRec : StreamRecType(
+  --                DataToModel(AXI_DATA_WIDTH-1 downto 0),
+  --                DataFromModel(AXI_DATA_WIDTH-1 downto 0),
+  --                ParamToModel(0 downto 1),    -- Not Used for AXI Stream
+  --                ParamFromModel(0 downto 1)   -- Not Used for AXI Stream
+  --             ) ;  
+  --
+  -- --------------------------------------------------------
   
-  ------------------------------------------------------------
-  -- SendAsync: Transaction Transmit Data Procedure
-  procedure SendAsync (
-  ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  Param           : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
-  ) ; 
-
-  procedure SendAsync (
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
-  ) ; 
-  
-  ------------------------------------------------------------
-  -- Get: Transaction Receive Data Procedure
-  procedure Get (
-  ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  Data            : out   std_logic_vector ;
-    variable  Param           : out   std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
-  ) ; 
-
-  procedure Get (
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  Data            : out   std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
-  ) ; 
-
-  ------------------------------------------------------------
-  -- TryGet: Transaction Receive Data if available Procedure
-  procedure TryGet (
-  ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  Data            : out   std_logic_vector ;
-    variable  Available       : out   boolean ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
-  ) ; 
-  
-  procedure TryGet (
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  Data            : out   std_logic_vector ;
-    variable  Param           : out   std_logic_vector ;
-    variable  Available       : out   boolean ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
-  ) ;  
-
-  ------------------------------------------------------------
-  -- Check: Transaction Receive and Check Procedure
-  procedure Check (
-  ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  Param           : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
-  ) ; 
-
-  procedure Check (
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
-  ) ; 
+--!TODO add VHDL-2018 Interfaces
 
 
-  ------------------------------------------------------------
-  -- TryCheck: Transaction Receive and Check Data if available Procedure
-  procedure TryCheck (
-  ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  Param           : in    std_logic_vector ;
-    variable  Available       : out   boolean ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
-  ) ; 
+  -- ========================================================
+  --  Types of Transactions
+  --  A transaction may be either a directive or an interface transaction.
+  --
+  --  Directive transactions interact with the verification component 
+  --  without generating any transactions or interface waveforms.
+  --
+  --  An interface transaction results in interface signaling to the DUT.
+  --
+  --  A blocking transaction is an interface transaction that does not 
+  --  does not return (complete) until the interface operation   
+  --  requested by the transaction has completed.
+  --
+  --  An asynchronous transaction is nonblocking interface transaction
+  --  that returns before the transaction has completed - typically 
+  --  immediately and before the transaction has started. 
+  --
+  --  A Try transaction is nonblocking interface transaction that 
+  --  checks to see if transaction information is available, 
+  --  such as read data, and if it is returns it.  
+  --
+  -- ========================================================
 
-  procedure TryCheck (
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    variable  Available       : out   boolean ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
-  ) ; 
 
-
+  -- ========================================================
+  --  Directive Transactions  
+  --  Directive transactions interact with the verification component 
+  --  without generating any transactions or interface waveforms.
+  --  Supported by all verification components
+  -- ========================================================
   ------------------------------------------------------------
-  -- WaitForTransaction  
-  --   Wait until pending (transmit) or next (receive) transaction(s) complete
   procedure WaitForTransaction (
+  --  Wait until pending (transmit) or next (receive) transaction(s) complete
   ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType 
   ) ; 
 
   ------------------------------------------------------------
-  -- WaitForClock:  Directive, do nothing for WaitCycles number of clocks
   procedure WaitForClock (
+  -- Wait for NumberOfClocks number of clocks 
+  -- relative to the verification component clock
   ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     constant  WaitCycles      : in    natural := 1
   ) ; 
 
   ------------------------------------------------------------
-  -- GetAlertLogID:  Directive, get AlertLogID from the model 
   procedure GetAlertLogID (
+  -- Get the AlertLogID from the verification component.
   ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     variable  AlertLogID      : out   AlertLogIDType 
   ) ; 
   
   ------------------------------------------------------------
-  -- GetErrors:  
-  --    For non-osvvm testbenches, returns error count for this model
-  --    If Error Count is also non-zero, also prints error counts
   procedure GetErrorCount (
+  -- Error reporting for testbenches that do not use OSVVM AlertLogPkg
+  -- Returns error count.  If an error count /= 0, also print errors
   ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     variable  ErrorCount      : out   natural
   ) ; 
   
   ------------------------------------------------------------
-  -- GetTransactionCount:  Directive, get model transaction count
   procedure GetTransactionCount (
+  -- Get the number of transactions handled by the model.  
   ------------------------------------------------------------
     signal    TransactionRec   : inout StreamRecType ;
     variable  TransactionCount : out   integer 
   ) ; 
 
+
+  -- ========================================================
+  --  Set and Get Model Options  
+  --  Model operations are directive transactions that are  
+  --  used to configure the verification component.  
+  --  They can either be used directly or with a model specific
+  --  wrapper around them - see AXI models for examples.
+  -- ========================================================
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
@@ -315,17 +280,149 @@ package StreamTransactionPkg is
     variable OptVal      : Out   time
   ) ;
 
+
+  -- ========================================================
+  --  Transmitter Transactions
+  -- ========================================================
+
   ------------------------------------------------------------
-  -- OSVVM Model Support
+  procedure Send (
+  -- Blocking Send Transaction. 
+  -- Param is an extra parameter used by the verification component
+  -- The UART verification component uses Param for error injection.
   ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  Data            : in    std_logic_vector ;
+    constant  Param           : in    std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) ; 
+
+  procedure Send (
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  Data            : in    std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) ; 
+  
+  ------------------------------------------------------------
+  procedure SendAsync (
+  -- Asynchronous / Non-Blocking Send Transaction
+  -- Param is an extra parameter used by the verification component
+  -- The UART verification component uses Param for error injection. 
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  Data            : in    std_logic_vector ;
+    constant  Param           : in    std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) ; 
+
+  procedure SendAsync (
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  Data            : in    std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) ; 
+
+
+  -- ========================================================
+  --  Receiver Transactions
+  -- ========================================================
+  ------------------------------------------------------------
+  procedure Get (
+  -- Blocking Get Transaction. 
+  -- Param is an extra parameter used by the verification component
+  -- The UART verification component uses Param for error injection.
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    variable  Data            : out   std_logic_vector ;
+    variable  Param           : out   std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) ; 
+
+  procedure Get (
+    signal    TransactionRec  : inout StreamRecType ;
+    variable  Data            : out   std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) ; 
+
+  ------------------------------------------------------------
+  procedure TryGet (
+  -- Try Get Transaction
+  -- If Data is available, get it and return available TRUE,
+  -- otherwise Return Available FALSE.
+  -- Param is an extra parameter used by the verification component
+  -- The UART verification component uses Param for error injection. 
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    variable  Data            : out   std_logic_vector ;
+    variable  Available       : out   boolean ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) ; 
+  
+  procedure TryGet (
+    signal    TransactionRec  : inout StreamRecType ;
+    variable  Data            : out   std_logic_vector ;
+    variable  Param           : out   std_logic_vector ;
+    variable  Available       : out   boolean ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) ;  
+
+  ------------------------------------------------------------
+  procedure Check (
+  -- Blocking Get Transaction. 
+  -- Data is the expected value to be received.
+  -- Param is an extra parameter used by the verification component
+  -- The UART verification component uses Param for error injection.
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  Data            : in    std_logic_vector ;
+    constant  Param           : in    std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) ; 
+
+  procedure Check (
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  Data            : in    std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) ; 
+
+
+  ------------------------------------------------------------
+  procedure TryCheck (
+  -- Try Check Transaction
+  -- If Data is available, check it and return available TRUE,
+  -- otherwise Return Available FALSE.
+  -- Param is an extra parameter used by the verification component
+  -- The UART verification component uses Param for error injection. 
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  Data            : in    std_logic_vector ;
+    constant  Param           : in    std_logic_vector ;
+    variable  Available       : out   boolean ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) ; 
+
+  procedure TryCheck (
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  Data            : in    std_logic_vector ;
+    variable  Available       : out   boolean ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) ; 
+
+
+  -- ========================================================
+  --  Verification Component Support Functions
+  --  These help decode the operation value (StreamOperationType)  
+  --  to determine properties about the operation
+  -- ========================================================
   ------------------------------------------------------------
   function IsTry (
+  -- True when this transaction is an asynchronous or try transaction.
   -----------------------------------------------------------
     constant Operation     : in StreamOperationType
   ) return boolean ;
 
   ------------------------------------------------------------
   function IsCheck (
+  -- True when this transaction is a check transaction.
   -----------------------------------------------------------
     constant Operation     : in StreamOperationType
   ) return boolean ;
