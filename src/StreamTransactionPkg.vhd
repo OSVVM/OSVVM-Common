@@ -182,6 +182,8 @@ package StreamTransactionPkg is
     signal    TransactionRec  : inout StreamRecType ;
     constant  WaitCycles      : in    natural := 1
   ) ; 
+  
+ alias NoOp is WaitForClock [StreamRecType, natural] ;
 
   ------------------------------------------------------------
   procedure GetAlertLogID (
