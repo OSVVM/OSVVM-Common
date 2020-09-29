@@ -1003,7 +1003,7 @@ package body AddressBusTransactionPkg is
   ) is
   begin
     -- Put values in record
-    TransRec.Operation          <= ASYNC_READ_DATA ;
+    TransRec.Operation          <= ASYNC_READ_DATA_CHECK ;
     TransRec.Address            <= (TransRec.Address'range => 'X') ;
     TransRec.DataToModel        <= ToTransaction(Extend(iData, TransRec.DataToModel'length)) ;
     TransRec.DataWidth          <= iData'length ;
