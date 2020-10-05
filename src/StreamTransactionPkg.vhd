@@ -62,9 +62,13 @@ package StreamTransactionPkg is
    --  Transmitter
     SEND, 
     SEND_ASYNC,
+    SEND_BURST,
+    SEND_BURST_ASYNC,
     -- Receiver
     GET,             
     TRY_GET,
+    GET_BURST,
+    TRY_GET_BURST,
     CHECK,
     TRY_CHECK,
     -- Model Directives
@@ -186,6 +190,14 @@ package StreamTransactionPkg is
  alias NoOp is WaitForClock [StreamRecType, natural] ;
 
   ------------------------------------------------------------
+  procedure GetTransactionCount (
+  -- Get the number of transactions handled by the model.  
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  TransactionCount : out   integer 
+  ) ; 
+
+  ------------------------------------------------------------
   procedure GetAlertLogID (
   -- Get the AlertLogID from the verification component.
   ------------------------------------------------------------
@@ -202,14 +214,6 @@ package StreamTransactionPkg is
     variable  ErrorCount      : out   natural
   ) ; 
   
-  ------------------------------------------------------------
-  procedure GetTransactionCount (
-  -- Get the number of transactions handled by the model.  
-  ------------------------------------------------------------
-    signal    TransactionRec   : inout StreamRecType ;
-    variable  TransactionCount : out   integer 
-  ) ; 
-
 
   -- ========================================================
   --  Set and Get Model Options  
@@ -301,11 +305,15 @@ package StreamTransactionPkg is
   --  Transmitter Transactions
   -- ========================================================
 
+  -- ========================================================
+  -- Send
+  -- Blocking Send Transaction. 
+  -- Param, when present, is an extra parameter used by the verification component
+  -- The UART verification component uses Param for error injection.
+  -- ========================================================
+  
   ------------------------------------------------------------
   procedure Send (
-  -- Blocking Send Transaction. 
-  -- Param is an extra parameter used by the verification component
-  -- The UART verification component uses Param for error injection.
   ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     constant  Data            : in    std_logic_vector ;
@@ -313,17 +321,24 @@ package StreamTransactionPkg is
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) ; 
 
+  ------------------------------------------------------------
   procedure Send (
+  ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     constant  Data            : in    std_logic_vector ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) ; 
   
+
+  -- ========================================================
+  -- SendAsync
+  -- Asynchronous / Non-Blocking Send Transaction
+  -- Param, when present, is an extra parameter used by the verification component
+  -- The UART verification component uses Param for error injection. 
+  -- ========================================================
+
   ------------------------------------------------------------
   procedure SendAsync (
-  -- Asynchronous / Non-Blocking Send Transaction
-  -- Param is an extra parameter used by the verification component
-  -- The UART verification component uses Param for error injection. 
   ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     constant  Data            : in    std_logic_vector ;
@@ -331,7 +346,9 @@ package StreamTransactionPkg is
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) ; 
 
+  ------------------------------------------------------------
   procedure SendAsync (
+  ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     constant  Data            : in    std_logic_vector ;
     constant  StatusMsgOn     : in    boolean := FALSE 
@@ -339,13 +356,67 @@ package StreamTransactionPkg is
 
 
   -- ========================================================
+  -- SendBurst
+  -- Blocking Send Burst Transaction. 
+  -- Param, when present, is an extra parameter used by the verification component
+  -- The UART verification component uses Param for error injection.
+  -- ========================================================
+
+  ------------------------------------------------------------
+  procedure SendBurst (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  NumBytes        : In    integer ;
+    constant  Param           : in    std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) ; 
+
+  ------------------------------------------------------------
+  procedure SendBurst (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  NumBytes        : In    integer ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) ; 
+
+  -- ========================================================
+  -- SendBurstAsync
+  -- Asynchronous / Non-Blocking Send Transaction
+  -- Param, when present, is an extra parameter used by the verification component
+  -- The UART verification component uses Param for error injection. 
+  -- ========================================================
+
+  ------------------------------------------------------------
+  procedure SendBurstAsync (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  NumBytes        : In    integer ;
+    constant  Param           : in    std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) ; 
+
+  ------------------------------------------------------------
+  procedure SendBurstAsync (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  NumBytes        : In    integer ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) ; 
+  
+
+  -- ========================================================
   --  Receiver Transactions
   -- ========================================================
+
+  -- ========================================================
+  -- Get
+  -- Blocking Get Transaction. 
+  -- Param, when present, is an extra parameter used by the verification component
+  -- The UART verification component uses Param for received error status.
+  -- ========================================================
+
   ------------------------------------------------------------
   procedure Get (
-  -- Blocking Get Transaction. 
-  -- Param is an extra parameter used by the verification component
-  -- The UART verification component uses Param for error injection.
   ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     variable  Data            : out   std_logic_vector ;
@@ -353,19 +424,26 @@ package StreamTransactionPkg is
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) ; 
 
+  ------------------------------------------------------------
   procedure Get (
+  ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     variable  Data            : out   std_logic_vector ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) ; 
 
-  ------------------------------------------------------------
-  procedure TryGet (
+
+  -- ========================================================
+  -- TryGet
   -- Try Get Transaction
   -- If Data is available, get it and return available TRUE,
   -- otherwise Return Available FALSE.
-  -- Param is an extra parameter used by the verification component
-  -- The UART verification component uses Param for error injection. 
+  -- Param, when present, is an extra parameter used by the verification component
+  -- The UART verification component uses Param for received error status.
+  -- ========================================================
+
+  ------------------------------------------------------------
+  procedure TryGet (
   ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     variable  Data            : out   std_logic_vector ;
@@ -373,7 +451,9 @@ package StreamTransactionPkg is
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) ; 
   
+  ------------------------------------------------------------
   procedure TryGet (
+  ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     variable  Data            : out   std_logic_vector ;
     variable  Param           : out   std_logic_vector ;
@@ -381,12 +461,70 @@ package StreamTransactionPkg is
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) ;  
 
+
+  -- ========================================================
+  -- GetBurst
+  -- Blocking Get Burst Transaction. 
+  -- Param, when present, is an extra parameter from the verification component
+  -- The UART verification component uses Param for received error status.
+  -- ========================================================
+
   ------------------------------------------------------------
-  procedure Check (
+  procedure GetBurst (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    variable  NumBytes        : inout integer ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) ; 
+  
+  ------------------------------------------------------------
+  procedure GetBurst (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    variable  NumBytes        : inout integer ;
+    variable  Param           : out   std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) ;  
+
+  -- ========================================================
+  -- TryGetBurst
+  -- Try Get Burst Transaction
+  -- If Data is available, get it and return available TRUE,
+  -- otherwise Return Available FALSE.
+  -- Param, when present, is an extra parameter used by the verification component
+  -- The UART verification component uses Param for received error status.
+  -- ========================================================
+
+  ------------------------------------------------------------
+  procedure TryGetBurst (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    variable  NumBytes        : inout integer ;
+    variable  Available       : out   boolean ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) ; 
+  
+  ------------------------------------------------------------
+  procedure TryGetBurst (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    variable  NumBytes        : inout integer ;
+    variable  Param           : out   std_logic_vector ;
+    variable  Available       : out   boolean ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) ;  
+
+
+  -- ========================================================
+  -- Check
   -- Blocking Get Transaction. 
   -- Data is the expected value to be received.
-  -- Param is an extra parameter used by the verification component
-  -- The UART verification component uses Param for error injection.
+  -- Param, when present, is an extra parameter used by the verification component
+  -- The UART verification component uses Param for received error status.
+  -- ========================================================
+
+  ------------------------------------------------------------
+  procedure Check (
   ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     constant  Data            : in    std_logic_vector ;
@@ -394,20 +532,26 @@ package StreamTransactionPkg is
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) ; 
 
+  ------------------------------------------------------------
   procedure Check (
+  ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     constant  Data            : in    std_logic_vector ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) ; 
 
 
-  ------------------------------------------------------------
-  procedure TryCheck (
+  -- ========================================================
+  -- TryCheck
   -- Try Check Transaction
   -- If Data is available, check it and return available TRUE,
   -- otherwise Return Available FALSE.
-  -- Param is an extra parameter used by the verification component
-  -- The UART verification component uses Param for error injection. 
+  -- Param, when present, is an extra parameter used by the verification component
+  -- The UART verification component uses Param for received error status.
+  -- ========================================================
+
+  ------------------------------------------------------------
+  procedure TryCheck (
   ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     constant  Data            : in    std_logic_vector ;
@@ -416,7 +560,9 @@ package StreamTransactionPkg is
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) ; 
 
+  ------------------------------------------------------------
   procedure TryCheck (
+  ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     constant  Data            : in    std_logic_vector ;
     variable  Available       : out   boolean ;
@@ -433,7 +579,7 @@ package StreamTransactionPkg is
   function IsBlocking (
   -----------------------------------------------------------
     constant Operation     : in StreamOperationType
-  )  ;
+  ) return boolean ;
   
   ------------------------------------------------------------
   function IsTry (
@@ -460,198 +606,16 @@ package body StreamTransactionPkg is
     return maximum(s) ;
   end function resolved_max ; 
 
-  ------------------------------------------------------------
-  -- OSVVM Model Independent Transactions
-  ------------------------------------------------------------
-  ------------------------------------------------------------
-  -- Send: Transaction Transmit Data Procedure
-  procedure LocalSend (
-  ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Operation       : in    StreamOperationType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  Param           : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
-  ) is 
-  begin
-    TransactionRec.Operation     <= Operation ;
-    TransactionRec.DataToModel   <= std_logic_vector_max_c(Data) ; 
-    TransactionRec.ParamToModel  <= std_logic_vector_max_c(Param) ; 
-    TransactionRec.IntToModel    <= Data'length ;
-    TransactionRec.BoolToModel   <= StatusMsgOn ; 
-    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
-  end procedure LocalSend ; 
 
+  -- ========================================================
+  --  Directive Transactions  
+  --  Directive transactions interact with the verification component 
+  --  without generating any transactions or interface waveforms.
+  --  Supported by all verification components
+  -- ========================================================
   ------------------------------------------------------------
-  -- Send: Transaction Transmit Data Procedure
-  procedure Send (
-  ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  Param           : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
-  ) is 
-    constant LocalParam : std_logic_vector(TransactionRec.ParamToModel'length -1 downto 0) := (others => '-') ;
-  begin
-    LocalParam(Param'length-1 downto 0) := Param ; 
-    LocalSend(TransactionRec, SEND, Data, LocalParam, StatusMsgOn) ;
-  end procedure Send ; 
-
-  procedure Send (
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
-  ) is 
-    constant LocalParam : std_logic_vector(TransactionRec.ParamToModel'range) := (others => '-') ;
-  begin
-    LocalSend(TransactionRec, SEND, Data, LocalParam, StatusMsgOn);
-  end procedure Send ; 
-
-  ------------------------------------------------------------
-  -- SendAsync: Transaction Transmit Data Procedure
-  procedure SendAsync (
-  ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  Param           : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
-  ) is 
-    constant LocalParam : std_logic_vector(TransactionRec.ParamToModel'length -1 downto 0) := (others => '-') ;
-  begin
-    LocalParam(Param'length-1 downto 0) := Param ; 
-    LocalSend(TransactionRec, SEND_ASYNC, Data, LocalParam, StatusMsgOn) ;
-  end procedure SendAsync ; 
-
-  procedure SendAsync (
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
-  ) is 
-    constant LocalParam : std_logic_vector(TransactionRec.ParamToModel'range) := (others => '-') ;
-  begin
-    LocalSend(TransactionRec, SEND_ASYNC, Data, LocalParam, StatusMsgOn);
-  end procedure SendAsync ; 
-
-  ------------------------------------------------------------
-  -- Get: Transaction Receive Data Procedure
-  procedure Get (
-  ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  Data            : out   std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
-  ) is 
-  begin
-    TransactionRec.Operation   <= GET ;
-    TransactionRec.IntToModel  <= Data'length ;
-    TransactionRec.BoolToModel <= StatusMsgOn ;     
-    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
-    Data      := std_logic_vector(TransactionRec.DataFromModel) ; 
-  end procedure Get ; 
-  
-  procedure Get (
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  Data            : out   std_logic_vector ;
-    variable  Param           : out   std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
-  ) is 
-  begin
-    Get(TransactionRec, Data, StatusMsgOn) ;
-    Param := std_logic_vector(TransactionRec.ParamFromModel) ; 
-  end procedure Get ;  
-
-  ------------------------------------------------------------
-  -- TryGet: Transaction Receive Data if available Procedure
-  procedure TryGet (
-  ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  Data            : out   std_logic_vector ;
-    variable  Available       : out   boolean ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
-  ) is 
-  begin
-    TransactionRec.Operation   <= TRY_GET ;
-    TransactionRec.IntToModel  <= Data'length ;
-    TransactionRec.BoolToModel <= StatusMsgOn ;     
-    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
-    Data      := std_logic_vector(TransactionRec.DataFromModel) ; 
-    Available := TransactionRec.IntFromModel = 1 ;
-  end procedure TryGet ; 
-  
-  procedure TryGet (
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  Data            : out   std_logic_vector ;
-    variable  Param           : out   std_logic_vector ;
-    variable  Available       : out   boolean ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
-  ) is 
-  begin
-    TryGet(TransactionRec, Data, Available, StatusMsgOn) ;
-    Param := std_logic_vector(TransactionRec.ParamFromModel) ; 
-  end procedure TryGet ;  
-
-  ------------------------------------------------------------
-  -- Check: Transaction Receive and Check Procedure
-  procedure Check (
-  ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  Param           : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
-  ) is 
-  begin
-    TransactionRec.Operation     <= CHECK ;
-    TransactionRec.DataToModel   <= std_logic_vector_max_c(Data) ; 
-    TransactionRec.ParamToModel  <= std_logic_vector_max_c(Param) ; 
-    TransactionRec.IntToModel    <= Data'length ;
-    TransactionRec.BoolToModel   <= StatusMsgOn ;     
-    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
-  end procedure Check ; 
-
-  procedure Check (
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
-  ) is 
-    constant Param : std_logic_vector(TransactionRec.ParamToModel'range) := (others => '0') ;
-  begin
-    Check(TransactionRec, Data, Param, StatusMsgOn) ;
-  end procedure Check ; 
-
-  ------------------------------------------------------------
-  -- TryCheck: Transaction Receive and Check Data if available Procedure
-  procedure TryCheck (
-  ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  Param           : in    std_logic_vector ;
-    variable  Available       : out   boolean ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
-  ) is 
-  begin
-    TransactionRec.Operation     <= TRY_CHECK ;
-    TransactionRec.DataToModel   <= std_logic_vector_max_c(Data) ; 
-    TransactionRec.ParamToModel  <= std_logic_vector_max_c(Param) ; 
-    TransactionRec.IntToModel    <= Data'length ;
-    TransactionRec.BoolToModel   <= StatusMsgOn ;     
-    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
-    Available := TransactionRec.IntFromModel = 1 ;
-  end procedure TryCheck ; 
-
-  procedure TryCheck (
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    variable  Available       : out   boolean ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
-  ) is 
-    constant Param : std_logic_vector(TransactionRec.ParamToModel'range) := (others => '0') ;
-  begin
-    TryCheck(TransactionRec, Data, Param, Available, StatusMsgOn) ;
-  end procedure TryCheck ; 
-
-  ------------------------------------------------------------
-  -- WaitForTransaction  
-  --   Wait until pending (transmit) or next (receive) transaction(s) complete
   procedure WaitForTransaction (
+  --  Wait until pending (transmit) or next (receive) transaction(s) complete
   ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType 
   ) is
@@ -661,8 +625,9 @@ package body StreamTransactionPkg is
   end procedure WaitForTransaction ; 
 
   ------------------------------------------------------------
-  -- WaitForClock:  Directive, do nothing for WaitCycles number of clocks
   procedure WaitForClock (
+  -- Wait for NumberOfClocks number of clocks 
+  -- relative to the verification component clock
   ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     constant  WaitCycles      : in    natural := 1
@@ -674,8 +639,21 @@ package body StreamTransactionPkg is
   end procedure WaitForClock ; 
 
   ------------------------------------------------------------
-  -- GetAlertLogID:  Directive, get AlertLogID from the model 
+  procedure GetTransactionCount (
+  -- Get the number of transactions handled by the model.  
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  TransactionCount : out   integer 
+  ) is
+  begin
+    TransactionRec.Operation   <= GET_TRANSACTION_COUNT ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
+    TransactionCount := TransactionRec.IntFromModel ; 
+  end procedure GetTransactionCount ; 
+
+  ------------------------------------------------------------
   procedure GetAlertLogID (
+  -- Get the AlertLogID from the verification component.
   ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     variable  AlertLogID      : out   AlertLogIDType 
@@ -687,10 +665,9 @@ package body StreamTransactionPkg is
   end procedure GetAlertLogID ; 
   
   ------------------------------------------------------------
-  -- GetErrors:  
-  --    For non-osvvm testbenches, returns error count for this model
-  --    If Error Count is also non-zero, also prints error counts
   procedure GetErrorCount (
+  -- Error reporting for testbenches that do not use OSVVM AlertLogPkg
+  -- Returns error count.  If an error count /= 0, also print errors
   ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     variable  ErrorCount      : out   natural
@@ -702,19 +679,14 @@ package body StreamTransactionPkg is
     ErrorCount := GetAlertCount(AlertLogID => AlertLogID) ;
   end procedure GetErrorCount ; 
   
-  ------------------------------------------------------------
-  -- GetTransactionCount:  Directive, get model transaction count
-  procedure GetTransactionCount (
-  ------------------------------------------------------------
-    signal    TransactionRec   : inout StreamRecType ;
-    variable  TransactionCount : out   integer 
-  ) is
-  begin
-    TransactionRec.Operation   <= GET_TRANSACTION_COUNT ;
-    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
-    TransactionCount := TransactionRec.IntFromModel ; 
-  end procedure GetTransactionCount ; 
 
+  -- ========================================================
+  --  Set and Get Model Options  
+  --  Model operations are directive transactions that are  
+  --  used to configure the verification component.  
+  --  They can either be used directly or with a model specific
+  --  wrapper around them - see AXI models for examples.
+  -- ========================================================
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
@@ -856,9 +828,423 @@ package body StreamTransactionPkg is
   end procedure GetModelOptions ;
 
 
+  -- ========================================================
+  --  Transmitter Transactions
+  -- ========================================================
+  
+  -- ========================================================
+  -- Send
+  -- Blocking Send Transaction. 
+  -- Param, when present, is an extra parameter used by the verification component
+  -- The UART verification component uses Param for error injection.
+  -- ========================================================
   ------------------------------------------------------------
-  -- OSVVM Model Support
+  procedure LocalSend (
+  -- Package Local - simplifies the other calls to Send
   ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  Operation       : in    StreamOperationType ;
+    constant  Data            : in    std_logic_vector ;
+    constant  Param           : in    std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) is 
+  begin
+    TransactionRec.Operation     <= Operation ;
+    TransactionRec.DataToModel   <= std_logic_vector_max_c(Data) ; 
+    TransactionRec.ParamToModel  <= std_logic_vector_max_c(Param) ; 
+    TransactionRec.IntToModel    <= Data'length ;
+    TransactionRec.BoolToModel   <= StatusMsgOn ; 
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
+  end procedure LocalSend ; 
+
+  ------------------------------------------------------------
+  procedure Send (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  Data            : in    std_logic_vector ;
+    constant  Param           : in    std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) is 
+    variable LocalParam : std_logic_vector(TransactionRec.ParamToModel'length -1 downto 0) := (others => '-') ;
+  begin
+    LocalParam(Param'length-1 downto 0) := Param ; 
+    LocalSend(TransactionRec, SEND, Data, LocalParam, StatusMsgOn) ;
+  end procedure Send ; 
+
+  ------------------------------------------------------------
+  procedure Send (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  Data            : in    std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) is 
+    constant LocalParam : std_logic_vector(TransactionRec.ParamToModel'range) := (others => '-') ;
+  begin
+    LocalSend(TransactionRec, SEND, Data, LocalParam, StatusMsgOn);
+  end procedure Send ; 
+
+  -- ========================================================
+  -- SendAsync
+  -- Asynchronous / Non-Blocking Send Transaction
+  -- Param, when present, is an extra parameter used by the verification component
+  -- The UART verification component uses Param for error injection. 
+  -- ========================================================
+
+  ------------------------------------------------------------
+  procedure SendAsync (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  Data            : in    std_logic_vector ;
+    constant  Param           : in    std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) is 
+    variable LocalParam : std_logic_vector(TransactionRec.ParamToModel'length -1 downto 0) := (others => '-') ;
+  begin
+    LocalParam(Param'length-1 downto 0) := Param ; 
+    LocalSend(TransactionRec, SEND_ASYNC, Data, LocalParam, StatusMsgOn) ;
+  end procedure SendAsync ; 
+
+  ------------------------------------------------------------
+  procedure SendAsync (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  Data            : in    std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) is 
+    constant LocalParam : std_logic_vector(TransactionRec.ParamToModel'range) := (others => '-') ;
+  begin
+    LocalSend(TransactionRec, SEND_ASYNC, Data, LocalParam, StatusMsgOn);
+  end procedure SendAsync ; 
+
+
+  -- ========================================================
+  -- SendBurst
+  -- Blocking Send Burst Transaction. 
+  -- Param, when present, is an extra parameter used by the verification component
+  -- The UART verification component uses Param for error injection.
+  -- ========================================================
+  ------------------------------------------------------------
+  procedure LocalSendBurst (
+  -- Package Local - simplifies the other calls to Send
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  Operation       : in    StreamOperationType ;
+    constant  NumBytes        : In    integer ;
+    constant  Param           : in    std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) is 
+  begin
+    TransactionRec.Operation     <= Operation ;
+    TransactionRec.IntToModel    <= NumBytes ; 
+    TransactionRec.ParamToModel  <= std_logic_vector_max_c(Param) ; 
+    TransactionRec.BoolToModel   <= StatusMsgOn ; 
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
+  end procedure LocalSendBurst ; 
+
+  ------------------------------------------------------------
+  procedure SendBurst (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  NumBytes        : In    integer ;
+    constant  Param           : in    std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) is 
+    variable LocalParam : std_logic_vector(TransactionRec.ParamToModel'length -1 downto 0) := (others => '-') ;
+  begin
+    LocalParam(Param'length-1 downto 0) := Param ; 
+    LocalSendBurst(TransactionRec, SEND_BURST, NumBytes, LocalParam, StatusMsgOn) ;
+  end procedure SendBurst ; 
+
+  ------------------------------------------------------------
+  procedure SendBurst (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  NumBytes        : In    integer ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) is 
+    constant LocalParam : std_logic_vector(TransactionRec.ParamToModel'range) := (others => '-') ;
+  begin
+    LocalSendBurst(TransactionRec, SEND_BURST, NumBytes, LocalParam, StatusMsgOn) ;
+  end procedure SendBurst ; 
+
+  -- ========================================================
+  -- SendBurstAsync
+  -- Asynchronous / Non-Blocking Send Transaction
+  -- Param, when present, is an extra parameter used by the verification component
+  -- The UART verification component uses Param for error injection. 
+  -- ========================================================
+
+  ------------------------------------------------------------
+  procedure SendBurstAsync (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  NumBytes        : In    integer ;
+    constant  Param           : in    std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) is 
+    variable LocalParam : std_logic_vector(TransactionRec.ParamToModel'length -1 downto 0) := (others => '-') ;
+  begin
+    LocalParam(Param'length-1 downto 0) := Param ; 
+    LocalSendBurst(TransactionRec, SEND_BURST_ASYNC, NumBytes, LocalParam, StatusMsgOn) ;
+  end procedure SendBurstAsync ; 
+
+  ------------------------------------------------------------
+  procedure SendBurstAsync (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  NumBytes        : In    integer ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) is 
+    constant LocalParam : std_logic_vector(TransactionRec.ParamToModel'range) := (others => '-') ;
+  begin
+    LocalSendBurst(TransactionRec, SEND_BURST_ASYNC, NumBytes, LocalParam, StatusMsgOn) ;
+  end procedure SendBurstAsync ; 
+  
+
+  -- ========================================================
+  --  Receiver Transactions
+  -- ========================================================
+
+  -- ========================================================
+  -- Get
+  -- Blocking Get Transaction. 
+  -- Param, when present, is an extra parameter used by the verification component
+  -- The UART verification component uses Param for received error status.
+  -- ========================================================
+
+  ------------------------------------------------------------
+  procedure Get (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    variable  Data            : out   std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) is 
+  begin
+    TransactionRec.Operation   <= GET ;
+    TransactionRec.IntToModel  <= Data'length ;
+    TransactionRec.BoolToModel <= StatusMsgOn ;     
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
+    Data  := std_logic_vector(TransactionRec.DataFromModel) ; 
+  end procedure Get ; 
+  
+  ------------------------------------------------------------
+  procedure Get (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    variable  Data            : out   std_logic_vector ;
+    variable  Param           : out   std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) is 
+  begin
+    Get(TransactionRec, Data, StatusMsgOn) ;
+    Param := std_logic_vector(TransactionRec.ParamFromModel) ; 
+  end procedure Get ;  
+
+  -- ========================================================
+  -- TryGet
+  -- Try Get Transaction
+  -- If Data is available, get it and return available TRUE,
+  -- otherwise Return Available FALSE.
+  -- Param, when present, is an extra parameter used by the verification component
+  -- The UART verification component uses Param for received error status.
+  -- ========================================================
+
+  ------------------------------------------------------------
+  procedure TryGet (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    variable  Data            : out   std_logic_vector ;
+    variable  Available       : out   boolean ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) is 
+  begin
+    TransactionRec.Operation   <= TRY_GET ;
+    TransactionRec.IntToModel  <= Data'length ;
+    TransactionRec.BoolToModel <= StatusMsgOn ;     
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
+    Data      := std_logic_vector(TransactionRec.DataFromModel) ; 
+    Available := TransactionRec.BoolFromModel ;
+  end procedure TryGet ; 
+  
+  ------------------------------------------------------------
+  procedure TryGet (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    variable  Data            : out   std_logic_vector ;
+    variable  Param           : out   std_logic_vector ;
+    variable  Available       : out   boolean ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) is 
+  begin
+    TryGet(TransactionRec, Data, Available, StatusMsgOn) ;
+    Param := std_logic_vector(TransactionRec.ParamFromModel) ; 
+  end procedure TryGet ;  
+
+
+  -- ========================================================
+  -- GetBurst
+  -- Blocking Get Burst Transaction. 
+  -- Param, when present, is an extra parameter from the verification component
+  -- The UART verification component uses Param for received error status.
+  -- ========================================================
+
+  ------------------------------------------------------------
+  procedure GetBurst (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    variable  NumBytes        : inout integer ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) is 
+  begin
+    TransactionRec.Operation   <= GET_BURST ;
+    TransactionRec.IntToModel  <= NumBytes ;  -- For models without burst framing (like UART)
+    TransactionRec.BoolToModel <= StatusMsgOn ;     
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
+--    Last word of data, it maybe there, we don't return it, it is also in the BurstFifo
+--    Data  := std_logic_vector(TransactionRec.DataFromModel) ; 
+    NumBytes := TransactionRec.IntFromModel ;
+  end procedure GetBurst ; 
+  
+  ------------------------------------------------------------
+  procedure GetBurst (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    variable  NumBytes        : inout integer ;
+    variable  Param           : out   std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) is 
+  begin
+    GetBurst(TransactionRec, NumBytes, StatusMsgOn) ;
+    Param := std_logic_vector(TransactionRec.ParamFromModel) ; 
+  end procedure GetBurst ;  
+
+  -- ========================================================
+  -- TryGetBurst
+  -- Try Get Burst Transaction
+  -- If Data is available, get it and return available TRUE,
+  -- otherwise Return Available FALSE.
+  -- Param, when present, is an extra parameter used by the verification component
+  -- The UART verification component uses Param for received error status.
+  -- ========================================================
+
+  ------------------------------------------------------------
+  procedure TryGetBurst (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    variable  NumBytes        : inout integer ;
+    variable  Available       : out   boolean ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) is 
+  begin
+    TransactionRec.Operation   <= TRY_GET_BURST ;
+    TransactionRec.IntToModel  <= NumBytes ;  -- For models without burst framing (like UART)
+    TransactionRec.BoolToModel <= StatusMsgOn ;     
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
+--    Last word of data, it maybe there, we don't return it, it is also in the BurstFifo
+--    Data  := std_logic_vector(TransactionRec.DataFromModel) ; 
+    NumBytes  := TransactionRec.IntFromModel ;
+    Available := TransactionRec.BoolFromModel ;
+  end procedure TryGetBurst ; 
+  
+  ------------------------------------------------------------
+  procedure TryGetBurst (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    variable  NumBytes        : inout integer ;
+    variable  Param           : out   std_logic_vector ;
+    variable  Available       : out   boolean ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) is 
+  begin
+    TryGetBurst(TransactionRec, NumBytes, Available, StatusMsgOn) ;
+    Param := std_logic_vector(TransactionRec.ParamFromModel) ; 
+  end procedure TryGetBurst ;  
+
+  -- ========================================================
+  -- Check
+  -- Blocking Get Transaction. 
+  -- Data is the expected value to be received.
+  -- Param, when present, is an extra parameter used by the verification component
+  -- The UART verification component uses Param for received error status.
+  -- ========================================================
+
+  ------------------------------------------------------------
+  procedure Check (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  Data            : in    std_logic_vector ;
+    constant  Param           : in    std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) is 
+  begin
+    TransactionRec.Operation     <= CHECK ;
+    TransactionRec.DataToModel   <= std_logic_vector_max_c(Data) ; 
+    TransactionRec.ParamToModel  <= std_logic_vector_max_c(Param) ; 
+    TransactionRec.IntToModel    <= Data'length ;
+    TransactionRec.BoolToModel   <= StatusMsgOn ;     
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
+  end procedure Check ; 
+
+  ------------------------------------------------------------
+  procedure Check (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  Data            : in    std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) is 
+    constant Param : std_logic_vector(TransactionRec.ParamToModel'range) := (others => '0') ;
+  begin
+    Check(TransactionRec, Data, Param, StatusMsgOn) ;
+  end procedure Check ; 
+
+
+  -- ========================================================
+  -- TryCheck
+  -- Try Check Transaction
+  -- If Data is available, check it and return available TRUE,
+  -- otherwise Return Available FALSE.
+  -- Param, when present, is an extra parameter used by the verification component
+  -- The UART verification component uses Param for received error status.
+  -- ========================================================
+
+  ------------------------------------------------------------
+  procedure TryCheck (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  Data            : in    std_logic_vector ;
+    constant  Param           : in    std_logic_vector ;
+    variable  Available       : out   boolean ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) is 
+  begin
+    TransactionRec.Operation     <= TRY_CHECK ;
+    TransactionRec.DataToModel   <= std_logic_vector_max_c(Data) ; 
+    TransactionRec.ParamToModel  <= std_logic_vector_max_c(Param) ; 
+    TransactionRec.IntToModel    <= Data'length ;
+    TransactionRec.BoolToModel   <= StatusMsgOn ;     
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
+    Available := TransactionRec.BoolFromModel ;
+  end procedure TryCheck ; 
+
+  ------------------------------------------------------------
+  procedure TryCheck (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  Data            : in    std_logic_vector ;
+    variable  Available       : out   boolean ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) is 
+    constant Param : std_logic_vector(TransactionRec.ParamToModel'range) := (others => '0') ;
+  begin
+    TryCheck(TransactionRec, Data, Param, Available, StatusMsgOn) ;
+  end procedure TryCheck ; 
+
+
+  -- ========================================================
+  --  Verification Component Support Functions
+  --  These help decode the operation value (StreamOperationType)  
+  --  to determine properties about the operation
+  -- ========================================================
   ------------------------------------------------------------
   function IsBlocking (
   -----------------------------------------------------------

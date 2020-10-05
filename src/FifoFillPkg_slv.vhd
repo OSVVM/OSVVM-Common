@@ -23,6 +23,7 @@
 --    Date      Version      Description
 --    05/2020   2020.05     Initial revision
 --    09/2020   2020.09     Updating comments to serve as documentation
+--    10/2020   2020.10     Updating comments to serve as documentation
 --
 --  This file is part of OSVVM.
 --  
@@ -140,7 +141,48 @@ package FifoFillPkg_slv is
     constant DataWidth : in    integer := 8
   ) ;
 
-end FifoFillPkg_slv ;
+
+  -- ========================================================
+  --  Verification Component Support
+  -- ========================================================
+
+  ------------------------------------------------------------
+  procedure PopWord (
+  -- Pop bytes from BurstFifo and form a word 
+  -- Current implementation for now assumes it is assembling bytes.   
+  --
+  ------------------------------------------------------------
+    variable Fifo              : inout ScoreboardPType ;
+    variable Valid             : out   boolean ;
+    variable Data              : out   std_logic_vector ; 
+    variable BytesToSend       : inout integer ;
+    constant ByteAddress       : in    natural := 0 
+  ) ; 
+
+  ------------------------------------------------------------
+  procedure PushWord (
+  -- Push a word into the byte oriented BurstFifo
+  -- Current implementation for now assumes it is assembling bytes.   
+  --
+  ------------------------------------------------------------
+    variable Fifo              : inout ScoreboardPType ;
+    variable Data              : in    std_logic_vector ; 
+    constant DropUndriven      : in    boolean := FALSE ;
+    constant ByteAddress       : in    natural := 0 
+  ) ; 
+
+  ------------------------------------------------------------
+  function CountBytes(
+  -- Count number of bytes in a word
+  --
+  ------------------------------------------------------------
+    constant Data              : std_logic_vector ;
+    constant DropUndriven      : in    boolean := FALSE ;
+    constant ByteAddress       : in    natural := 0 
+  ) return integer ;
+  
+end package FifoFillPkg_slv ;
+
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -217,7 +259,7 @@ package body FifoFillPkg_slv is
       end if ;
     end loop ;
   end procedure PopBurst ;
-
+  
   ------------------------------------------------------------
   procedure CheckBurst (
   ------------------------------------------------------------
@@ -271,5 +313,87 @@ package body FifoFillPkg_slv is
       Fifo.Check(RV.RandSlv(0, MOD_VAL-1, DataWidth)) ;
     end loop ;
   end procedure CheckBurstRandom ;
+  
+  
+  -- ========================================================
+  --  Verification Component Support
+  -- ========================================================
+
+  ------------------------------------------------------------
+  procedure PopWord (
+  -- Pop bytes from BurstFifo and form a word 
+  -- Current implementation for now assumes it is assembling bytes.   
+  --
+  ------------------------------------------------------------
+    variable Fifo              : inout ScoreboardPType ;
+    variable Valid             : out   boolean ;
+    variable Data              : out   std_logic_vector ; 
+    variable BytesToSend       : inout integer ;
+    constant ByteAddress       : in    natural := 0 
+  ) is
+    variable Index    : integer := ByteAddress * 8 ; 
+    constant DataLeft : integer := Data'length-1; 
+    alias aData       : std_logic_vector(DataLeft downto 0) is Data;
+  begin
+    aData := (aData'range => 'U') ;  -- Default Undriven
+    Valid := TRUE ; 
+    GetWord : while Index <= DataLeft loop  
+      if not Fifo.empty then 
+        aData(Index+7 downto Index) := Fifo.pop ; 
+        BytesToSend := BytesToSend - 1 ; 
+        exit when BytesToSend = 0 ; 
+      else
+        Valid := FALSE ; 
+        exit ; 
+      end if ; 
+      Index := Index + 8 ; 
+    end loop GetWord ;
+  end PopWord ; 
+
+  ------------------------------------------------------------
+  procedure PushWord (
+  -- Push a word into the byte oriented BurstFifo
+  -- Current implementation for now assumes it is assembling bytes.   
+  --
+  ------------------------------------------------------------
+    variable Fifo              : inout ScoreboardPType ;
+    variable Data              : in    std_logic_vector ; 
+    constant DropUndriven      : in    boolean := FALSE ;
+    constant ByteAddress       : in    natural := 0 
+  ) is
+    variable Index    : integer := ByteAddress * 8 ; 
+    constant DataLeft : integer := Data'length-1; 
+    alias aData       : std_logic_vector(DataLeft downto 0) is Data;
+  begin
+    PushBytes : while Index <= DataLeft loop  
+      if not (DropUndriven and aData(Index) = 'U') then 
+        Fifo.push(aData(Index+7 downto Index)) ; 
+      end if ;
+      Index := Index + 8 ; 
+    end loop PushBytes ; 
+  end PushWord ; 
+
+  ------------------------------------------------------------
+  function CountBytes(
+  -- Count number of bytes in a word
+  --
+  ------------------------------------------------------------
+    constant Data              : std_logic_vector ;
+    constant DropUndriven      : in    boolean := FALSE ;
+    constant ByteAddress       : in    natural := 0 
+  ) return integer is
+    variable Index    : integer := ByteAddress * 8 ; 
+    variable Count    : integer := 0 ; 
+    constant DataLeft : integer := Data'length-1 ;
+    alias aData       : std_logic_vector(DataLeft downto 0) is Data ; 
+  begin
+    while Index <= DataLeft loop
+      if not (DropUndriven and aData(Index) = 'U') then 
+        Count := Count + 1 ; 
+      end if ;
+      Index := Index + 8 ; 
+    end loop ; 
+    return Count ;
+  end function CountBytes ; 
     
 end FifoFillPkg_slv ;
