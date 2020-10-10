@@ -675,7 +675,7 @@ package body StreamTransactionPkg is
     variable  AlertLogID : AlertLogIDType ;
   begin
     GetAlertLogID(TransactionRec, AlertLogID) ;
-    ReportNonZeroAlerts(AlertLogID => AlertLogID) ;
+--    ReportNonZeroAlerts(AlertLogID => AlertLogID) ;
     ErrorCount := GetAlertCount(AlertLogID => AlertLogID) ;
   end procedure GetErrorCount ; 
   
@@ -1251,7 +1251,8 @@ package body StreamTransactionPkg is
     constant Operation     : in StreamOperationType
   ) return boolean is
   begin
-    return (Operation = SEND) or (Operation = GET) or (Operation = CHECK) ;
+    return (Operation = SEND) or (Operation = GET) or (Operation = CHECK) or 
+           (Operation = SEND_BURST) or (Operation = GET_BURST)  ;
   end function IsBlocking ;
 
   ------------------------------------------------------------
