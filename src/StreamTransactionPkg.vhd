@@ -1261,7 +1261,7 @@ package body StreamTransactionPkg is
     constant Operation     : in StreamOperationType
   ) return boolean is
   begin
-    return (Operation = TRY_GET) or (Operation = TRY_CHECK) ;
+    return (Operation = TRY_GET) or (Operation = TRY_CHECK) or (Operation = TRY_GET_BURST) ;
   end function IsTry ;
 
   ------------------------------------------------------------
