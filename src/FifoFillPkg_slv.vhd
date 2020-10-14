@@ -366,7 +366,7 @@ package body FifoFillPkg_slv is
     alias aData       : std_logic_vector(DataLeft downto 0) is Data;
   begin
     PushBytes : while Index <= DataLeft loop  
-      if not (DropUndriven and aData(Index) = 'U') then 
+      if not ((DropUndriven and aData(Index) = 'U') or aData(Index) = '-') then 
         Fifo.push(aData(Index+7 downto Index)) ; 
       end if ;
       Index := Index + 8 ; 
@@ -388,7 +388,7 @@ package body FifoFillPkg_slv is
     alias aData       : std_logic_vector(DataLeft downto 0) is Data ; 
   begin
     while Index <= DataLeft loop
-      if not (DropUndriven and aData(Index) = 'U') then 
+      if not ((DropUndriven and aData(Index) = 'U') or aData(Index) = '-') then 
         Count := Count + 1 ; 
       end if ;
       Index := Index + 8 ; 
