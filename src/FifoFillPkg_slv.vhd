@@ -229,17 +229,18 @@ package body FifoFillPkg_slv is
     constant DataWidth : in    integer := 8
   ) is
     variable RV : RandomPType ; 
-    variable Junk : integer ; 
-    constant MOD_VAL : integer := 2**DataWidth  ; 
+    variable JunkValue : integer ;
+    variable Data : std_logic_vector(DataWidth-1 downto 0) ;
   begin
     -- Initialize seed and toss first random value  
     RV.InitSeed(Start) ;
-    Junk := RV.RandInt(0, MOD_VAL-1) ;
+    JunkValue := RV.RandInt(1, 10) ;  -- toss
     
-    Fifo.Push(to_slv(Start mod MOD_VAL, DataWidth)) ;
+    Fifo.Push(to_slv(Start mod 2**DataWidth, DataWidth)) ;
     
     for i in 2 to ByteCount loop 
-      Fifo.Push(RV.RandSlv(0, MOD_VAL-1, DataWidth)) ;
+      Data := RV.RandSlv(DataWidth) ;
+      Fifo.Push(Data) ;
     end loop ;
   end procedure PushBurstRandom ;
   
@@ -267,12 +268,16 @@ package body FifoFillPkg_slv is
     constant Bytes     : in    integer_vector ;
     constant DataWidth : in    integer := 8
   ) is
+    variable AlertLogID : AlertLogIDType ; 
+    variable RxVal : std_logic_vector(DataWidth-1 downto 0) ;
   begin
+    AlertLogID := Fifo.GetAlertLogID ; 
     for i in Bytes'range loop 
+      RxVal := Fifo.Pop ;
       if Bytes(i) < 0 then 
-        Fifo.Check((DataWidth downto 1 => 'U')) ;
+        AffirmIfEqual(AlertLogID, RxVal, (DataWidth downto 1 => 'U')) ;
       else 
-        Fifo.Check(to_slv(Bytes(i), DataWidth)) ;
+        AffirmIfEqual(AlertLogID, RxVal, to_slv(Bytes(i), DataWidth)) ;
       end if ;
     end loop ;
   end procedure CheckBurst ;
@@ -285,9 +290,13 @@ package body FifoFillPkg_slv is
     constant ByteCount : in    integer ;
     constant DataWidth : in    integer := 8
   ) is
+    variable AlertLogID : AlertLogIDType ; 
+    variable RxVal : std_logic_vector(DataWidth-1 downto 0) ;
   begin
+    AlertLogID := Fifo.GetAlertLogID ; 
     for i in Start to ByteCount+Start-1 loop 
-      Fifo.Check(to_slv(i mod (2**DataWidth), DataWidth)) ;
+      RxVal := Fifo.Pop ;
+      AffirmIfEqual(AlertLogID, RxVal, to_slv(i mod (2**DataWidth), DataWidth)) ;
     end loop ;
   end procedure CheckBurstIncrement ;
   
@@ -300,17 +309,24 @@ package body FifoFillPkg_slv is
     constant DataWidth : in    integer := 8
   ) is
     variable RV : RandomPType ; 
-    variable Junk : integer; 
-    constant MOD_VAL : integer := 2**DataWidth  ; 
+    variable JunkValue : integer ;
+    variable AlertLogID : AlertLogIDType ; 
+    variable RxVal, ExpVal : std_logic_vector(DataWidth-1 downto 0) ;
   begin
+    AlertLogID := Fifo.GetAlertLogID ; 
     -- Initialize seed and toss first random value 
     RV.InitSeed(Start) ;
-    Junk := RV.RandInt(0, MOD_VAL-1) ;
+    JunkValue := RV.RandInt(1, 10) ;  -- Toss
     
-    Fifo.Check(to_slv(Start mod MOD_VAL, DataWidth)) ;
+    RxVal := Fifo.Pop ;
+    -- Check First Value      Received    Expected, First Value
+    AffirmIfEqual(AlertLogID, RxVal,      to_slv(Start mod 2**DataWidth, DataWidth) ) ;
     
     for i in 2 to ByteCount loop 
-      Fifo.Check(RV.RandSlv(0, MOD_VAL-1, DataWidth)) ;
+      RxVal := Fifo.Pop ;
+      ExpVal := RV.RandSlv(DataWidth) ;
+      -- Check Remaining Values   Received    Expected
+      AffirmIfEqual(AlertLogID,   RxVal,      ExpVal ) ;
     end loop ;
   end procedure CheckBurstRandom ;
   
