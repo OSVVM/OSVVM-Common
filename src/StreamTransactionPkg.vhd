@@ -1176,10 +1176,12 @@ package body StreamTransactionPkg is
     constant  Param           : in    std_logic_vector ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) is 
+    variable LocalParam : std_logic_vector(TransactionRec.ParamToModel'length -1 downto 0) := (others => '-') ;
   begin
+    LocalParam(Param'length-1 downto 0) := Param ; 
     TransactionRec.Operation     <= CHECK ;
     TransactionRec.DataToModel   <= std_logic_vector_max_c(Data) ; 
-    TransactionRec.ParamToModel  <= std_logic_vector_max_c(Param) ; 
+    TransactionRec.ParamToModel  <= std_logic_vector_max_c(LocalParam) ; 
     TransactionRec.IntToModel    <= Data'length ;
     TransactionRec.BoolToModel   <= StatusMsgOn ;     
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
@@ -1192,7 +1194,7 @@ package body StreamTransactionPkg is
     constant  Data            : in    std_logic_vector ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) is 
-    constant Param : std_logic_vector(TransactionRec.ParamToModel'range) := (others => '0') ;
+    constant Param : std_logic_vector(TransactionRec.ParamToModel'range) := (others => '-') ;
   begin
     Check(TransactionRec, Data, Param, StatusMsgOn) ;
   end procedure Check ; 
@@ -1216,10 +1218,12 @@ package body StreamTransactionPkg is
     variable  Available       : out   boolean ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) is 
+    variable LocalParam : std_logic_vector(TransactionRec.ParamToModel'length -1 downto 0) := (others => '-') ;
   begin
+    LocalParam(Param'length-1 downto 0) := Param ; 
     TransactionRec.Operation     <= TRY_CHECK ;
     TransactionRec.DataToModel   <= std_logic_vector_max_c(Data) ; 
-    TransactionRec.ParamToModel  <= std_logic_vector_max_c(Param) ; 
+    TransactionRec.ParamToModel  <= std_logic_vector_max_c(LocalParam) ; 
     TransactionRec.IntToModel    <= Data'length ;
     TransactionRec.BoolToModel   <= StatusMsgOn ;     
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
@@ -1234,7 +1238,7 @@ package body StreamTransactionPkg is
     variable  Available       : out   boolean ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) is 
-    constant Param : std_logic_vector(TransactionRec.ParamToModel'range) := (others => '0') ;
+    constant Param : std_logic_vector(TransactionRec.ParamToModel'range) := (others => '-') ;
   begin
     TryCheck(TransactionRec, Data, Param, Available, StatusMsgOn) ;
   end procedure TryCheck ; 
