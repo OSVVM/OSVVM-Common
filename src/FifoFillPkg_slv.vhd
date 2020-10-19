@@ -216,7 +216,11 @@ package body FifoFillPkg_slv is
   ) is
   begin
     for i in Start to ByteCount+Start-1 loop 
-      Fifo.Push(to_slv(i mod (2**DataWidth), DataWidth)) ;
+      if DataWidth < 31 then 
+        Fifo.Push(to_slv(i mod (2**DataWidth), DataWidth)) ;
+      else 
+        Fifo.Push(to_slv(i, DataWidth)) ;
+      end if ; 
     end loop ;
   end procedure PushBurstIncrement ;
   
@@ -236,7 +240,11 @@ package body FifoFillPkg_slv is
     RV.InitSeed(Start) ;
     JunkValue := RV.RandInt(1, 10) ;  -- toss
     
-    Fifo.Push(to_slv(Start mod 2**DataWidth, DataWidth)) ;
+    if DataWidth < 31 then 
+      Fifo.Push(to_slv(Start mod (2**DataWidth), DataWidth)) ;
+    else 
+      Fifo.Push(to_slv(Start, DataWidth)) ;
+    end if ; 
     
     for i in 2 to ByteCount loop 
       Data := RV.RandSlv(DataWidth) ;
@@ -296,7 +304,11 @@ package body FifoFillPkg_slv is
     AlertLogID := Fifo.GetAlertLogID ; 
     for i in Start to ByteCount+Start-1 loop 
       RxVal := Fifo.Pop ;
-      AffirmIfEqual(AlertLogID, RxVal, to_slv(i mod (2**DataWidth), DataWidth)) ;
+      if DataWidth < 31 then 
+        AffirmIfEqual(AlertLogID, RxVal, to_slv(i mod (2**DataWidth), DataWidth)) ;
+      else 
+        AffirmIfEqual(AlertLogID, RxVal, to_slv(i, DataWidth)) ;
+      end if ; 
     end loop ;
   end procedure CheckBurstIncrement ;
   
@@ -320,7 +332,11 @@ package body FifoFillPkg_slv is
     
     RxVal := Fifo.Pop ;
     -- Check First Value      Received    Expected, First Value
-    AffirmIfEqual(AlertLogID, RxVal,      to_slv(Start mod 2**DataWidth, DataWidth) ) ;
+    if DataWidth < 31 then 
+      AffirmIfEqual(AlertLogID, RxVal, to_slv(Start mod (2**DataWidth), DataWidth)) ;
+    else 
+      AffirmIfEqual(AlertLogID, RxVal, to_slv(Start, DataWidth)) ;
+    end if ; 
     
     for i in 2 to ByteCount loop 
       RxVal := Fifo.Pop ;
