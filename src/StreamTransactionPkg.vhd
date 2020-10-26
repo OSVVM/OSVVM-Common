@@ -59,7 +59,18 @@ package StreamTransactionPkg is
   --  to the model via the transaction interface
   -- ========================================================
   type StreamUnresolvedOperationType is (
-   --  Transmitter
+    -- Directives
+    WAIT_FOR_CLOCK, 
+    WAIT_FOR_TRANSACTION,
+    GET_TRANSACTION_COUNT,
+    GET_ALERTLOG_ID,
+    -- Burst FIFO Configuration
+    SET_BURST_MODE,
+    GET_BURST_MODE,
+    -- Model Options
+    SET_MODEL_OPTIONS,
+    GET_MODEL_OPTIONS,
+    --  Transmitter
     SEND, 
     SEND_ASYNC,
     SEND_BURST,
@@ -71,13 +82,8 @@ package StreamTransactionPkg is
     TRY_GET_BURST,
     CHECK,
     TRY_CHECK,
-    -- Model Directives
-    WAIT_FOR_CLOCK, 
-    GET_ALERTLOG_ID,
-    GET_TRANSACTION_COUNT,
-    SET_MODEL_OPTIONS,
-    GET_MODEL_OPTIONS,
-    WAIT_FOR_TRANSACTION,
+    CHECK_BURST,
+    CHECK_BURST_ASYNC,
     THE_END
   ) ;
   type StreamUnresolvedOperationVectorType is array (natural range <>) of StreamUnresolvedOperationType ;
@@ -121,6 +127,13 @@ package StreamTransactionPkg is
     -- Verification Component Options Type - currently aliased to type integer_max 
     Options         : integer_max ; 
   end record StreamRecType ; 
+  
+
+  subtype StreamFifoBurstModeType is integer ;
+  
+  constant STREAM_BURST_BYTE_MODE       : integer := 0 ; 
+  constant STREAM_BURST_WORD_MODE       : integer := 1 ;
+  constant STREAM_BURST_WORD_PARAM_MODE : integer := 2 ;
     
   -- --------------------------------------------------------
   -- Usage of the Transaction Interface (StreamRecType)
@@ -138,7 +151,7 @@ package StreamTransactionPkg is
   --
   -- --------------------------------------------------------
   
---!TODO add VHDL-2018 Interfaces
+--!TODO add VHDL-2019 Interfaces
 
 
   -- ========================================================
@@ -214,6 +227,25 @@ package StreamTransactionPkg is
     variable  ErrorCount      : out   natural
   ) ; 
   
+  
+  -- ========================================================
+  --  Set and Get Burst Mode   
+  --  Set Burst Mode for models that do bursting.
+  -- ========================================================
+  ------------------------------------------------------------
+  procedure SetBurstMode (
+  ------------------------------------------------------------
+    signal   TransRec    : InOut StreamRecType ;
+    constant OptVal      : In    StreamFifoBurstModeType
+  ) ;
+
+  ------------------------------------------------------------
+  procedure GetBurstMode (
+  ------------------------------------------------------------
+    signal   TransRec    : InOut StreamRecType ;
+    variable OptVal      : Out   StreamFifoBurstModeType
+  ) ;
+
 
   -- ========================================================
   --  Set and Get Model Options  
@@ -679,6 +711,35 @@ package body StreamTransactionPkg is
     ErrorCount := GetAlertCount(AlertLogID => AlertLogID) ;
   end procedure GetErrorCount ; 
   
+  
+  -- ========================================================
+  --  Set and Get Burst Mode   
+  --  Set Burst Mode for models that do bursting.
+  -- ========================================================
+  ------------------------------------------------------------
+  procedure SetBurstMode (
+  ------------------------------------------------------------
+    signal   TransRec    : InOut StreamRecType ;
+    constant OptVal      : In    StreamFifoBurstModeType
+  ) is
+  begin
+    TransRec.Operation     <= SET_BURST_MODE ;
+    TransRec.IntToModel    <= OptVal ;
+    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+  end procedure SetBurstMode ;
+
+  ------------------------------------------------------------
+  procedure GetBurstMode (
+  ------------------------------------------------------------
+    signal   TransRec    : InOut StreamRecType ;
+    variable OptVal      : Out   StreamFifoBurstModeType
+  ) is
+  begin
+    TransRec.Operation     <= GET_BURST_MODE ;
+    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    OptVal := TransRec.IntFromModel ; 
+  end procedure GetBurstMode ;
+
 
   -- ========================================================
   --  Set and Get Model Options  
@@ -1160,6 +1221,7 @@ package body StreamTransactionPkg is
     Param := std_logic_vector(TransactionRec.ParamFromModel) ; 
   end procedure TryGetBurst ;  
 
+
   -- ========================================================
   -- Check
   -- Blocking Get Transaction. 
@@ -1245,6 +1307,90 @@ package body StreamTransactionPkg is
 
 
   -- ========================================================
+  -- CheckBurst
+  -- Blocking Check Burst Transaction. 
+  -- Param, when present, is an extra parameter used by the verification component
+  -- The UART verification component uses Param for checking error injection.
+  -- ========================================================
+  ------------------------------------------------------------
+  procedure LocalCheckBurst (
+  -- Package Local - simplifies the other calls to Check
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  Operation       : in    StreamOperationType ;
+    constant  NumBytes        : In    integer ;
+    constant  Param           : in    std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) is 
+  begin
+    TransactionRec.Operation     <= Operation ;
+    TransactionRec.IntToModel    <= NumBytes ; 
+    TransactionRec.ParamToModel  <= std_logic_vector_max_c(Param) ; 
+    TransactionRec.BoolToModel   <= StatusMsgOn ; 
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
+  end procedure LocalCheckBurst ; 
+
+  ------------------------------------------------------------
+  procedure CheckBurst (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  NumBytes        : In    integer ;
+    constant  Param           : in    std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) is 
+    variable LocalParam : std_logic_vector(TransactionRec.ParamToModel'length -1 downto 0) := (others => '-') ;
+  begin
+    LocalParam(Param'length-1 downto 0) := Param ; 
+    LocalCheckBurst(TransactionRec, CHECK_BURST, NumBytes, LocalParam, StatusMsgOn) ;
+  end procedure CheckBurst ; 
+
+  ------------------------------------------------------------
+  procedure CheckBurst (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  NumBytes        : In    integer ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) is 
+    constant LocalParam : std_logic_vector(TransactionRec.ParamToModel'range) := (others => '-') ;
+  begin
+    LocalCheckBurst(TransactionRec, CHECK_BURST, NumBytes, LocalParam, StatusMsgOn) ;
+  end procedure CheckBurst ; 
+
+  -- ========================================================
+  -- CheckBurstAsync
+  -- Asynchronous / Non-Blocking Check Transaction
+  -- Param, when present, is an extra parameter used by the verification component
+  -- The UART verification component uses Param for error injection. 
+  -- ========================================================
+
+  ------------------------------------------------------------
+  procedure CheckBurstAsync (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  NumBytes        : In    integer ;
+    constant  Param           : in    std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) is 
+    variable LocalParam : std_logic_vector(TransactionRec.ParamToModel'length -1 downto 0) := (others => '-') ;
+  begin
+    LocalParam(Param'length-1 downto 0) := Param ; 
+    LocalCheckBurst(TransactionRec, CHECK_BURST_ASYNC, NumBytes, LocalParam, StatusMsgOn) ;
+  end procedure CheckBurstAsync ; 
+
+  ------------------------------------------------------------
+  procedure CheckBurstAsync (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  NumBytes        : In    integer ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) is 
+    constant LocalParam : std_logic_vector(TransactionRec.ParamToModel'range) := (others => '-') ;
+  begin
+    LocalCheckBurst(TransactionRec, CHECK_BURST_ASYNC, NumBytes, LocalParam, StatusMsgOn) ;
+  end procedure CheckBurstAsync ; 
+
+
+  -- ========================================================
   --  Verification Component Support Functions
   --  These help decode the operation value (StreamOperationType)  
   --  to determine properties about the operation
@@ -1256,7 +1402,7 @@ package body StreamTransactionPkg is
   ) return boolean is
   begin
     return (Operation = SEND) or (Operation = GET) or (Operation = CHECK) or 
-           (Operation = SEND_BURST) or (Operation = GET_BURST)  ;
+           (Operation = SEND_BURST) or (Operation = GET_BURST) or (Operation = CHECK_BURST)  ;
   end function IsBlocking ;
 
   ------------------------------------------------------------
@@ -1274,7 +1420,7 @@ package body StreamTransactionPkg is
     constant Operation     : in StreamOperationType
   ) return boolean is
   begin
-    return (Operation = CHECK) or (Operation = TRY_CHECK) ;
+    return (Operation = CHECK) or (Operation = TRY_CHECK) or (Operation = CHECK_BURST) or (Operation = CHECK_BURST_ASYNC) ;
   end function IsCheck ;
 
 end StreamTransactionPkg ;
