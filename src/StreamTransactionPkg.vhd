@@ -83,7 +83,7 @@ package StreamTransactionPkg is
     CHECK,
     TRY_CHECK,
     CHECK_BURST,
-    CHECK_BURST_ASYNC,
+    TRY_CHECK_BURST,
     THE_END
   ) ;
   type StreamUnresolvedOperationVectorType is array (natural range <>) of StreamUnresolvedOperationType ;
@@ -601,6 +601,54 @@ package StreamTransactionPkg is
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) ; 
 
+  -- ========================================================
+  -- CheckBurst
+  -- Blocking Check Burst Transaction. 
+  -- Param, when present, is an extra parameter used by the verification component
+  -- The UART verification component uses Param for checking error injection.
+  -- ========================================================
+  ------------------------------------------------------------
+  procedure CheckBurst (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  NumBytes        : In    integer ;
+    constant  Param           : in    std_logic_vector ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) ; 
+
+  ------------------------------------------------------------
+  procedure CheckBurst (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  NumBytes        : In    integer ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) ; 
+
+  -- ========================================================
+  -- TryCheckBurst
+  -- Try / Non-Blocking Check Burst Transaction
+  -- Param, when present, is an extra parameter used by the verification component
+  -- The UART verification component uses Param for error injection. 
+  -- ========================================================
+
+  ------------------------------------------------------------
+  procedure TryCheckBurst (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  NumBytes        : In    integer ;
+    constant  Param           : in    std_logic_vector ;
+    variable  Available       : out   boolean ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) ; 
+
+  ------------------------------------------------------------
+  procedure TryCheckBurst (
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType ;
+    constant  NumBytes        : In    integer ;
+    variable  Available       : out   boolean ;
+    constant  StatusMsgOn     : in    boolean := FALSE 
+  ) ; 
 
   -- ========================================================
   --  Verification Component Support Functions
@@ -1357,37 +1405,40 @@ package body StreamTransactionPkg is
   end procedure CheckBurst ; 
 
   -- ========================================================
-  -- CheckBurstAsync
-  -- Asynchronous / Non-Blocking Check Transaction
+  -- TryCheckBurst
+  -- Try / Non-Blocking Check Burst Transaction
   -- Param, when present, is an extra parameter used by the verification component
   -- The UART verification component uses Param for error injection. 
   -- ========================================================
-
   ------------------------------------------------------------
-  procedure CheckBurstAsync (
+  procedure TryCheckBurst (
   ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     constant  NumBytes        : In    integer ;
     constant  Param           : in    std_logic_vector ;
+    variable  Available       : out   boolean ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) is 
     variable LocalParam : std_logic_vector(TransactionRec.ParamToModel'length -1 downto 0) := (others => '-') ;
   begin
     LocalParam(Param'length-1 downto 0) := Param ; 
-    LocalCheckBurst(TransactionRec, CHECK_BURST_ASYNC, NumBytes, LocalParam, StatusMsgOn) ;
-  end procedure CheckBurstAsync ; 
+    LocalCheckBurst(TransactionRec, TRY_CHECK_BURST, NumBytes, LocalParam, StatusMsgOn) ;
+    Available := TransactionRec.BoolFromModel ;
+  end procedure TryCheckBurst ; 
 
   ------------------------------------------------------------
-  procedure CheckBurstAsync (
+  procedure TryCheckBurst (
   ------------------------------------------------------------
     signal    TransactionRec  : inout StreamRecType ;
     constant  NumBytes        : In    integer ;
+    variable  Available       : out   boolean ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) is 
     constant LocalParam : std_logic_vector(TransactionRec.ParamToModel'range) := (others => '-') ;
   begin
-    LocalCheckBurst(TransactionRec, CHECK_BURST_ASYNC, NumBytes, LocalParam, StatusMsgOn) ;
-  end procedure CheckBurstAsync ; 
+    LocalCheckBurst(TransactionRec, TRY_CHECK_BURST, NumBytes, LocalParam, StatusMsgOn) ;
+    Available := TransactionRec.BoolFromModel ;
+  end procedure TryCheckBurst ; 
 
 
   -- ========================================================
@@ -1411,7 +1462,7 @@ package body StreamTransactionPkg is
     constant Operation     : in StreamOperationType
   ) return boolean is
   begin
-    return (Operation = TRY_GET) or (Operation = TRY_CHECK) or (Operation = TRY_GET_BURST) ;
+    return (Operation = TRY_GET) or (Operation = TRY_CHECK) or (Operation = TRY_GET_BURST) or (Operation = TRY_CHECK_BURST) ;
   end function IsTry ;
 
   ------------------------------------------------------------
@@ -1420,7 +1471,7 @@ package body StreamTransactionPkg is
     constant Operation     : in StreamOperationType
   ) return boolean is
   begin
-    return (Operation = CHECK) or (Operation = TRY_CHECK) or (Operation = CHECK_BURST) or (Operation = CHECK_BURST_ASYNC) ;
+    return (Operation = CHECK) or (Operation = TRY_CHECK) or (Operation = CHECK_BURST) or (Operation = TRY_CHECK_BURST) ;
   end function IsCheck ;
 
 end StreamTransactionPkg ;
