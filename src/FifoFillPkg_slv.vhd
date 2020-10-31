@@ -170,6 +170,18 @@ package FifoFillPkg_slv is
     constant DropUndriven      : in    boolean := FALSE ;
     constant ByteAddress       : in    natural := 0 
   ) ; 
+  
+  ------------------------------------------------------------
+  procedure CheckWord (
+  -- Check a word using the byte oriented BurstFifo
+  -- Current implementation for now assumes it is assembling bytes.   
+  --
+  ------------------------------------------------------------
+    variable Fifo              : inout ScoreboardPType ;
+    variable Data              : in    std_logic_vector ; 
+    constant DropUndriven      : in    boolean := FALSE ;
+    constant ByteAddress       : in    natural := 0 
+  ) ;
 
   ------------------------------------------------------------
   function CountBytes(
@@ -404,6 +416,29 @@ package body FifoFillPkg_slv is
       Index := Index + 8 ; 
     end loop PushBytes ; 
   end PushWord ; 
+
+  ------------------------------------------------------------
+  procedure CheckWord (
+  -- Push a word into the byte oriented BurstFifo
+  -- Current implementation for now assumes it is assembling bytes.   
+  --
+  ------------------------------------------------------------
+    variable Fifo              : inout ScoreboardPType ;
+    variable Data              : in    std_logic_vector ; 
+    constant DropUndriven      : in    boolean := FALSE ;
+    constant ByteAddress       : in    natural := 0 
+  ) is
+    variable Index    : integer := ByteAddress * 8 ; 
+    constant DataLeft : integer := Data'length-1; 
+    alias aData       : std_logic_vector(DataLeft downto 0) is Data;
+  begin
+    PushBytes : while Index <= DataLeft loop  
+      if not ((DropUndriven and aData(Index) = 'U') or aData(Index) = '-') then 
+        Fifo.Check(aData(Index+7 downto Index)) ; 
+      end if ;
+      Index := Index + 8 ; 
+    end loop PushBytes ; 
+  end CheckWord ; 
 
   ------------------------------------------------------------
   function CountBytes(
