@@ -9,7 +9,9 @@
 --
 --
 --  Description:
---      Constant and Transaction Support for OSVVM UART Transmitter and Receiver models
+--    The Stream Model Independent Transaction package (StreamTransactionTransactionPkg.vhd) 
+--    defines a record for communication and transaction initiation procedures 
+--    that are suitable for Stream Interfaces.   
 --
 --
 --  Developed by:
@@ -22,6 +24,8 @@
 --    09/2020   2020.09    Updating comments to serve as documentation
 --    07/2019   2019.07    Refactored from UartTbPkg and AxiStreamTransactionPkg
 --    01/2020   2020.01    Updated license notice
+--    07/2020   2020.07    Updated
+--    10/2020   2020.10    Added bursting to stream transactions
 --
 --
 --  This file is part of OSVVM.
@@ -94,14 +98,17 @@ package StreamTransactionPkg is
   subtype StreamOperationType is resolved_max StreamUnresolvedOperationType ;
 
   -- ========================================================
-  --  StreamRecType 
-  --  Transaction interface between the test sequencer and the 
-  --  verification component.   As such it is the primary channel 
-  --  for information exchange between the two. The types bit_max,
-  --   std_logic_vector_max_c, integer_max, time_max, and 
-  --  boolean_max are defined the OSVVM package, ResolutionPkg.  
-  --  These types allow the record to support multiple drivers and 
-  --  use resolution functions based on function maximum (return largest value)
+  --  Stream Transaction Interface (StreamRecType) 
+  --  The Stream Transaction Interface (StreamRecType) defines the 
+  --  transaction interface between the test sequencer and the 
+  --  verification component.   As such, it is the primary channel for 
+  --  information exchange between the two.   It is defined as follows.
+  --
+  --  The record element types, bit_max, std_logic_vector_max_c, 
+  --  integer_max, time_max, and boolean_max, are defined in the
+  --  OSVVM package ResolutionPkg.  These types allow the record to 
+  --  support multiple drivers and use resolution functions based on 
+  --  function maximum (return largest value). 
   -- ========================================================
   type StreamRecType is record
     -- Handshaking controls
@@ -127,20 +134,15 @@ package StreamTransactionPkg is
     -- Verification Component Options Type - currently aliased to type integer_max 
     Options         : integer_max ; 
   end record StreamRecType ; 
-  
 
-  subtype StreamFifoBurstModeType is integer ;
-  
-  constant STREAM_BURST_BYTE_MODE       : integer := 0 ; 
-  constant STREAM_BURST_WORD_MODE       : integer := 1 ;
-  constant STREAM_BURST_WORD_PARAM_MODE : integer := 2 ;
-    
+
   -- --------------------------------------------------------
   -- Usage of the Transaction Interface (StreamRecType)
   -- The Data and Parameter fields of StreamRecType are unconstrained.
   -- Unconstrained objects may be used on component/entity interfaces.    
-  -- These fields will be sized when used as a record signal in the test harness 
-  -- of the testbench.  Such a declaration is shown below:
+  -- The record fields will be sized by the record signal that is mapped
+  -- as the actual in the test harness of the testbench.  
+  -- Such a declaration is shown below:
   --
   --   signal AxiStreamTransmitterTransRec : StreamRecType(
   --                DataToModel(AXI_DATA_WIDTH-1 downto 0),
@@ -151,6 +153,7 @@ package StreamTransactionPkg is
   --
   -- --------------------------------------------------------
   
+
 --!TODO add VHDL-2019 Interfaces
 
 
@@ -162,6 +165,7 @@ package StreamTransactionPkg is
   --  without generating any transactions or interface waveforms.
   --
   --  An interface transaction results in interface signaling to the DUT.
+  --  An interface transaction may be either blocking or non-blocking.
   --
   --  A blocking transaction is an interface transaction that does not 
   --  does not return (complete) until the interface operation   
@@ -169,11 +173,13 @@ package StreamTransactionPkg is
   --
   --  An asynchronous transaction is nonblocking interface transaction
   --  that returns before the transaction has completed - typically 
-  --  immediately and before the transaction has started. 
+  --  immediately and before the transaction has started.   
+  --  An asynchronous transaction has "Async" as part of its name.
   --
   --  A Try transaction is nonblocking interface transaction that 
   --  checks to see if transaction information is available, 
   --  such as read data, and if it is returns it.  
+  --  A Try transaction has "Try" as part of its name.
   --
   -- ========================================================
 
@@ -227,11 +233,43 @@ package StreamTransactionPkg is
     variable  ErrorCount      : out   natural
   ) ; 
   
+  -- ========================================================
+  -- BurstFIFOs and Burst Mode Controls
+  -- The burst FIFOs hold bursts of data that is to be sent to 
+  -- or was received from the interface.   The burst FIFO can be 
+  -- configured in the modes defined for StreamFifoBurstModeType.
+  -- Currently these modes defined as a subtype of integer, shown below.
+  -- The intention of using integers is to facilitate model specific 
+  -- extensions without the need to define separate transactions.
+  -- ========================================================
+  subtype StreamFifoBurstModeType is integer ;
   
-  -- ========================================================
-  --  Set and Get Burst Mode   
-  --  Set Burst Mode for models that do bursting.
-  -- ========================================================
+  -- Word mode indicates the burst FIFO contains interface words.
+  -- The size of the word is interface specific (UARTs support up 
+  -- to 8 bits) and sometimes interface instance specific 
+  -- (AxiStream supports interfaces sizes of 1, 2, 4, 8, 16, ... bytes)
+  constant STREAM_BURST_WORD_MODE       : StreamFifoBurstModeType  := 0 ;
+  
+  -- Word + Param mode indicates the burst FIFO contains interface 
+  -- words plus a parameter.   The size of the parameter are interface 
+  -- specific.   For example, for the OSVVM UART, the Param is 3 bits 
+  -- that correspond to parity, stop, and break error injection and 
+  -- the AxiStream uses the Param as the User field whose size is 
+  -- interface instance specific. 
+  constant STREAM_BURST_WORD_PARAM_MODE : StreamFifoBurstModeType  := 1 ;
+  
+  -- Byte mode is experimental and may be removed in a future revision.
+  -- Byte mode indicates that the burst FIFO contains bytes.  
+  -- The verification component assembles interface words from the bytes.
+  -- This allows transfers to be conceptualized in an interface independent 
+  --manner.    
+  constant STREAM_BURST_BYTE_MODE       : StreamFifoBurstModeType  := 2 ; 
+    
+  ------------------------------------------------------------
+  --  SetBurstMode and GetBurstMode
+  --  are directive transactions that configure the burst mode 
+  --  into one of the modes defined for StreamFifoBurstModeType
+  ------------------------------------------------------------
   ------------------------------------------------------------
   procedure SetBurstMode (
   ------------------------------------------------------------
@@ -549,7 +587,7 @@ package StreamTransactionPkg is
 
   -- ========================================================
   -- Check
-  -- Blocking Get Transaction. 
+  -- Blocking Check Transaction. 
   -- Data is the expected value to be received.
   -- Param, when present, is an extra parameter used by the verification component
   -- The UART verification component uses Param for received error status.
