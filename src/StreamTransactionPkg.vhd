@@ -131,7 +131,7 @@ package StreamTransactionPkg is
     BoolFromModel   : boolean_max ;
     TimeToModel     : time_max ; 
     TimeFromModel   : time_max ; 
-    -- Verification Component Options Type - currently aliased to type integer_max 
+    -- Verification Component Options Type 
     Options         : integer_max ; 
   end record StreamRecType ; 
 
