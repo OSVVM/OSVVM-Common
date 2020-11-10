@@ -59,86 +59,86 @@ library osvvm ;
 package FifoFillPkg_slv is
   ------------------------------------------------------------
   procedure PushBurst (
-  -- Push each value in the Bytes parameter into the FIFO.   
-  -- Only DataWidth bits of each value will be pushed.    
+  -- Push each value in the VectorOfWords parameter into the FIFO.   
+  -- Only FifoWidth bits of each value will be pushed.    
   ------------------------------------------------------------
-    variable Fifo      : inout ScoreboardPType ;
-    constant Bytes     : in    integer_vector ;
-    constant DataWidth : in    integer := 8
+    variable Fifo           : inout ScoreboardPType ;
+    constant VectorOfWords  : in    integer_vector ;
+    constant FifoWidth      : in    integer := 8
   ) ;
 
   ------------------------------------------------------------
   procedure PushBurstIncrement (
-  -- Push ByteCount number of values into FIFO.  The first value 
-  -- pushed will be Start and following values are one greater 
+  -- Push Count number of values into FIFO.  The first value 
+  -- pushed will be FirstWord and following values are one greater 
   -- than the previous one.  
-  -- Only DataWidth bits of each value will be pushed.    
+  -- Only FifoWidth bits of each value will be pushed.    
   ------------------------------------------------------------
     variable Fifo      : inout ScoreboardPType ;
-    constant Start     : in    integer ;
-    constant ByteCount : in    integer ;
-    constant DataWidth : in    integer := 8
+    constant FirstWord : in    integer ;
+    constant Count     : in    integer ;
+    constant FifoWidth : in    integer := 8
   ) ;
   
   ------------------------------------------------------------
   procedure PushBurstRandom (
-  -- Push ByteCount number of values into FIFO.  The first value 
-  -- pushed will be Start and following values are randomly generated 
+  -- Push Count number of values into FIFO.  The first value 
+  -- pushed will be FirstWord and following values are randomly generated 
   -- using the first value as the randomization seed.
-  -- Only DataWidth bits of each value will be pushed.    
+  -- Only FifoWidth bits of each value will be pushed.    
   ------------------------------------------------------------
     variable Fifo      : inout ScoreboardPType ;
-    constant Start     : in    integer ;
-    constant ByteCount : in    integer ;
-    constant DataWidth : in    integer := 8
+    constant FirstWord : in    integer ;
+    constant Count     : in    integer ;
+    constant FifoWidth : in    integer := 8
   ) ;
   
   ------------------------------------------------------------
   procedure PopBurst (
-  -- Pop values from the FIFO into the Bytes parameter.
-  -- Each value popped will be DataWidth bits wide.   
+  -- Pop values from the FIFO into the VectorOfWords parameter.
+  -- Each value popped will be FifoWidth bits wide.   
   ------------------------------------------------------------
-    variable Fifo      : inout ScoreboardPType ;
-    variable Bytes     : out   integer_vector ;
-    constant DataWidth : in    integer := 8
+    variable Fifo           : inout ScoreboardPType ;
+    variable VectorOfWords  : out   integer_vector ;
+    constant FifoWidth      : in    integer := 8
   ) ;
 
   ------------------------------------------------------------
   procedure CheckBurst (
   -- Pop values from the FIFO and check them against each value 
-  -- in the Bytes parameter.   
-  -- Each value popped will be DataWidth bits wide.   
+  -- in the VectorOfWords parameter.   
+  -- Each value popped will be FifoWidth bits wide.   
   ------------------------------------------------------------
-    variable Fifo      : inout ScoreboardPType ;
-    constant Bytes     : in    integer_vector ;
-    constant DataWidth : in    integer := 8
+    variable Fifo           : inout ScoreboardPType ;
+    constant VectorOfWords  : in    integer_vector ;
+    constant FifoWidth      : in    integer := 8
   ) ;
 
   ------------------------------------------------------------
   procedure CheckBurstIncrement (
   -- Pop values from the FIFO and check them against values determined 
-  -- by an incrementing pattern.  The first check value will be Start  
+  -- by an incrementing pattern.  The first check value will be FirstWord  
   -- and the following check values are one greater than the previous one.  
-  -- Each value popped will be DataWidth bits wide.   
+  -- Each value popped will be FifoWidth bits wide.   
   ------------------------------------------------------------
     variable Fifo      : inout ScoreboardPType ;
-    constant Start     : in    integer ;
-    constant ByteCount : in    integer ;
-    constant DataWidth : in    integer := 8
+    constant FirstWord : in    integer ;
+    constant Count     : in    integer ;
+    constant FifoWidth : in    integer := 8
   ) ;
   
   ------------------------------------------------------------
   procedure CheckBurstRandom (
   -- Pop values from the FIFO and check them against values determined 
-  -- by a random pattern.  The first check value will be Start and the
+  -- by a random pattern.  The first check value will be FirstWord and the
   -- following check values are randomly generated using the first  
   -- value as the randomization seed.  
-  -- Each value popped will be DataWidth bits wide.   
+  -- Each value popped will be FifoWidth bits wide.   
   ------------------------------------------------------------
     variable Fifo      : inout ScoreboardPType ;
-    constant Start     : in    integer ;
-    constant ByteCount : in    integer ;
-    constant DataWidth : in    integer := 8
+    constant FirstWord : in    integer ;
+    constant Count     : in    integer ;
+    constant FifoWidth : in    integer := 8
   ) ;
 
 
@@ -204,16 +204,16 @@ package body FifoFillPkg_slv is
   ------------------------------------------------------------
   procedure PushBurst (
   ------------------------------------------------------------
-    variable Fifo      : inout ScoreboardPType ;
-    constant Bytes     : in    integer_vector ;
-    constant DataWidth : in    integer := 8
+    variable Fifo           : inout ScoreboardPType ;
+    constant VectorOfWords  : in    integer_vector ;
+    constant FifoWidth      : in    integer := 8
   ) is
   begin
-    for i in Bytes'range loop 
-      if Bytes(i) < 0 then 
-        Fifo.Push((DataWidth downto 1 => 'U')) ;
+    for i in VectorOfWords'range loop 
+      if VectorOfWords(i) < 0 then 
+        Fifo.Push((FifoWidth downto 1 => 'U')) ;
       else 
-        Fifo.Push(to_slv(Bytes(i), DataWidth)) ;
+        Fifo.Push(to_slv(VectorOfWords(i), FifoWidth)) ;
       end if ;
     end loop ;
   end procedure PushBurst ;
@@ -222,16 +222,16 @@ package body FifoFillPkg_slv is
   procedure PushBurstIncrement (
   ------------------------------------------------------------
     variable Fifo      : inout ScoreboardPType ;
-    constant Start     : in    integer ;
-    constant ByteCount : in    integer ;
-    constant DataWidth : in    integer := 8
+    constant FirstWord : in    integer ;
+    constant Count     : in    integer ;
+    constant FifoWidth : in    integer := 8
   ) is
   begin
-    for i in Start to ByteCount+Start-1 loop 
-      if DataWidth < 31 then 
-        Fifo.Push(to_slv(i mod (2**DataWidth), DataWidth)) ;
+    for i in FirstWord to Count+FirstWord-1 loop 
+      if FifoWidth < 31 then 
+        Fifo.Push(to_slv(i mod (2**FifoWidth), FifoWidth)) ;
       else 
-        Fifo.Push(to_slv(i, DataWidth)) ;
+        Fifo.Push(to_slv(i, FifoWidth)) ;
       end if ; 
     end loop ;
   end procedure PushBurstIncrement ;
@@ -240,26 +240,26 @@ package body FifoFillPkg_slv is
   procedure PushBurstRandom (
   ------------------------------------------------------------
     variable Fifo      : inout ScoreboardPType ;
-    constant Start     : in    integer ;
-    constant ByteCount : in    integer ;
-    constant DataWidth : in    integer := 8
+    constant FirstWord : in    integer ;
+    constant Count     : in    integer ;
+    constant FifoWidth : in    integer := 8
   ) is
     variable RV : RandomPType ; 
     variable JunkValue : integer ;
-    variable Data : std_logic_vector(DataWidth-1 downto 0) ;
+    variable Data : std_logic_vector(FifoWidth-1 downto 0) ;
   begin
     -- Initialize seed and toss first random value  
-    RV.InitSeed(Start) ;
+    RV.InitSeed(FirstWord) ;
     JunkValue := RV.RandInt(1, 10) ;  -- toss
     
-    if DataWidth < 31 then 
-      Fifo.Push(to_slv(Start mod (2**DataWidth), DataWidth)) ;
+    if FifoWidth < 31 then 
+      Fifo.Push(to_slv(FirstWord mod (2**FifoWidth), FifoWidth)) ;
     else 
-      Fifo.Push(to_slv(Start, DataWidth)) ;
+      Fifo.Push(to_slv(FirstWord, FifoWidth)) ;
     end if ; 
     
-    for i in 2 to ByteCount loop 
-      Data := RV.RandSlv(DataWidth) ;
+    for i in 2 to Count loop 
+      Data := RV.RandSlv(FifoWidth) ;
       Fifo.Push(Data) ;
     end loop ;
   end procedure PushBurstRandom ;
@@ -267,16 +267,16 @@ package body FifoFillPkg_slv is
   ------------------------------------------------------------
   procedure PopBurst (
   ------------------------------------------------------------
-    variable Fifo      : inout ScoreboardPType ;
-    variable Bytes     : out   integer_vector ;
-    constant DataWidth : in    integer := 8
+    variable Fifo           : inout ScoreboardPType ;
+    variable VectorOfWords  : out   integer_vector ;
+    constant FifoWidth      : in    integer := 8
   ) is
   begin
-    for i in Bytes'range loop 
-      if Bytes(i) < 0 then 
-        Fifo.Push((DataWidth downto 1 => 'U')) ;
+    for i in VectorOfWords'range loop 
+      if VectorOfWords(i) < 0 then 
+        Fifo.Push((FifoWidth downto 1 => 'U')) ;
       else 
-        Fifo.Push(to_slv(Bytes(i), DataWidth)) ;
+        Fifo.Push(to_slv(VectorOfWords(i), FifoWidth)) ;
       end if ;
     end loop ;
   end procedure PopBurst ;
@@ -284,20 +284,20 @@ package body FifoFillPkg_slv is
   ------------------------------------------------------------
   procedure CheckBurst (
   ------------------------------------------------------------
-    variable Fifo      : inout ScoreboardPType ;
-    constant Bytes     : in    integer_vector ;
-    constant DataWidth : in    integer := 8
+    variable Fifo           : inout ScoreboardPType ;
+    constant VectorOfWords  : in    integer_vector ;
+    constant FifoWidth      : in    integer := 8
   ) is
     variable AlertLogID : AlertLogIDType ; 
-    variable RxVal : std_logic_vector(DataWidth-1 downto 0) ;
+    variable RxVal : std_logic_vector(FifoWidth-1 downto 0) ;
   begin
     AlertLogID := Fifo.GetAlertLogID ; 
-    for i in Bytes'range loop 
+    for i in VectorOfWords'range loop 
       RxVal := Fifo.Pop ;
-      if Bytes(i) < 0 then 
-        AffirmIfEqual(AlertLogID, RxVal, (DataWidth downto 1 => 'U')) ;
+      if VectorOfWords(i) < 0 then 
+        AffirmIfEqual(AlertLogID, RxVal, (FifoWidth downto 1 => 'U')) ;
       else 
-        AffirmIfEqual(AlertLogID, RxVal, to_slv(Bytes(i), DataWidth)) ;
+        AffirmIfEqual(AlertLogID, RxVal, to_slv(VectorOfWords(i), FifoWidth)) ;
       end if ;
     end loop ;
   end procedure CheckBurst ;
@@ -306,20 +306,20 @@ package body FifoFillPkg_slv is
   procedure CheckBurstIncrement (
   ------------------------------------------------------------
     variable Fifo      : inout ScoreboardPType ;
-    constant Start     : in    integer ;
-    constant ByteCount : in    integer ;
-    constant DataWidth : in    integer := 8
+    constant FirstWord : in    integer ;
+    constant Count     : in    integer ;
+    constant FifoWidth : in    integer := 8
   ) is
     variable AlertLogID : AlertLogIDType ; 
-    variable RxVal : std_logic_vector(DataWidth-1 downto 0) ;
+    variable RxVal : std_logic_vector(FifoWidth-1 downto 0) ;
   begin
     AlertLogID := Fifo.GetAlertLogID ; 
-    for i in Start to ByteCount+Start-1 loop 
+    for i in FirstWord to Count+FirstWord-1 loop 
       RxVal := Fifo.Pop ;
-      if DataWidth < 31 then 
-        AffirmIfEqual(AlertLogID, RxVal, to_slv(i mod (2**DataWidth), DataWidth)) ;
+      if FifoWidth < 31 then 
+        AffirmIfEqual(AlertLogID, RxVal, to_slv(i mod (2**FifoWidth), FifoWidth)) ;
       else 
-        AffirmIfEqual(AlertLogID, RxVal, to_slv(i, DataWidth)) ;
+        AffirmIfEqual(AlertLogID, RxVal, to_slv(i, FifoWidth)) ;
       end if ; 
     end loop ;
   end procedure CheckBurstIncrement ;
@@ -328,31 +328,31 @@ package body FifoFillPkg_slv is
   procedure CheckBurstRandom (
   ------------------------------------------------------------
     variable Fifo      : inout ScoreboardPType ;
-    constant Start     : in    integer ;
-    constant ByteCount : in    integer ;
-    constant DataWidth : in    integer := 8
+    constant FirstWord : in    integer ;
+    constant Count     : in    integer ;
+    constant FifoWidth : in    integer := 8
   ) is
     variable RV : RandomPType ; 
     variable JunkValue : integer ;
     variable AlertLogID : AlertLogIDType ; 
-    variable RxVal, ExpVal : std_logic_vector(DataWidth-1 downto 0) ;
+    variable RxVal, ExpVal : std_logic_vector(FifoWidth-1 downto 0) ;
   begin
     AlertLogID := Fifo.GetAlertLogID ; 
     -- Initialize seed and toss first random value 
-    RV.InitSeed(Start) ;
+    RV.InitSeed(FirstWord) ;
     JunkValue := RV.RandInt(1, 10) ;  -- Toss
     
     RxVal := Fifo.Pop ;
     -- Check First Value      Received    Expected, First Value
-    if DataWidth < 31 then 
-      AffirmIfEqual(AlertLogID, RxVal, to_slv(Start mod (2**DataWidth), DataWidth)) ;
+    if FifoWidth < 31 then 
+      AffirmIfEqual(AlertLogID, RxVal, to_slv(FirstWord mod (2**FifoWidth), FifoWidth)) ;
     else 
-      AffirmIfEqual(AlertLogID, RxVal, to_slv(Start, DataWidth)) ;
+      AffirmIfEqual(AlertLogID, RxVal, to_slv(FirstWord, FifoWidth)) ;
     end if ; 
     
-    for i in 2 to ByteCount loop 
+    for i in 2 to Count loop 
       RxVal := Fifo.Pop ;
-      ExpVal := RV.RandSlv(DataWidth) ;
+      ExpVal := RV.RandSlv(FifoWidth) ;
       -- Check Remaining Values   Received    Expected
       AffirmIfEqual(AlertLogID,   RxVal,      ExpVal ) ;
     end loop ;
