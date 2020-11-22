@@ -144,12 +144,12 @@ package StreamTransactionPkg is
   -- as the actual in the test harness of the testbench.  
   -- Such a declaration is shown below:
   --
-  --   signal AxiStreamTransmitterTransRec : StreamRecType(
-  --                DataToModel(AXI_DATA_WIDTH-1 downto 0),
-  --                DataFromModel(AXI_DATA_WIDTH-1 downto 0),
-  --                ParamToModel(0 downto 1),    -- Not Used for AXI Stream
-  --                ParamFromModel(0 downto 1)   -- Not Used for AXI Stream
-  --             ) ;  
+  --   signal StreamTxRec, StreamRxRec : StreamRecType(
+  --         DataToModel   (AXI_DATA_WIDTH-1  downto 0),
+  --         ParamToModel  (AXI_PARAM_WIDTH-1 downto 0),
+  --         DataFromModel (AXI_DATA_WIDTH-1  downto 0),
+  --         ParamFromModel(AXI_PARAM_WIDTH-1 downto 0)
+  --       ) ; 
   --
   -- --------------------------------------------------------
   
@@ -165,7 +165,8 @@ package StreamTransactionPkg is
   --  without generating any transactions or interface waveforms.
   --
   --  An interface transaction results in interface signaling to the DUT.
-  --  An interface transaction may be either blocking or non-blocking.
+  --  An interface transaction may be either blocking (such as Send or Get)
+  --  or non-blocking (such as SendAsync or TryGet).
   --
   --  A blocking transaction is an interface transaction that does not 
   --  does not return (complete) until the interface operation   
@@ -245,17 +246,19 @@ package StreamTransactionPkg is
   subtype StreamFifoBurstModeType is integer ;
   
   -- Word mode indicates the burst FIFO contains interface words.
-  -- The size of the word is interface specific (UARTs support up 
-  -- to 8 bits) and sometimes interface instance specific 
-  -- (AxiStream supports interfaces sizes of 1, 2, 4, 8, 16, ... bytes)
+  -- The size of the word may either be interface specific (such as 
+  -- a UART which supports up to 8 bits) or be interface instance specific 
+  -- (such as AxiStream which supports interfaces sizes of 1, 2, 4, 8, 
+  -- 16, ... bytes)
   constant STREAM_BURST_WORD_MODE       : StreamFifoBurstModeType  := 0 ;
   
   -- Word + Param mode indicates the burst FIFO contains interface 
-  -- words plus a parameter.   The size of the parameter are interface 
-  -- specific.   For example, for the OSVVM UART, the Param is 3 bits 
-  -- that correspond to parity, stop, and break error injection and 
-  -- the AxiStream uses the Param as the User field whose size is 
-  -- interface instance specific. 
+  -- words plus a parameter.   The size of the parameter is also either
+  -- interface specific (such as the OSVVM UART, which uses 3 bits - 
+  -- one bit for each of parity, stop, and break error injection) or
+  -- interface instance specific (such as AxiStream which uses the Param
+  -- field to hold TUser).  AxiStream TUser may be different size for
+  -- different applications.
   constant STREAM_BURST_WORD_PARAM_MODE : StreamFifoBurstModeType  := 1 ;
   
   -- Byte mode is experimental and may be removed in a future revision.
@@ -273,15 +276,15 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SetBurstMode (
   ------------------------------------------------------------
-    signal   TransRec    : InOut StreamRecType ;
-    constant OptVal      : In    StreamFifoBurstModeType
+    signal   TransactionRec  : InOut StreamRecType ;
+    constant OptVal          : In    StreamFifoBurstModeType
   ) ;
 
   ------------------------------------------------------------
   procedure GetBurstMode (
   ------------------------------------------------------------
-    signal   TransRec    : InOut StreamRecType ;
-    variable OptVal      : Out   StreamFifoBurstModeType
+    signal   TransactionRec  : InOut StreamRecType ;
+    variable OptVal          : Out   StreamFifoBurstModeType
   ) ;
 
 
@@ -295,79 +298,79 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut StreamRecType ;
-    constant Option      : In    integer ;
-    constant OptVal      : In    boolean
+    signal   TransactionRec  : InOut StreamRecType ;
+    constant Option          : In    integer ;
+    constant OptVal          : In    boolean
   ) ;
 
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut StreamRecType ;
-    constant Option      : In    integer ;
-    constant OptVal      : In    integer
+    signal   TransactionRec  : InOut StreamRecType ;
+    constant Option          : In    integer ;
+    constant OptVal          : In    integer
   ) ;
 
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut StreamRecType ;
-    constant Option      : In    integer ;
-    constant OptVal      : In    std_logic_vector
+    signal   TransactionRec  : InOut StreamRecType ;
+    constant Option          : In    integer ;
+    constant OptVal          : In    std_logic_vector
   ) ;
   
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut StreamRecType ;
-    constant Option      : In    integer ;
-    constant OptVal      : In    time
+    signal   TransactionRec  : InOut StreamRecType ;
+    constant Option          : In    integer ;
+    constant OptVal          : In    time
   ) ;
   
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut StreamRecType ;
-    constant Option      : In    integer 
+    signal   TransactionRec  : InOut StreamRecType ;
+    constant Option          : In    integer 
   ) ;
   
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut StreamRecType ;
-    constant Option      : In    integer ;
-    variable OptVal      : Out   boolean
+    signal   TransactionRec  : InOut StreamRecType ;
+    constant Option          : In    integer ;
+    variable OptVal          : Out   boolean
   ) ;
 
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut StreamRecType ;
-    constant Option      : In    integer ;
-    variable OptVal      : Out   integer
+    signal   TransactionRec  : InOut StreamRecType ;
+    constant Option          : In    integer ;
+    variable OptVal          : Out   integer
   ) ;
 
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut StreamRecType ;
-    constant Option      : In    integer ;
-    variable OptVal      : Out   std_logic_vector
+    signal   TransactionRec  : InOut StreamRecType ;
+    constant Option          : In    integer ;
+    variable OptVal          : Out   std_logic_vector
   ) ;
   
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut StreamRecType ;
-    constant Option      : In    integer ;
-    variable OptVal      : Out   time
+    signal   TransactionRec  : InOut StreamRecType ;
+    constant Option          : In    integer ;
+    variable OptVal          : Out   time
   ) ;
   
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut StreamRecType ;
-    constant Option      : In    integer 
+    signal   TransactionRec  : InOut StreamRecType ;
+    constant Option          : In    integer 
   ) ;
 
 
@@ -805,25 +808,25 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SetBurstMode (
   ------------------------------------------------------------
-    signal   TransRec    : InOut StreamRecType ;
+    signal   TransactionRec    : InOut StreamRecType ;
     constant OptVal      : In    StreamFifoBurstModeType
   ) is
   begin
-    TransRec.Operation     <= SET_BURST_MODE ;
-    TransRec.IntToModel    <= OptVal ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    TransactionRec.Operation     <= SET_BURST_MODE ;
+    TransactionRec.IntToModel    <= OptVal ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure SetBurstMode ;
 
   ------------------------------------------------------------
   procedure GetBurstMode (
   ------------------------------------------------------------
-    signal   TransRec    : InOut StreamRecType ;
+    signal   TransactionRec    : InOut StreamRecType ;
     variable OptVal      : Out   StreamFifoBurstModeType
   ) is
   begin
-    TransRec.Operation     <= GET_BURST_MODE ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
-    OptVal := TransRec.IntFromModel ; 
+    TransactionRec.Operation     <= GET_BURST_MODE ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+    OptVal := TransactionRec.IntFromModel ; 
   end procedure GetBurstMode ;
 
 
@@ -837,141 +840,141 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut StreamRecType ;
-    constant Option      : In    integer ;
-    constant OptVal      : In    boolean
+    signal   TransactionRec  : InOut StreamRecType ;
+    constant Option          : In    integer ;
+    constant OptVal          : In    boolean
   ) is
   begin
-    TransRec.Operation     <= SET_MODEL_OPTIONS ;
-    TransRec.Options       <= Option ;
-    TransRec.BoolToModel   <= OptVal ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    TransactionRec.Operation     <= SET_MODEL_OPTIONS ;
+    TransactionRec.Options       <= Option ;
+    TransactionRec.BoolToModel   <= OptVal ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure SetModelOptions ;
 
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut StreamRecType ;
-    constant Option      : In    integer ;
-    constant OptVal      : In    integer
+    signal   TransactionRec  : InOut StreamRecType ;
+    constant Option          : In    integer ;
+    constant OptVal          : In    integer
   ) is
   begin
-    TransRec.Operation     <= SET_MODEL_OPTIONS ;
-    TransRec.Options       <= Option ;
-    TransRec.IntToModel    <= OptVal ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    TransactionRec.Operation     <= SET_MODEL_OPTIONS ;
+    TransactionRec.Options       <= Option ;
+    TransactionRec.IntToModel    <= OptVal ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure SetModelOptions ;
 
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut StreamRecType ;
-    constant Option      : In    integer ;
-    constant OptVal      : In    std_logic_vector
+    signal   TransactionRec  : InOut StreamRecType ;
+    constant Option          : In    integer ;
+    constant OptVal          : In    std_logic_vector
   ) is
   begin
-    TransRec.Operation     <= SET_MODEL_OPTIONS ;
-    TransRec.Options       <= Option ;
-    TransRec.IntToModel    <= to_integer(OptVal) ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    TransactionRec.Operation     <= SET_MODEL_OPTIONS ;
+    TransactionRec.Options       <= Option ;
+    TransactionRec.IntToModel    <= to_integer(OptVal) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure SetModelOptions ;
   
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut StreamRecType ;
-    constant Option      : In    integer ;
-    constant OptVal      : In    time
+    signal   TransactionRec  : InOut StreamRecType ;
+    constant Option          : In    integer ;
+    constant OptVal          : In    time
   ) is
   begin
-    TransRec.Operation     <= SET_MODEL_OPTIONS ;
-    TransRec.Options       <= Option ;
-    TransRec.TimeToModel   <= OptVal ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    TransactionRec.Operation     <= SET_MODEL_OPTIONS ;
+    TransactionRec.Options       <= Option ;
+    TransactionRec.TimeToModel   <= OptVal ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure SetModelOptions ;
 
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut StreamRecType ;
-    constant Option      : In    integer 
+    signal   TransactionRec  : InOut StreamRecType ;
+    constant Option          : In    integer 
   ) is
   begin
-    TransRec.Operation     <= SET_MODEL_OPTIONS ;
-    TransRec.Options       <= Option ;
+    TransactionRec.Operation     <= SET_MODEL_OPTIONS ;
+    TransactionRec.Options       <= Option ;
     -- OptVal handled by Model Specific Package
-    -- TransRec.IntToModel    <= to_integer(OptVal) ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    -- TransactionRec.IntToModel    <= to_integer(OptVal) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure SetModelOptions ;
 
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut StreamRecType ;
-    constant Option      : In    integer ;
-    variable OptVal      : Out   boolean
+    signal   TransactionRec  : InOut StreamRecType ;
+    constant Option          : In    integer ;
+    variable OptVal          : Out   boolean
   ) is
   begin
-    TransRec.Operation     <= GET_MODEL_OPTIONS ;
-    TransRec.Options       <= Option ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
-    OptVal := TransRec.BoolFromModel    ;
+    TransactionRec.Operation     <= GET_MODEL_OPTIONS ;
+    TransactionRec.Options       <= Option ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+    OptVal := TransactionRec.BoolFromModel    ;
   end procedure GetModelOptions ;
 
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut StreamRecType ;
-    constant Option      : In    integer ;
-    variable OptVal      : Out   integer
+    signal   TransactionRec  : InOut StreamRecType ;
+    constant Option          : In    integer ;
+    variable OptVal          : Out   integer
   ) is
   begin
-    TransRec.Operation     <= GET_MODEL_OPTIONS ;
-    TransRec.Options       <= Option ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
-    OptVal := TransRec.IntFromModel ; 
+    TransactionRec.Operation     <= GET_MODEL_OPTIONS ;
+    TransactionRec.Options       <= Option ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+    OptVal := TransactionRec.IntFromModel ; 
   end procedure GetModelOptions ;
 
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut StreamRecType ;
-    constant Option      : In    integer ;
-    variable OptVal      : Out   std_logic_vector
+    signal   TransactionRec  : InOut StreamRecType ;
+    constant Option          : In    integer ;
+    variable OptVal          : Out   std_logic_vector
   ) is
   begin
-    TransRec.Operation     <= GET_MODEL_OPTIONS ;
-    TransRec.Options       <= Option ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
-    OptVal := to_slv(TransRec.IntFromModel, OptVal'length) ; 
+    TransactionRec.Operation     <= GET_MODEL_OPTIONS ;
+    TransactionRec.Options       <= Option ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+    OptVal := to_slv(TransactionRec.IntFromModel, OptVal'length) ; 
   end procedure GetModelOptions ;
   
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut StreamRecType ;
-    constant Option      : In    integer ;
-    variable OptVal      : Out   time
+    signal   TransactionRec  : InOut StreamRecType ;
+    constant Option          : In    integer ;
+    variable OptVal          : Out   time
   ) is
   begin
-    TransRec.Operation     <= GET_MODEL_OPTIONS ;
-    TransRec.Options       <= Option ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
-    OptVal := TransRec.TimeFromModel ; 
+    TransactionRec.Operation     <= GET_MODEL_OPTIONS ;
+    TransactionRec.Options       <= Option ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+    OptVal := TransactionRec.TimeFromModel ; 
   end procedure GetModelOptions ;
 
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut StreamRecType ;
-    constant Option      : In    integer 
+    signal   TransactionRec  : InOut StreamRecType ;
+    constant Option          : In    integer 
   ) is
   begin
-    TransRec.Operation     <= GET_MODEL_OPTIONS ;
-    TransRec.Options       <= Option ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    TransactionRec.Operation     <= GET_MODEL_OPTIONS ;
+    TransactionRec.Options       <= Option ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     -- OptVal handled by Model Specific layer overloading
-    -- OptVal := TransRec.TimeFromModel ; 
+    -- OptVal := TransactionRec.TimeFromModel ; 
   end procedure GetModelOptions ;
 
 
