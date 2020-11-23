@@ -1,6 +1,7 @@
 # OSVVM Common Library Change Log
 
 Revision      Date             Comments
+**2020.10**   October 2020     Added Bursting to Stream MOdel Independent Transactions 
 **2020.07**   July 2020        Major release.  
                                Package names have changed.
                                Transaction naming updated to remove
