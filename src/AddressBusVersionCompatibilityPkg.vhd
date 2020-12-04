@@ -57,137 +57,140 @@ use work.AddressBusResponderTransactionPkg.all ;
     
 package AddressBusVersionCompatibilityPkg is
 
-  alias AddressBusMasterTransactionRecType is AddressBusTransactionRecType ; 
+--  constant WAIT_CLOCK : UnresolvedAddressBusOperationType := WAIT_FOR_CLOCK ; 
+
+  alias AddressBusTransactionRecType is AddressBusRecType ; 
+  alias AddressBusMasterTransactionRecType is AddressBusRecType ; 
   alias AddressBusMasterOperationType is AddressBusOperationType ; 
-  alias AddressBusSlaveTransactionRecType is AddressBusTransactionRecType ; 
+  alias AddressBusSlaveTransactionRecType is AddressBusRecType ; 
   alias AddressBusSlaveOperationType is AddressBusOperationType ; 
   
 
 
   alias MasterWrite is Write 
-    [AddressBusTransactionRecType, std_logic_vector, std_logic_vector, boolean];
+    [AddressBusRecType, std_logic_vector, std_logic_vector, boolean];
 
   ------------------------------------------------------------
   alias MasterWriteAsync is WriteAsync
-    [AddressBusTransactionRecType, std_logic_vector, std_logic_vector, boolean];
+    [AddressBusRecType, std_logic_vector, std_logic_vector, boolean];
 
   ------------------------------------------------------------
   alias MasterWriteAddressAsync is WriteAddressAsync
-    [AddressBusTransactionRecType, std_logic_vector, boolean];
+    [AddressBusRecType, std_logic_vector, boolean];
 
   ------------------------------------------------------------
   alias MasterWriteDataAsync is WriteDataAsync
-    [AddressBusTransactionRecType, std_logic_vector, std_logic_vector, boolean];
+    [AddressBusRecType, std_logic_vector, std_logic_vector, boolean];
 
   ------------------------------------------------------------
   alias MasterWriteDataAsync is WriteDataAsync
-    [AddressBusTransactionRecType, std_logic_vector, boolean];
+    [AddressBusRecType, std_logic_vector, boolean];
   
   ------------------------------------------------------------
   alias MasterWriteBurst is WriteBurst
-    [AddressBusTransactionRecType, std_logic_vector, integer, boolean];
+    [AddressBusRecType, std_logic_vector, integer, boolean];
 
   ------------------------------------------------------------
   alias MasterWriteBurstAsync is WriteBurstAsync
-    [AddressBusTransactionRecType, std_logic_vector, integer, boolean];
+    [AddressBusRecType, std_logic_vector, integer, boolean];
 
   ------------------------------------------------------------
   alias MasterRead is Read
-    [AddressBusTransactionRecType, std_logic_vector, std_logic_vector, boolean];
+    [AddressBusRecType, std_logic_vector, std_logic_vector, boolean];
 
   ------------------------------------------------------------
   alias MasterReadCheck is ReadCheck
-    [AddressBusTransactionRecType, std_logic_vector, std_logic_vector, boolean];
+    [AddressBusRecType, std_logic_vector, std_logic_vector, boolean];
 
   ------------------------------------------------------------
   alias MasterReadAddressAsync is ReadAddressAsync
-    [AddressBusTransactionRecType, std_logic_vector, boolean];
+    [AddressBusRecType, std_logic_vector, boolean];
 
   ------------------------------------------------------------
   alias MasterReadData is ReadData
-    [AddressBusTransactionRecType, std_logic_vector, boolean];
+    [AddressBusRecType, std_logic_vector, boolean];
 
   ------------------------------------------------------------
   alias MasterReadCheckData is ReadCheckData
-    [AddressBusTransactionRecType, std_logic_vector, boolean];
+    [AddressBusRecType, std_logic_vector, boolean];
 
   ------------------------------------------------------------
   alias MasterTryReadData is TryReadData
-    [AddressBusTransactionRecType, std_logic_vector, boolean, boolean];
+    [AddressBusRecType, std_logic_vector, boolean, boolean];
 
   ------------------------------------------------------------
   alias MasterTryReadCheckData is TryReadCheckData
-    [AddressBusTransactionRecType, std_logic_vector, boolean, boolean];
+    [AddressBusRecType, std_logic_vector, boolean, boolean];
 
   ------------------------------------------------------------
   alias MasterReadPoll is ReadPoll
-    [AddressBusTransactionRecType, std_logic_vector, std_logic_vector, 
+    [AddressBusRecType, std_logic_vector, std_logic_vector, 
      Integer, std_logic, boolean, natural];
 
   ------------------------------------------------------------
   alias MasterReadPoll is ReadPoll
-    [AddressBusTransactionRecType, std_logic_vector,  
+    [AddressBusRecType, std_logic_vector,  
      Integer, std_logic, boolean, natural];
   
   ------------------------------------------------------------
   alias MasterReadBurst is ReadBurst
-    [AddressBusTransactionRecType, std_logic_vector, integer, boolean];
+    [AddressBusRecType, std_logic_vector, integer, boolean];
 
   ------------------------------------------------------------
   alias SlaveGetWrite is GetWrite
-    [AddressBusTransactionRecType, std_logic_vector, std_logic_vector, boolean];
+    [AddressBusRecType, std_logic_vector, std_logic_vector, boolean];
   
   ------------------------------------------------------------
   alias SlaveTryGetWrite is TryGetWrite
-    [AddressBusTransactionRecType, std_logic_vector, std_logic_vector, boolean, boolean];
+    [AddressBusRecType, std_logic_vector, std_logic_vector, boolean, boolean];
 
   ------------------------------------------------------------
   alias SlaveGetWriteAddress is GetWriteAddress
-    [AddressBusTransactionRecType, std_logic_vector, boolean];
+    [AddressBusRecType, std_logic_vector, boolean];
   
   ------------------------------------------------------------
   alias SlaveTryGetWriteAddress is TryGetWriteAddress
-    [AddressBusTransactionRecType, std_logic_vector, boolean, boolean];
+    [AddressBusRecType, std_logic_vector, boolean, boolean];
 
   ------------------------------------------------------------
   alias SlaveGetWriteData is GetWriteData
-    [AddressBusTransactionRecType, std_logic_vector, std_logic_vector, boolean];
+    [AddressBusRecType, std_logic_vector, std_logic_vector, boolean];
   
   ------------------------------------------------------------
   alias SlaveTryGetWriteData is TryGetWriteData
-    [AddressBusTransactionRecType, std_logic_vector, std_logic_vector, boolean, boolean];
+    [AddressBusRecType, std_logic_vector, std_logic_vector, boolean, boolean];
   
   ------------------------------------------------------------
   alias SlaveGetWriteData is GetWriteData
-    [AddressBusTransactionRecType, std_logic_vector, boolean];
+    [AddressBusRecType, std_logic_vector, boolean];
 
   ------------------------------------------------------------
   alias SlaveTryGetWriteData is TryGetWriteData
-    [AddressBusTransactionRecType, std_logic_vector, boolean, boolean];
+    [AddressBusRecType, std_logic_vector, boolean, boolean];
 
   ------------------------------------------------------------
   alias SlaveRead is SendRead
-    [AddressBusTransactionRecType, std_logic_vector, std_logic_vector, boolean];
+    [AddressBusRecType, std_logic_vector, std_logic_vector, boolean];
   
   ------------------------------------------------------------
   alias SlaveTryRead is TrySendRead
-    [AddressBusTransactionRecType, std_logic_vector, std_logic_vector, boolean, boolean];
+    [AddressBusRecType, std_logic_vector, std_logic_vector, boolean, boolean];
   
   ------------------------------------------------------------
   alias SlaveReadAddress is GetReadAddress
-    [AddressBusTransactionRecType, std_logic_vector, boolean];
+    [AddressBusRecType, std_logic_vector, boolean];
   
   ------------------------------------------------------------
   alias SlaveTryReadAddress is TryGetReadAddress
-    [AddressBusTransactionRecType, std_logic_vector, boolean, boolean];
+    [AddressBusRecType, std_logic_vector, boolean, boolean];
   
   ------------------------------------------------------------
   alias SlaveReadData is SendReadData
-    [AddressBusTransactionRecType, std_logic_vector, boolean];
+    [AddressBusRecType, std_logic_vector, boolean];
   
   ------------------------------------------------------------
   alias SlaveAsyncReadData is AsyncSendReadData 
-    [AddressBusTransactionRecType, std_logic_vector, boolean];
+    [AddressBusRecType, std_logic_vector, boolean];
   
 end package AddressBusVersionCompatibilityPkg ;
 

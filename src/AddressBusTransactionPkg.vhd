@@ -26,7 +26,7 @@
 --    02/2020   2020.02    Refactored from Axi4LiteMasterTransactionPkg
 --    07/2020   2020.07    Unified M/S packages - dropping M/S terminology
 --    09/2020   2020.09    Updating comments to serve as documentation
---
+--    12/2020   2020.12    Added SetBurstMode, updated parameter names for consistency
 --
 --  This file is part of OSVVM.
 --  
@@ -55,8 +55,6 @@ library osvvm ;
     
 package AddressBusTransactionPkg is
 
-  alias ModelOptionsType is integer_max ; 
-
   -- ========================================================
   --  AddressBusOperationType 
   --  Enumeration type used to communication transaction type
@@ -66,11 +64,18 @@ package AddressBusTransactionPkg is
     --
     -- Model Directives
     --
-    WAIT_CLOCK, 
-    GET_ALERTLOG_ID, 
+    WAIT_FOR_CLOCK,
+    WAIT_FOR_TRANSACTION,
+    WAIT_FOR_WRITE_TRANSACTION, WAIT_FOR_READ_TRANSACTION, 
     GET_TRANSACTION_COUNT, 
     GET_WRITE_TRANSACTION_COUNT, GET_READ_TRANSACTION_COUNT,
-    SET_MODEL_OPTIONS, GET_MODEL_OPTIONS,
+    GET_ALERTLOG_ID, 
+    -- Burst FIFO Configuration
+    SET_BURST_MODE,
+    GET_BURST_MODE,
+    -- Model Options
+    SET_MODEL_OPTIONS, 
+    GET_MODEL_OPTIONS,
     --
     --  bus operations                        Master                Minion
     --                       --------------------------------------------------------
@@ -109,6 +114,7 @@ package AddressBusTransactionPkg is
 
     THE_END
   ) ;
+  
   type UnresolvedAddressBusOperationVectorType is array (natural range <>) of UnresolvedAddressBusOperationType ;
 --  alias resolved_max is maximum[ UnresolvedAddressBusOperationVectorType return UnresolvedAddressBusOperationType] ;
   -- Maximum is implicitly defined for any array type in VHDL-2008.   Function resolved_max is a fall back.
@@ -117,7 +123,7 @@ package AddressBusTransactionPkg is
 
 
   -- ========================================================
-  --  AddressBusTransactionRecType 
+  --  AddressBusRecType 
   --  Transaction interface between the test sequencer and the 
   --  verification component.   As such it is the primary channel 
   --  for information exchange between the two.
@@ -126,7 +132,7 @@ package AddressBusTransactionPkg is
   --  These types allow the record to support multiple drivers and 
   --  use resolution functions based on function maximum (return largest value)
   -- ========================================================
-  type AddressBusTransactionRecType is record
+  type AddressBusRecType is record
     -- Handshaking controls
     --   Used by RequestTransaction in the Transaction Procedures
     --   Used by WaitForTransaction in the Verification Component
@@ -155,17 +161,17 @@ package AddressBusTransactionPkg is
     IntFromModel       : integer_max ; 
     BoolFromModel      : boolean_max ;
     -- Verification Component Options Type - currently aliased to type integer_max 
-    Options            : ModelOptionsType ;  
-  end record AddressBusTransactionRecType ;
+    Options            : integer_max ;  
+  end record AddressBusRecType ;
   
   -- --------------------------------------------------------
-  -- Usage of the Transaction Interface (AddressBusTransactionRecType)
-  -- The Address and Data fields of AddressBusTransactionRecType are unconstrained.
+  -- Usage of the Transaction Interface (AddressBusRecType)
+  -- The Address and Data fields of AddressBusRecType are unconstrained.
   -- Unconstrained objects may be used on component/entity interfaces.    
   -- These fields will be sized when used as a record signal in the test harness 
   -- of the testbench.  Such a declaration is shown below:
   --
-  --   signal AxiInitiatorTransRec : AddressBusTransactionRecType(
+  --   signal AxiInitiatorTransactionRec : AddressBusRecType(
   --           Address      (27 downto 0),
   --           DataToModel  (31 downto 0),
   --           DataFromModel(31 downto 0)
@@ -206,54 +212,121 @@ package AddressBusTransactionPkg is
   --  Supported by all verification components
   -- ========================================================
   ------------------------------------------------------------
+  procedure WaitForTransaction (
+  --  Wait until pending transaction completes
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout AddressBusRecType 
+  ) ; 
+
+  ------------------------------------------------------------
+  procedure WaitForWriteTransaction (
+  --  Wait until pending transaction completes
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout AddressBusRecType 
+  ) ; 
+
+  ------------------------------------------------------------
+  procedure WaitForReadTransaction (
+  --  Wait until pending transaction completes
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout AddressBusRecType 
+  ) ;
+  
+  ------------------------------------------------------------
   procedure WaitForClock (
   -- Wait for NumberOfClocks number of clocks 
   -- relative to the verification component clock
   ------------------------------------------------------------
-    signal   TransRec        : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec  : InOut AddressBusRecType ;
              NumberOfClocks  : In    natural := 1
   ) ;
 
-  alias NoOp is WaitForClock [AddressBusTransactionRecType, natural] ;
-
-  ------------------------------------------------------------
-  procedure GetAlertLogID (
-  -- Get the AlertLogID from the verification component.
-  ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    variable AlertLogID  : Out   AlertLogIDType
-  ) ;
-
-  ------------------------------------------------------------
-  procedure GetErrors (
-  -- Error reporting for testbenches that do not use OSVVM AlertLogPkg
-  -- Returns error count.  If an error count /= 0, also print errors
-  ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    variable ErrCnt      : Out   natural
-  ) ;
+  alias NoOp is WaitForClock [AddressBusRecType, natural] ;
 
   ------------------------------------------------------------
   procedure GetTransactionCount (
   -- Get the number of transactions handled by the model.  
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    variable Count       : Out   integer
+    signal   TransactionRec : InOut AddressBusRecType ;
+    variable Count          : Out   integer
   ) ;
 
   ------------------------------------------------------------
   procedure GetWriteTransactionCount (
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    variable Count       : Out   integer
+    signal   TransactionRec : InOut AddressBusRecType ;
+    variable Count          : Out   integer
   ) ;
 
   ------------------------------------------------------------
   procedure GetReadTransactionCount (
   -- Get the number of read transactions handled by the model.  
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    variable Count       : Out   integer
+    signal   TransactionRec : InOut AddressBusRecType ;
+    variable Count          : Out   integer
+  ) ;
+
+  ------------------------------------------------------------
+  procedure GetAlertLogID (
+  -- Get the AlertLogID from the verification component.
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+    variable AlertLogID     : Out   AlertLogIDType
+  ) ;
+
+  ------------------------------------------------------------
+  procedure GetErrorCount (
+  -- Error reporting for testbenches that do not use OSVVM AlertLogPkg
+  -- Returns error count.  If an error count /= 0, also print errors
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+    variable ErrorCount     : Out   natural
+  ) ;
+
+  alias GetErrors is GetErrorCount [AddressBusRecType, natural] ;
+
+
+  -- ========================================================
+  -- BurstFIFOs and Burst Mode Controls
+  -- The burst FIFOs hold bursts of data that is to be sent to 
+  -- or was received from the interface.   The burst FIFO can be 
+  -- configured in the modes defined for StreamFifoBurstModeType.
+  -- Currently these modes defined as a subtype of integer, shown below.
+  -- The intention of using integers is to facilitate model specific 
+  -- extensions without the need to define separate transactions.
+  -- ========================================================
+  subtype AddressBusFifoBurstModeType is integer ;
+  
+  -- Word mode indicates the burst FIFO contains interface words.
+  -- The size of the word may either be interface specific (such as 
+  -- a UART which supports up to 8 bits) or be interface instance specific 
+  -- (such as AxiStream which supports interfaces sizes of 1, 2, 4, 8, 
+  -- 16, ... bytes)
+  constant ADDRESS_BUS_BURST_WORD_MODE       : AddressBusFifoBurstModeType  := 0 ;
+  
+  -- Byte mode is experimental and may be removed in a future revision.
+  -- Byte mode indicates that the burst FIFO contains bytes.  
+  -- The verification component assembles interface words from the bytes.
+  -- This allows transfers to be conceptualized in an interface independent 
+  --manner.    
+  constant ADDRESS_BUS_BURST_BYTE_MODE       : AddressBusFifoBurstModeType  := 1 ; 
+
+  -- ========================================================
+  --  Set and Get Burst Mode   
+  --  Set Burst Mode for models that do bursting.
+  -- ========================================================
+  ------------------------------------------------------------
+  procedure SetBurstMode (
+  ------------------------------------------------------------
+    signal   TransactionRec  : InOut AddressBusRecType ;
+    constant OptVal          : In    AddressBusFifoBurstModeType
+  ) ;
+
+  ------------------------------------------------------------
+  procedure GetBurstMode (
+  ------------------------------------------------------------
+    signal   TransactionRec  : InOut AddressBusRecType ;
+    variable OptVal          : Out   AddressBusFifoBurstModeType
   ) ;
 
 
@@ -267,49 +340,49 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    constant Option      : In    ModelOptionsType ;
-    constant OptVal      : In    boolean
+    signal   TransactionRec : InOut AddressBusRecType ;
+    constant Option         : In    integer ;
+    constant OptVal         : In    boolean
   ) ;
 
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    constant Option      : In    ModelOptionsType ;
-    constant OptVal      : In    integer
+    signal   TransactionRec : InOut AddressBusRecType ;
+    constant Option         : In    integer ;
+    constant OptVal         : In    integer
   ) ;
 
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    constant Option      : In    ModelOptionsType ;
-    constant OptVal      : In    std_logic_vector
+    signal   TransactionRec : InOut AddressBusRecType ;
+    constant Option         : In    integer ;
+    constant OptVal         : In    std_logic_vector
   ) ;
   
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    constant Option      : In    ModelOptionsType ;
-    variable OptVal      : Out   boolean
+    signal   TransactionRec : InOut AddressBusRecType ;
+    constant Option         : In    integer ;
+    variable OptVal         : Out   boolean
   ) ;
 
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    constant Option      : In    ModelOptionsType ;
-    variable OptVal      : Out   integer
+    signal   TransactionRec : InOut AddressBusRecType ;
+    constant Option         : In    integer ;
+    variable OptVal         : Out   integer
   ) ;
 
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    constant Option      : In    ModelOptionsType ;
-    variable OptVal      : Out   std_logic_vector
+    signal   TransactionRec : InOut AddressBusRecType ;
+    constant Option         : In    integer ;
+    variable OptVal         : Out   std_logic_vector
   ) ;
   
   
@@ -331,40 +404,40 @@ package AddressBusTransactionPkg is
   procedure Write (
   -- Blocking Write Transaction. 
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             iData       : In    std_logic_vector ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             iData          : In    std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
   ) ;
 
   ------------------------------------------------------------
   procedure WriteAsync (
   -- Asynchronous / Non-Blocking Write Transaction
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             iData       : In    std_logic_vector ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             iData          : In    std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
   ) ;
 
   ------------------------------------------------------------
   procedure Read (
   -- Blocking Read Transaction.
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-    variable oData       : Out   std_logic_vector ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+    variable oData          : Out   std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
   ) ;
 
   ------------------------------------------------------------
   procedure ReadCheck (
   -- Blocking Read Transaction and check iData, rather than returning a value.
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             iData       : In    std_logic_vector ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             iData          : In    std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
   ) ;
   
   ------------------------------------------------------------
@@ -373,13 +446,13 @@ package AddressBusTransactionPkg is
   -- WaitTime is the number of clocks to wait between reads.
   -- oData is the value read.
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-    variable oData       : Out   std_logic_vector ;
-             Index       : In    Integer ;
-             BitValue    : In    std_logic ;
-             StatusMsgOn : In    boolean := false ;
-             WaitTime    : In    natural := 10
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+    variable oData          : Out   std_logic_vector ;
+             Index          : In    Integer ;
+             BitValue       : In    std_logic ;
+             StatusMsgOn    : In    boolean := false ;
+             WaitTime       : In    natural := 10
   ) ;
 
   ------------------------------------------------------------
@@ -387,12 +460,12 @@ package AddressBusTransactionPkg is
   -- Read location (iAddr) until Data(IndexI) = ValueI
   -- WaitTime is the number of clocks to wait between reads.
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             Index       : In    Integer ;
-             BitValue    : In    std_logic ;
-             StatusMsgOn : In    boolean := false ;
-             WaitTime    : In    natural := 10
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             Index          : In    Integer ;
+             BitValue       : In    std_logic ;
+             StatusMsgOn    : In    boolean := false ;
+             WaitTime       : In    natural := 10
   ) ;
   
   
@@ -409,34 +482,34 @@ package AddressBusTransactionPkg is
   procedure WriteBurst (
   -- Blocking Write Burst.   
   -- Data is provided separately via a WriteBurstFifo.   
-  -- NumBytes specifies the number of bytes to be transferred.
+  -- NumFifoWords specifies the number of items from the FIFO to be transferred.
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             NumBytes    : In    integer ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             NumFifoWords   : In    integer ;
+             StatusMsgOn    : In    boolean := false
   ) ;
 
   ------------------------------------------------------------
   procedure WriteBurstAsync (
   -- Asynchronous / Non-Blocking Write Burst.   
   -- Data is provided separately via a WriteBurstFifo.   
-  -- NumBytes specifies the number of bytes to be transferred.
+  -- NumFifoWords specifies the number of bytes to be transferred.
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             NumBytes    : In    integer ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             NumFifoWords   : In    integer ;
+             StatusMsgOn    : In    boolean := false
   ) ;
   
   ------------------------------------------------------------
   procedure ReadBurst (
   -- Blocking Read Burst.
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             NumBytes    : In    integer ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             NumFifoWords   : In    integer ;
+             StatusMsgOn    : In    boolean := false
   ) ;
 
 
@@ -454,55 +527,55 @@ package AddressBusTransactionPkg is
   procedure WriteAddressAsync (
   -- Non-blocking Write Address 
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
   ) ;
 
   ------------------------------------------------------------
   procedure WriteDataAsync (
   -- Non-blocking Write Data 
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             iData       : In    std_logic_vector ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             iData          : In    std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
   ) ;
 
   ------------------------------------------------------------
   procedure WriteDataAsync (
   -- Non-blocking Write Data.  iAddr = 0.  
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iData       : In    std_logic_vector ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iData          : In    std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
   ) ;
   
   ------------------------------------------------------------
   procedure ReadAddressAsync (
   -- Non-blocking Read Address
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
   ) ;
 
   ------------------------------------------------------------
   procedure ReadData (
   -- Blocking Read Data
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    variable oData       : Out   std_logic_vector ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+    variable oData          : Out   std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
   ) ;
 
   ------------------------------------------------------------
   procedure ReadCheckData (
   -- Blocking Read data and check iData, rather than returning a value.
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iData       : In    std_logic_vector ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iData          : In    std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
   ) ;
 
   ------------------------------------------------------------
@@ -511,10 +584,10 @@ package AddressBusTransactionPkg is
   -- If data is available, get it and return available TRUE.
   -- Otherwise Return Available FALSE.
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    variable oData       : Out   std_logic_vector ;
-    variable Available   : Out   boolean ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+    variable oData          : Out   std_logic_vector ;
+    variable Available      : Out   boolean ;
+             StatusMsgOn    : In    boolean := false
   ) ;
 
   ------------------------------------------------------------
@@ -523,10 +596,10 @@ package AddressBusTransactionPkg is
   -- If data is available, check it and return available TRUE.
   -- Otherwise Return Available FALSE.
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iData       : In    std_logic_vector ;
-    variable Available   : Out   boolean ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iData          : In    std_logic_vector ;
+    variable Available      : Out   boolean ;
+             StatusMsgOn    : In    boolean := false
   ) ;
 
 
@@ -641,329 +714,478 @@ package body AddressBusTransactionPkg is
 
 
   ------------------------------------------------------------
+  procedure WaitForTransaction (
+  --  Wait until pending transaction completes
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout AddressBusRecType 
+  ) is
+  begin
+    TransactionRec.Operation   <= WAIT_FOR_TRANSACTION ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
+  end procedure WaitForTransaction ; 
+
+  ------------------------------------------------------------
+  procedure WaitForWriteTransaction (
+  --  Wait until pending transaction completes
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout AddressBusRecType 
+  ) is
+  begin
+    TransactionRec.Operation   <= WAIT_FOR_WRITE_TRANSACTION ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
+  end procedure WaitForWriteTransaction ; 
+
+  ------------------------------------------------------------
+  procedure WaitForReadTransaction (
+  --  Wait until pending transaction completes
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout AddressBusRecType 
+  ) is
+  begin
+    TransactionRec.Operation   <= WAIT_FOR_READ_TRANSACTION ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
+  end procedure WaitForReadTransaction ; 
+
+  ------------------------------------------------------------
   procedure WaitForClock (
   -- Directive:  Wait for NumberOfClocks number of clocks in the model
   ------------------------------------------------------------
-    signal   TransRec        : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec  : InOut AddressBusRecType ;
              NumberOfClocks  : In    natural := 1
   ) is
   begin
-    TransRec.Operation     <= WAIT_CLOCK ;
-    TransRec.DataToModel   <= ToTransaction(NumberOfClocks, TransRec.DataToModel'length);
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    TransactionRec.Operation     <= WAIT_FOR_CLOCK ;
+    TransactionRec.DataToModel   <= ToTransaction(NumberOfClocks, TransactionRec.DataToModel'length);
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure WaitForClock ;
-
-  ------------------------------------------------------------
-  procedure GetAlertLogID (
-  ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    variable AlertLogID  : Out   AlertLogIDType
-  ) is
-  begin
-    TransRec.Operation     <= GET_ALERTLOG_ID ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
-
-    -- Return AlertLogID
-    AlertLogID := AlertLogIDType(TransRec.IntFromModel) ;
-  end procedure GetAlertLogID ;
-
-  ------------------------------------------------------------
-  procedure GetErrors (
-  -- Error reporting for testbenches that do not use AlertLogPkg
-  -- Returns error count.  If an error count /= 0, also print it
-  ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    variable ErrCnt      : Out   natural
-  ) is
-    variable ModelID : AlertLogIDType ;
-  begin
-    GetAlertLogID(TransRec, ModelID) ;
-    ReportNonZeroAlerts(AlertLogID => ModelID) ;
-    ErrCnt := GetAlertCount(AlertLogID => ModelID) ;
-  end procedure GetErrors ;
 
   ------------------------------------------------------------
   procedure GetTransactionCount (
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    variable Count       : Out   integer
+    signal   TransactionRec : InOut AddressBusRecType ;
+    variable Count          : Out   integer
   ) is
   begin
-    TransRec.Operation     <= GET_TRANSACTION_COUNT ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    TransactionRec.Operation     <= GET_TRANSACTION_COUNT ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
 
     -- Return AlertLogID
-    Count := TransRec.IntFromModel ;
+    Count := TransactionRec.IntFromModel ;
   end procedure GetTransactionCount ;
 
   ------------------------------------------------------------
   procedure GetWriteTransactionCount (
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    variable Count       : Out   integer
+    signal   TransactionRec : InOut AddressBusRecType ;
+    variable Count          : Out   integer
   ) is
   begin
-    TransRec.Operation     <= GET_WRITE_TRANSACTION_COUNT ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    TransactionRec.Operation     <= GET_WRITE_TRANSACTION_COUNT ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
 
     -- Return AlertLogID
-    Count := TransRec.IntFromModel ;
+    Count := TransactionRec.IntFromModel ;
   end procedure GetWriteTransactionCount ;
 
   ------------------------------------------------------------
   procedure GetReadTransactionCount (
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    variable Count       : Out   integer
+    signal   TransactionRec : InOut AddressBusRecType ;
+    variable Count          : Out   integer
   ) is
   begin
-    TransRec.Operation     <= GET_READ_TRANSACTION_COUNT ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    TransactionRec.Operation     <= GET_READ_TRANSACTION_COUNT ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
 
     -- Return AlertLogID
-    Count := TransRec.IntFromModel ;
+    Count := TransactionRec.IntFromModel ;
   end procedure GetReadTransactionCount ;
 
+  ------------------------------------------------------------
+  procedure GetAlertLogID (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+    variable AlertLogID     : Out   AlertLogIDType
+  ) is
+  begin
+    TransactionRec.Operation     <= GET_ALERTLOG_ID ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+
+    -- Return AlertLogID
+    AlertLogID := AlertLogIDType(TransactionRec.IntFromModel) ;
+  end procedure GetAlertLogID ;
+
+  ------------------------------------------------------------
+  procedure GetErrorCount (
+  -- Error reporting for testbenches that do not use AlertLogPkg
+  -- Returns error count.  If an error count /= 0, also print it
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+    variable ErrorCount     : Out   natural
+  ) is
+    variable ModelID : AlertLogIDType ;
+  begin
+    GetAlertLogID(TransactionRec, ModelID) ;
+--    ReportNonZeroAlerts(AlertLogID => ModelID) ;
+    ErrorCount := GetAlertCount(AlertLogID => ModelID) ;
+  end procedure GetErrorCount ;
+
+  -- ========================================================
+  --  Set and Get Burst Mode   
+  --  Set Burst Mode for models that do bursting.
+  -- ========================================================
+  ------------------------------------------------------------
+  procedure SetBurstMode (
+  ------------------------------------------------------------
+    signal   TransactionRec  : InOut AddressBusRecType ;
+    constant OptVal          : In    AddressBusFifoBurstModeType
+  ) is
+  begin
+    TransactionRec.Operation     <= SET_BURST_MODE ;
+    TransactionRec.IntToModel    <= OptVal ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+  end procedure SetBurstMode ;
+
+  ------------------------------------------------------------
+  procedure GetBurstMode (
+  ------------------------------------------------------------
+    signal   TransactionRec  : InOut AddressBusRecType ;
+    variable OptVal          : Out   AddressBusFifoBurstModeType
+  ) is
+  begin
+    TransactionRec.Operation     <= GET_BURST_MODE ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+    OptVal := TransactionRec.IntFromModel ; 
+  end procedure GetBurstMode ;
+
+  --
+  --  Extensions to support model customizations
+  -- 
+  ------------------------------------------------------------
+  procedure SetModelOptions (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+    constant Option         : In    integer ;
+    constant OptVal         : In    boolean
+  ) is
+  begin
+    TransactionRec.Operation     <= SET_MODEL_OPTIONS ;
+    TransactionRec.Options       <= Option ;
+    TransactionRec.BoolToModel   <= OptVal ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+  end procedure SetModelOptions ;
+
+  ------------------------------------------------------------
+  procedure SetModelOptions (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+    constant Option         : In    integer ;
+    constant OptVal         : In    integer
+  ) is
+  begin
+    TransactionRec.Operation     <= SET_MODEL_OPTIONS ;
+    TransactionRec.Options       <= Option ;
+    TransactionRec.IntToModel    <= OptVal ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+  end procedure SetModelOptions ;
+
+  ------------------------------------------------------------
+  procedure SetModelOptions (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+    constant Option         : In    integer ;
+    constant OptVal         : In    std_logic_vector
+  ) is
+  begin
+    TransactionRec.Operation     <= SET_MODEL_OPTIONS ;
+    TransactionRec.Options       <= Option ;
+    TransactionRec.IntToModel    <= to_integer(OptVal) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+  end procedure SetModelOptions ;
+  
+  ------------------------------------------------------------
+  procedure GetModelOptions (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+    constant Option         : In    integer ;
+    variable OptVal         : Out   boolean
+  ) is
+  begin
+    TransactionRec.Operation     <= GET_MODEL_OPTIONS ;
+    TransactionRec.Options       <= Option ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+    OptVal := TransactionRec.BoolFromModel    ;
+  end procedure GetModelOptions ;
+
+  ------------------------------------------------------------
+  procedure GetModelOptions (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+    constant Option         : In    integer ;
+    variable OptVal         : Out   integer
+  ) is
+  begin
+    TransactionRec.Operation     <= GET_MODEL_OPTIONS ;
+    TransactionRec.Options       <= Option ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+    OptVal := TransactionRec.IntFromModel ; 
+  end procedure GetModelOptions ;
+
+  ------------------------------------------------------------
+  procedure GetModelOptions (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+    constant Option         : In    integer ;
+    variable OptVal         : Out   std_logic_vector
+  ) is
+  begin
+    TransactionRec.Operation     <= GET_MODEL_OPTIONS ;
+    TransactionRec.Options       <= Option ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+    OptVal := to_slv(TransactionRec.IntFromModel, OptVal'length) ; 
+  end procedure GetModelOptions ;
+  
+  
   ------------------------------------------------------------
   procedure Write (
   -- do CPU Write Cycle
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             iData       : In    std_logic_vector ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             iData          : In    std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
   ) is
   begin
     -- Put values in record
-    TransRec.Operation        <= WRITE_OP ;
-    TransRec.Address          <= ToTransaction(iAddr) ;
-    TransRec.AddrWidth        <= iAddr'length ;
-    TransRec.DataToModel      <= ToTransaction(Extend(iData, TransRec.DataToModel'length)) ;
-    TransRec.DataWidth        <= iData'length ;
-    TransRec.StatusMsgOn      <= StatusMsgOn ;
+    TransactionRec.Operation        <= WRITE_OP ;
+    TransactionRec.Address          <= ToTransaction(iAddr) ;
+    TransactionRec.AddrWidth        <= iAddr'length ;
+    TransactionRec.DataToModel      <= ToTransaction(Extend(iData, TransactionRec.DataToModel'length)) ;
+    TransactionRec.DataWidth        <= iData'length ;
+    TransactionRec.StatusMsgOn      <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure Write ;
 
   ------------------------------------------------------------
   procedure WriteAsync (
   -- dispatch CPU Write Cycle
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             iData       : In    std_logic_vector ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             iData          : In    std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
   ) is
   begin
     -- Put values in record
-    TransRec.Operation        <= ASYNC_WRITE ;
-    TransRec.Address          <= ToTransaction(iAddr) ;
-    TransRec.AddrWidth        <= iAddr'length ;
-    TransRec.DataToModel      <= ToTransaction(Extend(iData, TransRec.DataToModel'length)) ;
-    TransRec.DataWidth        <= iData'length ;
-    TransRec.StatusMsgOn      <= StatusMsgOn ;
+    TransactionRec.Operation        <= ASYNC_WRITE ;
+    TransactionRec.Address          <= ToTransaction(iAddr) ;
+    TransactionRec.AddrWidth        <= iAddr'length ;
+    TransactionRec.DataToModel      <= ToTransaction(Extend(iData, TransactionRec.DataToModel'length)) ;
+    TransactionRec.DataWidth        <= iData'length ;
+    TransactionRec.StatusMsgOn      <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure WriteAsync ;
 
   ------------------------------------------------------------
   procedure WriteAddressAsync (
   -- dispatch CPU Write Address Cycle
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
   ) is
   begin
     -- Put values in record
-    TransRec.Operation        <= ASYNC_WRITE_ADDRESS ;
-    TransRec.Address          <= ToTransaction(iAddr) ;
-    TransRec.AddrWidth        <= iAddr'length ;
-    TransRec.DataToModel      <= (TransRec.DataToModel'range => 'X') ;
-    TransRec.DataWidth        <= 0 ;
-    TransRec.StatusMsgOn      <= StatusMsgOn ;
+    TransactionRec.Operation        <= ASYNC_WRITE_ADDRESS ;
+    TransactionRec.Address          <= ToTransaction(iAddr) ;
+    TransactionRec.AddrWidth        <= iAddr'length ;
+    TransactionRec.DataToModel      <= (TransactionRec.DataToModel'range => 'X') ;
+    TransactionRec.DataWidth        <= 0 ;
+    TransactionRec.StatusMsgOn      <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure WriteAddressAsync ;
 
   ------------------------------------------------------------
   procedure WriteDataAsync (
   -- dispatch CPU Write Data Cycle
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             iData       : In    std_logic_vector ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             iData          : In    std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
   ) is
   begin
     -- Put values in record
-    TransRec.Operation        <= ASYNC_WRITE_DATA ;
-    TransRec.Address          <= ToTransaction(iAddr, TransRec.Address'length) ;
-    TransRec.AddrWidth        <= iAddr'length ;
-    TransRec.DataToModel      <= ToTransaction(iData, TransRec.DataToModel'length) ;
-    TransRec.DataWidth        <= iData'length ;
-    TransRec.StatusMsgOn      <= StatusMsgOn ;
+    TransactionRec.Operation        <= ASYNC_WRITE_DATA ;
+    TransactionRec.Address          <= ToTransaction(iAddr, TransactionRec.Address'length) ;
+    TransactionRec.AddrWidth        <= iAddr'length ;
+    TransactionRec.DataToModel      <= ToTransaction(iData, TransactionRec.DataToModel'length) ;
+    TransactionRec.DataWidth        <= iData'length ;
+    TransactionRec.StatusMsgOn      <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure WriteDataAsync ;
   
   ------------------------------------------------------------
   procedure WriteDataAsync (
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iData       : In    std_logic_vector ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iData          : In    std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
   ) is
   begin
-    WriteDataAsync(TransRec, X"00", iData, StatusMsgOn) ;
+    WriteDataAsync(TransactionRec, X"00", iData, StatusMsgOn) ;
   end procedure WriteDataAsync ;
 
   ------------------------------------------------------------
   procedure WriteBurst (
   -- do CPU Write Cycle
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             NumBytes    : In    integer ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             NumFifoWords   : In    integer ;
+             StatusMsgOn    : In    boolean := false
   ) is
   begin
     -- Put values in record
-    TransRec.Operation        <= WRITE_BURST ;
-    TransRec.Address          <= ToTransaction(iAddr) ;
-    TransRec.AddrWidth        <= iAddr'length ;
---    TransRec.DataToModel      <= (TransRec.DataToModel'range => 'X') ;
-    TransRec.DataWidth        <= NumBytes ;
---    TransRec.DataToModel      <= ToTransaction(to_slv(NumBytes, TransRec.DataToModel'length)) ;
---    TransRec.DataWidth        <= 0 ;
-    TransRec.StatusMsgOn      <= StatusMsgOn ;
+    TransactionRec.Operation        <= WRITE_BURST ;
+    TransactionRec.Address          <= ToTransaction(iAddr) ;
+    TransactionRec.AddrWidth        <= iAddr'length ;
+--    TransactionRec.DataToModel      <= (TransactionRec.DataToModel'range => 'X') ;
+    TransactionRec.DataWidth        <= NumFifoWords ;
+--    TransactionRec.DataToModel      <= ToTransaction(to_slv(NumFifoWords, TransactionRec.DataToModel'length)) ;
+--    TransactionRec.DataWidth        <= 0 ;
+    TransactionRec.StatusMsgOn      <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure WriteBurst ;
 
   ------------------------------------------------------------
   procedure WriteBurstAsync (
   -- dispatch CPU Write Cycle
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             NumBytes    : In    integer ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             NumFifoWords   : In    integer ;
+             StatusMsgOn    : In    boolean := false
   ) is
   begin
     -- Put values in record
-    TransRec.Operation        <= ASYNC_WRITE_BURST ;
-    TransRec.Address          <= ToTransaction(iAddr) ;
-    TransRec.AddrWidth        <= iAddr'length ;
---    TransRec.DataToModel      <= (TransRec.DataToModel'range => 'X') ;
-    TransRec.DataWidth        <= NumBytes ;
---    TransRec.DataToModel      <= ToTransaction(to_slv(NumBytes, TransRec.DataToModel'length)) ;
---    TransRec.DataWidth        <= 0 ;
-    TransRec.StatusMsgOn      <= StatusMsgOn ;
+    TransactionRec.Operation        <= ASYNC_WRITE_BURST ;
+    TransactionRec.Address          <= ToTransaction(iAddr) ;
+    TransactionRec.AddrWidth        <= iAddr'length ;
+--    TransactionRec.DataToModel      <= (TransactionRec.DataToModel'range => 'X') ;
+    TransactionRec.DataWidth        <= NumFifoWords ;
+--    TransactionRec.DataToModel      <= ToTransaction(to_slv(NumFifoWords, TransactionRec.DataToModel'length)) ;
+--    TransactionRec.DataWidth        <= 0 ;
+    TransactionRec.StatusMsgOn      <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure WriteBurstAsync ;
   
   ------------------------------------------------------------
   procedure Read (
   -- do CPU Read Cycle and return data
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-    variable oData       : Out   std_logic_vector ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+    variable oData          : Out   std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
   ) is
   begin
     -- Put values in record
-    TransRec.Operation          <= READ_OP ;
-    TransRec.Address            <= ToTransaction(iAddr) ;
-    TransRec.AddrWidth          <= iAddr'length ;
-    TransRec.DataWidth          <= oData'length ;
-    TransRec.StatusMsgOn        <= StatusMsgOn ;
+    TransactionRec.Operation          <= READ_OP ;
+    TransactionRec.Address            <= ToTransaction(iAddr) ;
+    TransactionRec.AddrWidth          <= iAddr'length ;
+    TransactionRec.DataWidth          <= oData'length ;
+    TransactionRec.StatusMsgOn        <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     -- Return Results
-    oData := Reduce(FromTransaction(TransRec.DataFromModel), oData'Length) ;
+    oData := Reduce(FromTransaction(TransactionRec.DataFromModel), oData'Length) ;
   end procedure Read ;
 
   ------------------------------------------------------------
   procedure ReadCheck (
   -- do CPU Read Cycle and check supplied data
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             iData       : In    std_logic_vector ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             iData          : In    std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
   ) is
   begin
     -- Put values in record
-    TransRec.Operation          <= READ_CHECK ;
-    TransRec.Address            <= ToTransaction(iAddr) ;
-    TransRec.AddrWidth          <= iAddr'length ;
-    TransRec.DataToModel        <= ToTransaction(Extend(iData, TransRec.DataToModel'length)) ;
-    TransRec.DataWidth          <= iData'length ;
-    TransRec.StatusMsgOn        <= StatusMsgOn ;
+    TransactionRec.Operation          <= READ_CHECK ;
+    TransactionRec.Address            <= ToTransaction(iAddr) ;
+    TransactionRec.AddrWidth          <= iAddr'length ;
+    TransactionRec.DataToModel        <= ToTransaction(Extend(iData, TransactionRec.DataToModel'length)) ;
+    TransactionRec.DataWidth          <= iData'length ;
+    TransactionRec.StatusMsgOn        <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure ReadCheck ;
 
   ------------------------------------------------------------
   procedure ReadAddressAsync (
   -- dispatch CPU Read Address Cycle
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
   ) is
   begin
     -- Put values in record
-    TransRec.Operation          <= ASYNC_READ_ADDRESS ;
-    TransRec.Address            <= ToTransaction(iAddr) ;
-    TransRec.AddrWidth          <= iAddr'length ;
-    TransRec.DataToModel        <= (TransRec.DataToModel'range => 'X') ;
-    TransRec.DataWidth          <= 0 ;
-    TransRec.StatusMsgOn        <= StatusMsgOn ;
+    TransactionRec.Operation          <= ASYNC_READ_ADDRESS ;
+    TransactionRec.Address            <= ToTransaction(iAddr) ;
+    TransactionRec.AddrWidth          <= iAddr'length ;
+    TransactionRec.DataToModel        <= (TransactionRec.DataToModel'range => 'X') ;
+    TransactionRec.DataWidth          <= 0 ;
+    TransactionRec.StatusMsgOn        <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure ReadAddressAsync ;
 
   ------------------------------------------------------------
   procedure ReadData (
   -- Do CPU Read Data Cycle
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    variable oData       : Out   std_logic_vector ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+    variable oData          : Out   std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
   ) is
   begin
     -- Put values in record
-    TransRec.Operation          <= READ_DATA ;
-    TransRec.Address            <= (TransRec.Address'range => 'X') ;
-    TransRec.DataWidth          <= oData'length ;
-    TransRec.StatusMsgOn        <= StatusMsgOn ;
+    TransactionRec.Operation          <= READ_DATA ;
+    TransactionRec.Address            <= (TransactionRec.Address'range => 'X') ;
+    TransactionRec.DataWidth          <= oData'length ;
+    TransactionRec.StatusMsgOn        <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     -- Return Results
-    oData := Reduce(FromTransaction(TransRec.DataFromModel), oData'Length) ;
+    oData := Reduce(FromTransaction(TransactionRec.DataFromModel), oData'Length) ;
   end procedure ReadData ;
 
   ------------------------------------------------------------
   procedure ReadCheckData (
   -- Do CPU Read Data Cycle and check received Data
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iData       : In    std_logic_vector ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iData          : In    std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
   ) is
   begin
     -- Put values in record
-    TransRec.Operation          <= READ_DATA_CHECK ;
-    TransRec.Address            <= (TransRec.Address'range => 'X') ;
-    TransRec.DataToModel        <= ToTransaction(Extend(iData, TransRec.DataToModel'length)) ;
-    TransRec.DataWidth          <= iData'length ;
-    TransRec.StatusMsgOn        <= StatusMsgOn ;
+    TransactionRec.Operation          <= READ_DATA_CHECK ;
+    TransactionRec.Address            <= (TransactionRec.Address'range => 'X') ;
+    TransactionRec.DataToModel        <= ToTransaction(Extend(iData, TransactionRec.DataToModel'length)) ;
+    TransactionRec.DataWidth          <= iData'length ;
+    TransactionRec.StatusMsgOn        <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure ReadCheckData ;
 
   ------------------------------------------------------------
@@ -972,22 +1194,22 @@ package body AddressBusTransactionPkg is
   -- If data is available, get it and return available TRUE.
   -- Otherwise Return Available FALSE.
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    variable oData       : Out   std_logic_vector ;
-    variable Available   : Out   boolean ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+    variable oData          : Out   std_logic_vector ;
+    variable Available      : Out   boolean ;
+             StatusMsgOn    : In    boolean := false
   ) is
   begin
     -- Put values in record
-    TransRec.Operation          <= ASYNC_READ_DATA ;
-    TransRec.Address            <= (TransRec.Address'range => 'X') ;
-    TransRec.DataWidth          <= oData'length ;
-    TransRec.StatusMsgOn        <= StatusMsgOn ;
+    TransactionRec.Operation          <= ASYNC_READ_DATA ;
+    TransactionRec.Address            <= (TransactionRec.Address'range => 'X') ;
+    TransactionRec.DataWidth          <= oData'length ;
+    TransactionRec.StatusMsgOn        <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     -- Return Results
-    oData := Reduce(FromTransaction(TransRec.DataFromModel), oData'Length) ;
-    Available := TransRec.BoolFromModel ;
+    oData := Reduce(FromTransaction(TransactionRec.DataFromModel), oData'Length) ;
+    Available := TransactionRec.BoolFromModel ;
   end procedure TryReadData ;
 
   ------------------------------------------------------------
@@ -996,45 +1218,45 @@ package body AddressBusTransactionPkg is
   -- If data is available, check it and return available TRUE.
   -- Otherwise Return Available FALSE.
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iData       : In    std_logic_vector ;
-    variable Available   : Out   boolean ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iData          : In    std_logic_vector ;
+    variable Available      : Out   boolean ;
+             StatusMsgOn    : In    boolean := false
   ) is
   begin
     -- Put values in record
-    TransRec.Operation          <= ASYNC_READ_DATA_CHECK ;
-    TransRec.Address            <= (TransRec.Address'range => 'X') ;
-    TransRec.DataToModel        <= ToTransaction(Extend(iData, TransRec.DataToModel'length)) ;
-    TransRec.DataWidth          <= iData'length ;
-    TransRec.StatusMsgOn        <= StatusMsgOn ;
+    TransactionRec.Operation          <= ASYNC_READ_DATA_CHECK ;
+    TransactionRec.Address            <= (TransactionRec.Address'range => 'X') ;
+    TransactionRec.DataToModel        <= ToTransaction(Extend(iData, TransactionRec.DataToModel'length)) ;
+    TransactionRec.DataWidth          <= iData'length ;
+    TransactionRec.StatusMsgOn        <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
-    Available := TransRec.BoolFromModel ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+    Available := TransactionRec.BoolFromModel ;
   end procedure TryReadCheckData ;
 
   ------------------------------------------------------------
   procedure ReadPoll (
   -- Read location (iAddr) until Data(IndexI) = ValueI
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-    variable oData       : Out   std_logic_vector ;
-             Index       : In    Integer ;
-             BitValue    : In    std_logic ;
-             StatusMsgOn : In    boolean := false ;
-             WaitTime    : In    natural := 10
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+    variable oData          : Out   std_logic_vector ;
+             Index          : In    Integer ;
+             BitValue       : In    std_logic ;
+             StatusMsgOn    : In    boolean := false ;
+             WaitTime       : In    natural := 10
   ) is
     variable vData    : std_logic_vector(oData'length-1 downto 0) ;
     variable ModelID  : AlertLogIDType ;
   begin
     loop
-      WaitForClock(TransRec, WaitTime) ;
-      Read (TransRec, iAddr, vData) ;
+      WaitForClock(TransactionRec, WaitTime) ;
+      Read (TransactionRec, iAddr, vData) ;
       exit when vData(Index) = BitValue ;
     end loop ;
 
-    GetAlertLogID(TransRec, ModelID) ;
+    GetAlertLogID(TransactionRec, ModelID) ;
     Log(ModelID, "CpuPoll: address" & to_hstring(iAddr) &
       "  Data: " & to_hstring(FromTransaction(vData)), INFO, StatusMsgOn) ;
     oData := vData ;
@@ -1044,39 +1266,39 @@ package body AddressBusTransactionPkg is
   procedure ReadPoll (
   -- Read location (iAddr) until Data(IndexI) = ValueI
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             Index       : In    Integer ;
-             BitValue    : In    std_logic ;
-             StatusMsgOn : In    boolean := false ;
-             WaitTime    : In    natural := 10
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             Index          : In    Integer ;
+             BitValue       : In    std_logic ;
+             StatusMsgOn    : In    boolean := false ;
+             WaitTime       : In    natural := 10
   ) is
-    variable vData    : std_logic_vector(TransRec.DataFromModel'range) ;
+    variable vData    : std_logic_vector(TransactionRec.DataFromModel'range) ;
   begin
-    ReadPoll(TransRec, iAddr, vData, Index, BitValue, StatusMsgOn, WaitTime) ;
+    ReadPoll(TransactionRec, iAddr, vData, Index, BitValue, StatusMsgOn, WaitTime) ;
   end procedure ReadPoll ;
 
   ------------------------------------------------------------
   procedure ReadBurst (
   -- do CPU Read Cycle and return data
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-             iAddr       : In    std_logic_vector ;
-             NumBytes    : In    integer ;
-             StatusMsgOn : In    boolean := false
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             NumFifoWords   : In    integer ;
+             StatusMsgOn    : In    boolean := false
   ) is
   begin
     -- Put values in record
-    TransRec.Operation          <= READ_BURST ;
-    TransRec.Address            <= ToTransaction(iAddr) ;
-    TransRec.AddrWidth          <= iAddr'length ;
-    TransRec.DataWidth          <= NumBytes ;
---??    TransRec.DataWidth          <= 0 ;
-    TransRec.StatusMsgOn        <= StatusMsgOn ;
+    TransactionRec.Operation          <= READ_BURST ;
+    TransactionRec.Address            <= ToTransaction(iAddr) ;
+    TransactionRec.AddrWidth          <= iAddr'length ;
+    TransactionRec.DataWidth          <= NumFifoWords ;
+--??    TransactionRec.DataWidth          <= 0 ;
+    TransactionRec.StatusMsgOn        <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
 --??    -- Return Results
---??    NumBytes := to_integer(Reduce(FromTransaction(TransRec.DataFromModel), 31)) ;
+--??    NumFifoWords := to_integer(Reduce(FromTransaction(TransactionRec.DataFromModel), 31)) ;
   end procedure ReadBurst ;
   
   ------------------------------------------------------------
@@ -1278,91 +1500,4 @@ package body AddressBusTransactionPkg is
       (Operation = ASYNC_READ_BURST_DATA) ;
   end function IsBurst ;
 
-  --
-  --  Extensions to support model customizations
-  -- 
-  
-  ------------------------------------------------------------
-  procedure SetModelOptions (
-  ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    constant Option      : In    ModelOptionsType ;
-    constant OptVal      : In    boolean
-  ) is
-  begin
-    TransRec.Operation     <= SET_MODEL_OPTIONS ;
-    TransRec.Options       <= Option ;
-    TransRec.BoolToModel   <= OptVal ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
-  end procedure SetModelOptions ;
-
-  ------------------------------------------------------------
-  procedure SetModelOptions (
-  ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    constant Option      : In    ModelOptionsType ;
-    constant OptVal      : In    integer
-  ) is
-  begin
-    TransRec.Operation     <= SET_MODEL_OPTIONS ;
-    TransRec.Options       <= Option ;
-    TransRec.IntToModel    <= OptVal ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
-  end procedure SetModelOptions ;
-
-  ------------------------------------------------------------
-  procedure SetModelOptions (
-  ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    constant Option      : In    ModelOptionsType ;
-    constant OptVal      : In    std_logic_vector
-  ) is
-  begin
-    TransRec.Operation     <= SET_MODEL_OPTIONS ;
-    TransRec.Options       <= Option ;
-    TransRec.IntToModel    <= to_integer(OptVal) ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
-  end procedure SetModelOptions ;
-  
-  ------------------------------------------------------------
-  procedure GetModelOptions (
-  ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    constant Option      : In    ModelOptionsType ;
-    variable OptVal      : Out   boolean
-  ) is
-  begin
-    TransRec.Operation     <= GET_MODEL_OPTIONS ;
-    TransRec.Options       <= Option ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
-    OptVal := TransRec.BoolFromModel    ;
-  end procedure GetModelOptions ;
-
-  ------------------------------------------------------------
-  procedure GetModelOptions (
-  ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    constant Option      : In    ModelOptionsType ;
-    variable OptVal      : Out   integer
-  ) is
-  begin
-    TransRec.Operation     <= GET_MODEL_OPTIONS ;
-    TransRec.Options       <= Option ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
-    OptVal := TransRec.IntFromModel ; 
-  end procedure GetModelOptions ;
-
-  ------------------------------------------------------------
-  procedure GetModelOptions (
-  ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
-    constant Option      : In    ModelOptionsType ;
-    variable OptVal      : Out   std_logic_vector
-  ) is
-  begin
-    TransRec.Operation     <= GET_MODEL_OPTIONS ;
-    TransRec.Options       <= Option ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
-    OptVal := to_slv(TransRec.IntFromModel, OptVal'length) ; 
-  end procedure GetModelOptions ;
 end package body AddressBusTransactionPkg ;

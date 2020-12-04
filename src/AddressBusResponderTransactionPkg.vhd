@@ -97,7 +97,7 @@ package AddressBusResponderTransactionPkg is
   -- oData variable should be sized to match the size of the data 
   -- being transferred.
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     variable oAddr       : Out   std_logic_vector ;
     variable oData       : Out   std_logic_vector ;
     constant StatusMsgOn : In    boolean := false
@@ -111,7 +111,7 @@ package AddressBusResponderTransactionPkg is
   -- oData variable should be sized to match the size of the data 
   -- being transferred.
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     variable oAddr       : Out   std_logic_vector ;
     variable oData       : Out   std_logic_vector ;
     variable Available   : Out   boolean ;
@@ -125,7 +125,7 @@ package AddressBusResponderTransactionPkg is
   -- iData variable should be sized to match the size of the data 
   -- being transferred.
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     variable oAddr       : Out   std_logic_vector ;
     constant iData       : In    std_logic_vector ;
     constant StatusMsgOn : In    boolean := false
@@ -140,7 +140,7 @@ package AddressBusResponderTransactionPkg is
   -- iData variable should be sized to match the size of the data 
   -- being transferred.
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     variable oAddr       : Out   std_logic_vector ;
     constant iData       : In    std_logic_vector ;
     variable Available   : Out   boolean ;
@@ -161,7 +161,7 @@ package AddressBusResponderTransactionPkg is
   procedure GetWriteAddress (
   -- Blocking write address transaction.  
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     variable oAddr       : Out   std_logic_vector ;
     constant StatusMsgOn : In    boolean := false
   ) ;
@@ -172,7 +172,7 @@ package AddressBusResponderTransactionPkg is
   -- If a write address cycle has already completed return oAddr and 
   -- return Available as TRUE, otherwise, return Available as FALSE.
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     variable oAddr       : Out   std_logic_vector ;
     variable Available   : Out   boolean ;
     constant StatusMsgOn : In    boolean := false
@@ -184,7 +184,7 @@ package AddressBusResponderTransactionPkg is
   -- oData should be sized to match the size of the data 
   -- being transferred.  
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     constant iAddr       : In    std_logic_vector ;
     variable oData       : Out   std_logic_vector ;
     constant StatusMsgOn : In    boolean := false
@@ -198,7 +198,7 @@ package AddressBusResponderTransactionPkg is
   -- oData should be sized to match the size of the data 
   -- being transferred.  
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     constant iAddr       : In    std_logic_vector ;
     variable oData       : Out   std_logic_vector ;
     variable Available   : Out   boolean ;
@@ -211,7 +211,7 @@ package AddressBusResponderTransactionPkg is
   -- oData should be sized to match the size of the data 
   -- being transferred.  iAddr = 0
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     variable oData       : Out   std_logic_vector ;
     constant StatusMsgOn : In    boolean := false
   ) ;
@@ -224,7 +224,7 @@ package AddressBusResponderTransactionPkg is
   -- oData should be sized to match the size of the data 
   -- being transferred.  iAddr = 0
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     variable oData       : Out   std_logic_vector ;
     variable Available   : Out   boolean ;
     constant StatusMsgOn : In    boolean := false
@@ -234,7 +234,7 @@ package AddressBusResponderTransactionPkg is
   procedure GetReadAddress (
   -- Blocking Read address transaction.   
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     variable oAddr       : Out   std_logic_vector ;
     constant StatusMsgOn : In    boolean := false
   ) ;
@@ -245,7 +245,7 @@ package AddressBusResponderTransactionPkg is
   -- If a read address cycle has already completed return oAddr and 
   -- return Available as TRUE, otherwise, return Available as FALSE.
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     variable oAddr       : Out   std_logic_vector ;
     variable Available   : Out   boolean ;
     constant StatusMsgOn : In    boolean := false
@@ -257,7 +257,7 @@ package AddressBusResponderTransactionPkg is
   -- iData should be sized to match the size of the data 
   -- being transferred.
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     constant iData       : In    std_logic_vector ;
     constant StatusMsgOn : In    boolean := false
   ) ;
@@ -268,7 +268,7 @@ package AddressBusResponderTransactionPkg is
   -- iData should be sized to match the size of the data 
   -- being transferred.
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     constant iData       : In    std_logic_vector ;
     constant StatusMsgOn : In    boolean := false
   ) ;   
@@ -284,27 +284,27 @@ package body AddressBusResponderTransactionPkg is
   procedure GetWrite (
   -- Blocks until Address and Data are both available
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     variable oAddr       : Out   std_logic_vector ;
     variable oData       : Out   std_logic_vector ;
     constant StatusMsgOn : In    boolean := false
   ) is
   begin
     -- Put values in record
-    TransRec.Operation        <= WRITE_OP ;
-    TransRec.AddrWidth        <= oAddr'length ;
-    TransRec.DataWidth        <= oData'length ;
-    TransRec.StatusMsgOn      <= StatusMsgOn ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
-    oAddr  := FromTransaction(TransRec.Address) ;
-    oData  := Reduce(FromTransaction(TransRec.DataFromModel), oData'length) ;
+    TransactionRec.Operation        <= WRITE_OP ;
+    TransactionRec.AddrWidth        <= oAddr'length ;
+    TransactionRec.DataWidth        <= oData'length ;
+    TransactionRec.StatusMsgOn      <= StatusMsgOn ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+    oAddr  := FromTransaction(TransactionRec.Address) ;
+    oData  := Reduce(FromTransaction(TransactionRec.DataFromModel), oData'length) ;
   end procedure GetWrite ;
 
   ------------------------------------------------------------
   procedure TryGetWrite (
   -- Return address and data if both available otherwise return false
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     variable oAddr       : Out   std_logic_vector ;
     variable oData       : Out   std_logic_vector ;
     variable Available   : Out   boolean ;
@@ -312,50 +312,50 @@ package body AddressBusResponderTransactionPkg is
   ) is
   begin
     -- Put values in record
-    TransRec.Operation        <= ASYNC_WRITE ;
-    TransRec.AddrWidth        <= oAddr'length ;
-    TransRec.DataWidth        <= oData'length ;
-    TransRec.StatusMsgOn      <= StatusMsgOn ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
-    oAddr     := FromTransaction(TransRec.Address) ;
-    oData     := Reduce(FromTransaction(TransRec.DataFromModel), oData'length) ;
-    Available := TransRec.BoolFromModel ;
+    TransactionRec.Operation        <= ASYNC_WRITE ;
+    TransactionRec.AddrWidth        <= oAddr'length ;
+    TransactionRec.DataWidth        <= oData'length ;
+    TransactionRec.StatusMsgOn      <= StatusMsgOn ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+    oAddr     := FromTransaction(TransactionRec.Address) ;
+    oData     := Reduce(FromTransaction(TransactionRec.DataFromModel), oData'length) ;
+    Available := TransactionRec.BoolFromModel ;
   end procedure TryGetWrite ;
 
   ------------------------------------------------------------
   procedure GetWriteAddress (
   -- Blocks until Address is available
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     variable oAddr       : Out   std_logic_vector ;
     constant StatusMsgOn : In    boolean := false
   ) is
   begin
     -- Put values in record
-    TransRec.Operation        <= WRITE_ADDRESS ;
-    TransRec.AddrWidth        <= oAddr'length ;
-    TransRec.StatusMsgOn      <= StatusMsgOn ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
-    oAddr  := FromTransaction(TransRec.Address) ;
+    TransactionRec.Operation        <= WRITE_ADDRESS ;
+    TransactionRec.AddrWidth        <= oAddr'length ;
+    TransactionRec.StatusMsgOn      <= StatusMsgOn ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+    oAddr  := FromTransaction(TransactionRec.Address) ;
   end procedure GetWriteAddress ;
   
   ------------------------------------------------------------
   procedure TryGetWriteAddress (
   -- Return address if available otherwise return false
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     variable oAddr       : Out   std_logic_vector ;
     variable Available   : Out   boolean ;
     constant StatusMsgOn : In    boolean := false
   ) is
   begin
     -- Put values in record
-    TransRec.Operation        <= ASYNC_WRITE_ADDRESS ;
-    TransRec.AddrWidth        <= oAddr'length ;
-    TransRec.StatusMsgOn      <= StatusMsgOn ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
-    oAddr     := FromTransaction(TransRec.Address) ;
-    Available := TransRec.BoolFromModel ;
+    TransactionRec.Operation        <= ASYNC_WRITE_ADDRESS ;
+    TransactionRec.AddrWidth        <= oAddr'length ;
+    TransactionRec.StatusMsgOn      <= StatusMsgOn ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+    oAddr     := FromTransaction(TransactionRec.Address) ;
+    Available := TransactionRec.BoolFromModel ;
   end procedure TryGetWriteAddress ;
 
   ------------------------------------------------------------
@@ -364,7 +364,7 @@ package body AddressBusResponderTransactionPkg is
   -- oData should be sized to match the size of the data 
   -- being transferred.  
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     constant iAddr       : In    std_logic_vector ;
     variable oData       : Out   std_logic_vector ;
     constant StatusMsgOn : In    boolean := false
@@ -373,12 +373,12 @@ package body AddressBusResponderTransactionPkg is
     constant ADDR_LEN : integer := minimum(aAddr'left, 30) ;
   begin
     -- Put values in record
-    TransRec.Operation        <= WRITE_DATA ;
-    TransRec.AddrWidth        <= to_integer(aAddr(ADDR_LEN downto 0)) ; -- Allows bursts upto 2**31
-    TransRec.DataWidth        <= oData'length ;
-    TransRec.StatusMsgOn      <= StatusMsgOn ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
-    oData  := Reduce(FromTransaction(TransRec.DataFromModel), oData'length) ;
+    TransactionRec.Operation        <= WRITE_DATA ;
+    TransactionRec.AddrWidth        <= to_integer(aAddr(ADDR_LEN downto 0)) ; -- Allows bursts upto 2**31
+    TransactionRec.DataWidth        <= oData'length ;
+    TransactionRec.StatusMsgOn      <= StatusMsgOn ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+    oData  := Reduce(FromTransaction(TransactionRec.DataFromModel), oData'length) ;
   end procedure GetWriteData ;
   
   ------------------------------------------------------------
@@ -389,7 +389,7 @@ package body AddressBusResponderTransactionPkg is
   -- oData should be sized to match the size of the data 
   -- being transferred.  
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     constant iAddr       : In    std_logic_vector ;
     variable oData       : Out   std_logic_vector ;
     variable Available   : Out   boolean ;
@@ -399,65 +399,65 @@ package body AddressBusResponderTransactionPkg is
     constant ADDR_LEN : integer := minimum(aAddr'left, 30) ;
   begin
     -- Put values in record
-    TransRec.Operation        <= ASYNC_WRITE_DATA ;
-    TransRec.AddrWidth        <= to_integer(aAddr(ADDR_LEN downto 0)) ; -- Allows bursts upto 2**31
-    TransRec.DataWidth        <= oData'length ;
-    TransRec.StatusMsgOn      <= StatusMsgOn ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
-    oData     := Reduce(FromTransaction(TransRec.DataFromModel), oData'length) ;
-    Available := TransRec.BoolFromModel ;
+    TransactionRec.Operation        <= ASYNC_WRITE_DATA ;
+    TransactionRec.AddrWidth        <= to_integer(aAddr(ADDR_LEN downto 0)) ; -- Allows bursts upto 2**31
+    TransactionRec.DataWidth        <= oData'length ;
+    TransactionRec.StatusMsgOn      <= StatusMsgOn ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+    oData     := Reduce(FromTransaction(TransactionRec.DataFromModel), oData'length) ;
+    Available := TransactionRec.BoolFromModel ;
   end procedure TryGetWriteData ;
   
   ------------------------------------------------------------
   procedure GetWriteData (
   -- Blocks until Data is available
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     variable oData       : Out   std_logic_vector ;
     constant StatusMsgOn : In    boolean := false
   ) is
   begin
-    GetWriteData(TransRec, X"00", oData, StatusMsgOn) ;
+    GetWriteData(TransactionRec, X"00", oData, StatusMsgOn) ;
   end procedure GetWriteData ;
 
   ------------------------------------------------------------
   procedure TryGetWriteData (
   -- Return data if available otherwise return false
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     variable oData       : Out   std_logic_vector ;
     variable Available   : Out   boolean ;
     constant StatusMsgOn : In    boolean := false
   ) is
   begin
-    TryGetWriteData(TransRec, X"00", oData, Available, StatusMsgOn) ;
+    TryGetWriteData(TransactionRec, X"00", oData, Available, StatusMsgOn) ;
   end procedure TryGetWriteData ;
 
   ------------------------------------------------------------
   procedure SendRead (
   -- Block until address is available and data is done
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     variable oAddr       : Out   std_logic_vector ;
     constant iData       : In    std_logic_vector ;
     constant StatusMsgOn : In    boolean := false
   ) is
   begin
     -- Put values in record
-    TransRec.Operation        <= READ_OP ;
-    TransRec.AddrWidth        <= oAddr'length ;
-    TransRec.DataWidth        <= iData'length ;
-    TransRec.DataToModel      <= ToTransaction(Extend(iData, TransRec.DataToModel'length)) ;
-    TransRec.StatusMsgOn      <= StatusMsgOn ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
-    oAddr  := FromTransaction(TransRec.Address) ;
+    TransactionRec.Operation        <= READ_OP ;
+    TransactionRec.AddrWidth        <= oAddr'length ;
+    TransactionRec.DataWidth        <= iData'length ;
+    TransactionRec.DataToModel      <= ToTransaction(Extend(iData, TransactionRec.DataToModel'length)) ;
+    TransactionRec.StatusMsgOn      <= StatusMsgOn ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+    oAddr  := FromTransaction(TransactionRec.Address) ;
   end procedure SendRead ;
   
   ------------------------------------------------------------
   procedure TrySendRead (
   -- Return address if available, send data if address available
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     variable oAddr       : Out   std_logic_vector ;
     constant iData       : In    std_logic_vector ;
     variable Available   : Out   boolean ;
@@ -465,84 +465,84 @@ package body AddressBusResponderTransactionPkg is
   ) is
   begin
     -- Put values in record
-    TransRec.Operation        <= ASYNC_READ ;
-    TransRec.AddrWidth        <= oAddr'length ;
-    TransRec.DataWidth        <= iData'length ;
-    TransRec.DataToModel      <= ToTransaction(Extend(iData, TransRec.DataToModel'length)) ;
-    TransRec.StatusMsgOn      <= StatusMsgOn ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
-    oAddr  := FromTransaction(TransRec.Address) ;
-    Available  := TransRec.BoolFromModel ;
+    TransactionRec.Operation        <= ASYNC_READ ;
+    TransactionRec.AddrWidth        <= oAddr'length ;
+    TransactionRec.DataWidth        <= iData'length ;
+    TransactionRec.DataToModel      <= ToTransaction(Extend(iData, TransactionRec.DataToModel'length)) ;
+    TransactionRec.StatusMsgOn      <= StatusMsgOn ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+    oAddr  := FromTransaction(TransactionRec.Address) ;
+    Available  := TransactionRec.BoolFromModel ;
   end procedure TrySendRead ;
     
   ------------------------------------------------------------
   procedure GetReadAddress (
   -- Block until address is available
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     variable oAddr       : Out   std_logic_vector ;
     constant StatusMsgOn : In    boolean := false
   ) is
   begin
     -- Put values in record
-    TransRec.Operation        <= READ_ADDRESS ;
-    TransRec.AddrWidth        <= oAddr'length ;
-    TransRec.StatusMsgOn      <= StatusMsgOn ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
-    oAddr  := FromTransaction(TransRec.Address) ;
+    TransactionRec.Operation        <= READ_ADDRESS ;
+    TransactionRec.AddrWidth        <= oAddr'length ;
+    TransactionRec.StatusMsgOn      <= StatusMsgOn ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+    oAddr  := FromTransaction(TransactionRec.Address) ;
   end procedure GetReadAddress ;
   
   ------------------------------------------------------------
   procedure TryGetReadAddress (
   -- Return read address if available, otherwise return false on Available
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     variable oAddr       : Out   std_logic_vector ;
     variable Available   : Out   boolean ;
     constant StatusMsgOn : In    boolean := false
   ) is
   begin
     -- Put values in record
-    TransRec.Operation        <= ASYNC_READ_ADDRESS ;
-    TransRec.AddrWidth        <= oAddr'length ;
-    TransRec.StatusMsgOn      <= StatusMsgOn ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
-    oAddr      := FromTransaction(TransRec.Address) ;
-    Available  := TransRec.BoolFromModel ;
+    TransactionRec.Operation        <= ASYNC_READ_ADDRESS ;
+    TransactionRec.AddrWidth        <= oAddr'length ;
+    TransactionRec.StatusMsgOn      <= StatusMsgOn ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+    oAddr      := FromTransaction(TransactionRec.Address) ;
+    Available  := TransactionRec.BoolFromModel ;
   end procedure TryGetReadAddress ;
   
   ------------------------------------------------------------
   procedure SendReadData (
   -- Block until data is done
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     constant iData       : In    std_logic_vector ;
     constant StatusMsgOn : In    boolean := false
   ) is
   begin
     -- Put values in record
-    TransRec.Operation        <= READ_DATA ;
-    TransRec.DataWidth        <= iData'length ;
-    TransRec.DataToModel      <= ToTransaction(Extend(iData, TransRec.DataToModel'length)) ;
-    TransRec.StatusMsgOn      <= StatusMsgOn ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    TransactionRec.Operation        <= READ_DATA ;
+    TransactionRec.DataWidth        <= iData'length ;
+    TransactionRec.DataToModel      <= ToTransaction(Extend(iData, TransactionRec.DataToModel'length)) ;
+    TransactionRec.StatusMsgOn      <= StatusMsgOn ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure SendReadData ;
   
   ------------------------------------------------------------
   procedure AsyncSendReadData (
   -- Queue Read Data
   ------------------------------------------------------------
-    signal   TransRec    : InOut AddressBusTransactionRecType ;
+    signal   TransactionRec    : InOut AddressBusRecType ;
     constant iData       : In    std_logic_vector ;
     constant StatusMsgOn : In    boolean := false
   ) is
   begin
     -- Put values in record
-    TransRec.Operation        <= ASYNC_READ_DATA ;
-    TransRec.DataWidth        <= iData'length ;
-    TransRec.DataToModel      <= ToTransaction(Extend(iData, TransRec.DataToModel'length)) ;
-    TransRec.StatusMsgOn      <= StatusMsgOn ;
-    RequestTransaction(Rdy => TransRec.Rdy, Ack => TransRec.Ack) ;
+    TransactionRec.Operation        <= ASYNC_READ_DATA ;
+    TransactionRec.DataWidth        <= iData'length ;
+    TransactionRec.DataToModel      <= ToTransaction(Extend(iData, TransactionRec.DataToModel'length)) ;
+    TransactionRec.StatusMsgOn      <= StatusMsgOn ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure AsyncSendReadData ;  
   
 end package body AddressBusResponderTransactionPkg ;
