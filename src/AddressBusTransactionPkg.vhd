@@ -310,7 +310,7 @@ package AddressBusTransactionPkg is
   -- This allows transfers to be conceptualized in an interface independent 
   --manner.    
   constant ADDRESS_BUS_BURST_BYTE_MODE       : AddressBusFifoBurstModeType  := 1 ; 
-
+  
   -- ========================================================
   --  Set and Get Burst Mode   
   --  Set Burst Mode for models that do bursting.
@@ -328,6 +328,12 @@ package AddressBusTransactionPkg is
     signal   TransactionRec  : InOut AddressBusRecType ;
     variable OptVal          : Out   AddressBusFifoBurstModeType
   ) ;
+
+  ------------------------------------------------------------
+  function IsAddressBusBurstMode (
+  -----------------------------------------------------------
+    constant AddressBusFifoBurstMode : in AddressBusFifoBurstModeType
+  ) return boolean ;
 
 
   -- ========================================================
@@ -857,6 +863,17 @@ package body AddressBusTransactionPkg is
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     OptVal := TransactionRec.IntFromModel ; 
   end procedure GetBurstMode ;
+
+  ------------------------------------------------------------
+  function IsAddressBusBurstMode (
+  -----------------------------------------------------------
+    constant AddressBusFifoBurstMode : in AddressBusFifoBurstModeType
+  ) return boolean is
+  begin
+    return
+      (AddressBusFifoBurstMode = ADDRESS_BUS_BURST_WORD_MODE) or
+      (AddressBusFifoBurstMode = ADDRESS_BUS_BURST_BYTE_MODE) ;
+  end function IsAddressBusBurstMode ;
 
   --
   --  Extensions to support model customizations
