@@ -113,6 +113,7 @@ package body ModelParametersPkg is
 		begin
 			if ParmPtrVar /= NULL then
 -- probably a mistake to do this
+-- Should instead do a resize of the structure like in ScoreboardPkg.
         Deallocate; 
       end if; 
 			ParmPtrVar := new ParameterRecArrayType(0 to nparams-1);
