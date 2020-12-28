@@ -189,7 +189,10 @@ package AddressBusVersionCompatibilityPkg is
     [AddressBusRecType, std_logic_vector, boolean];
   
   ------------------------------------------------------------
-  alias SlaveAsyncReadData is AsyncSendReadData 
+  alias SlaveAsyncReadData is SendReadDataAsync 
+    [AddressBusRecType, std_logic_vector, boolean];
+    
+  alias AsyncSendReadData  is SendReadDataAsync 
     [AddressBusRecType, std_logic_vector, boolean];
   
 end package AddressBusVersionCompatibilityPkg ;
