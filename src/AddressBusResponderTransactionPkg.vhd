@@ -263,7 +263,7 @@ package AddressBusResponderTransactionPkg is
   ) ;
   
   ------------------------------------------------------------
-  procedure AsyncSendReadData (
+  procedure SendReadDataAsync (
   -- Asynchronous Send Read Data transaction.  
   -- iData should be sized to match the size of the data 
   -- being transferred.
@@ -540,7 +540,7 @@ package body AddressBusResponderTransactionPkg is
   end procedure SendReadData ;
   
   ------------------------------------------------------------
-  procedure AsyncSendReadData (
+  procedure SendReadDataAsync (
   -- Queue Read Data
   ------------------------------------------------------------
     signal   TransactionRec  : InOut AddressBusRecType ;
@@ -555,6 +555,6 @@ package body AddressBusResponderTransactionPkg is
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
-  end procedure AsyncSendReadData ;  
+  end procedure SendReadDataAsync ;  
   
 end package body AddressBusResponderTransactionPkg ;
