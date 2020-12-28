@@ -62,7 +62,7 @@ package AddressBusTransactionPkg is
   -- ========================================================
   type UnresolvedAddressBusOperationType is (
     -- Default. Not required but recommended for debug
-    DEFAULT_NOT_USED,  
+    NOT_DRIVEN,  
     --
     -- Model Directives
     --
@@ -79,7 +79,7 @@ package AddressBusTransactionPkg is
     SET_MODEL_OPTIONS, 
     GET_MODEL_OPTIONS,
     --
-    --  bus operations                        Master                Minion
+    --  bus operations                        Master                Responder
     --                       --------------------------------------------------------
     WRITE_OP,                -- Blocking     (Tx Addr & Data)      (Rx Addr & Data)
     WRITE_ADDRESS,           -- Blocking     (Tx Addr)             (Rx Addr)
