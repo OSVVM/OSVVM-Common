@@ -297,8 +297,8 @@ package body AddressBusResponderTransactionPkg is
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
-    oAddr  := FromTransaction(TransactionRec.Address) ;
-    oData  := Reduce(FromTransaction(TransactionRec.DataFromModel), oData'length) ;
+    oAddr  := FromTransaction(TransactionRec.Address, oAddr'length) ;
+    oData  := FromTransaction(TransactionRec.DataFromModel, oData'length) ;
   end procedure GetWrite ;
 
   ------------------------------------------------------------
@@ -319,8 +319,8 @@ package body AddressBusResponderTransactionPkg is
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
-    oAddr     := FromTransaction(TransactionRec.Address) ;
-    oData     := Reduce(FromTransaction(TransactionRec.DataFromModel), oData'length) ;
+    oAddr  := FromTransaction(TransactionRec.Address, oAddr'length) ;
+    oData  := FromTransaction(TransactionRec.DataFromModel, oData'length) ;
     Available := TransactionRec.BoolFromModel ;
   end procedure TryGetWrite ;
 
@@ -339,7 +339,7 @@ package body AddressBusResponderTransactionPkg is
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
-    oAddr  := FromTransaction(TransactionRec.Address) ;
+    oAddr  := FromTransaction(TransactionRec.Address, oAddr'length) ;
   end procedure GetWriteAddress ;
   
   ------------------------------------------------------------
@@ -358,7 +358,7 @@ package body AddressBusResponderTransactionPkg is
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
-    oAddr     := FromTransaction(TransactionRec.Address) ;
+    oAddr  := FromTransaction(TransactionRec.Address, oAddr'length) ;
     Available := TransactionRec.BoolFromModel ;
   end procedure TryGetWriteAddress ;
 
@@ -383,7 +383,7 @@ package body AddressBusResponderTransactionPkg is
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
-    oData  := Reduce(FromTransaction(TransactionRec.DataFromModel), oData'length) ;
+    oData  := FromTransaction(TransactionRec.DataFromModel, oData'length) ;
   end procedure GetWriteData ;
   
   ------------------------------------------------------------
@@ -410,7 +410,7 @@ package body AddressBusResponderTransactionPkg is
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
-    oData     := Reduce(FromTransaction(TransactionRec.DataFromModel), oData'length) ;
+    oData  := FromTransaction(TransactionRec.DataFromModel, oData'length) ;
     Available := TransactionRec.BoolFromModel ;
   end procedure TryGetWriteData ;
   
@@ -453,11 +453,11 @@ package body AddressBusResponderTransactionPkg is
     TransactionRec.Operation     <= READ_OP ;
     TransactionRec.AddrWidth     <= oAddr'length ;
     TransactionRec.DataWidth     <= iData'length ;
-    TransactionRec.DataToModel   <= ToTransaction(Extend(iData, TransactionRec.DataToModel'length)) ;
+    TransactionRec.DataToModel   <= ToTransaction(iData, TransactionRec.DataToModel'length) ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
-    oAddr  := FromTransaction(TransactionRec.Address) ;
+    oAddr  := FromTransaction(TransactionRec.Address, oAddr'length) ;
   end procedure SendRead ;
   
   ------------------------------------------------------------
@@ -475,11 +475,11 @@ package body AddressBusResponderTransactionPkg is
     TransactionRec.Operation     <= ASYNC_READ ;
     TransactionRec.AddrWidth     <= oAddr'length ;
     TransactionRec.DataWidth     <= iData'length ;
-    TransactionRec.DataToModel   <= ToTransaction(Extend(iData, TransactionRec.DataToModel'length)) ;
+    TransactionRec.DataToModel   <= ToTransaction(iData, TransactionRec.DataToModel'length) ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
-    oAddr  := FromTransaction(TransactionRec.Address) ;
+    oAddr  := FromTransaction(TransactionRec.Address, oAddr'length) ;
     Available  := TransactionRec.BoolFromModel ;
   end procedure TrySendRead ;
     
@@ -498,7 +498,7 @@ package body AddressBusResponderTransactionPkg is
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
-    oAddr  := FromTransaction(TransactionRec.Address) ;
+    oAddr  := FromTransaction(TransactionRec.Address, oAddr'length) ;
   end procedure GetReadAddress ;
   
   ------------------------------------------------------------
@@ -517,7 +517,7 @@ package body AddressBusResponderTransactionPkg is
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
-    oAddr      := FromTransaction(TransactionRec.Address) ;
+    oAddr  := FromTransaction(TransactionRec.Address, oAddr'length) ;
     Available  := TransactionRec.BoolFromModel ;
   end procedure TryGetReadAddress ;
   
@@ -533,7 +533,7 @@ package body AddressBusResponderTransactionPkg is
     -- Put values in record
     TransactionRec.Operation     <= READ_DATA ;
     TransactionRec.DataWidth     <= iData'length ;
-    TransactionRec.DataToModel   <= ToTransaction(Extend(iData, TransactionRec.DataToModel'length)) ;
+    TransactionRec.DataToModel   <= ToTransaction(iData, TransactionRec.DataToModel'length) ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
@@ -551,7 +551,7 @@ package body AddressBusResponderTransactionPkg is
     -- Put values in record
     TransactionRec.Operation     <= ASYNC_READ_DATA ;
     TransactionRec.DataWidth     <= iData'length ;
-    TransactionRec.DataToModel   <= ToTransaction(Extend(iData, TransactionRec.DataToModel'length)) ;
+    TransactionRec.DataToModel   <= ToTransaction(iData, TransactionRec.DataToModel'length) ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 

@@ -766,7 +766,7 @@ package body AddressBusTransactionPkg is
   ) is
   begin
     TransactionRec.Operation     <= WAIT_FOR_CLOCK ;
-    TransactionRec.DataToModel   <= ToTransaction(NumberOfClocks, TransactionRec.DataToModel'length);
+    TransactionRec.IntToModel    <= NumberOfClocks ; 
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
   end procedure WaitForClock ;
@@ -993,9 +993,9 @@ package body AddressBusTransactionPkg is
   begin
     -- Put values in record
     TransactionRec.Operation     <= WRITE_OP ;
-    TransactionRec.Address       <= ToTransaction(iAddr) ;
+    TransactionRec.Address       <= ToTransaction(iAddr, TransactionRec.Address'length) ;
     TransactionRec.AddrWidth     <= iAddr'length ;
-    TransactionRec.DataToModel   <= ToTransaction(Extend(iData, TransactionRec.DataToModel'length)) ;
+    TransactionRec.DataToModel   <= ToTransaction(iData, TransactionRec.DataToModel'length) ;
     TransactionRec.DataWidth     <= iData'length ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
@@ -1015,9 +1015,9 @@ package body AddressBusTransactionPkg is
   begin
     -- Put values in record
     TransactionRec.Operation     <= ASYNC_WRITE ;
-    TransactionRec.Address       <= ToTransaction(iAddr) ;
+    TransactionRec.Address       <= ToTransaction(iAddr, TransactionRec.Address'length) ;
     TransactionRec.AddrWidth     <= iAddr'length ;
-    TransactionRec.DataToModel   <= ToTransaction(Extend(iData, TransactionRec.DataToModel'length)) ;
+    TransactionRec.DataToModel   <= ToTransaction(iData, TransactionRec.DataToModel'length) ;
     TransactionRec.DataWidth     <= iData'length ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
@@ -1036,9 +1036,8 @@ package body AddressBusTransactionPkg is
   begin
     -- Put values in record
     TransactionRec.Operation     <= ASYNC_WRITE_ADDRESS ;
-    TransactionRec.Address       <= ToTransaction(iAddr) ;
+    TransactionRec.Address       <= ToTransaction(iAddr, TransactionRec.Address'length) ;
     TransactionRec.AddrWidth     <= iAddr'length ;
-    TransactionRec.DataToModel   <= (TransactionRec.DataToModel'range => 'X') ;
     TransactionRec.DataWidth     <= 0 ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
@@ -1091,12 +1090,10 @@ package body AddressBusTransactionPkg is
   begin
     -- Put values in record
     TransactionRec.Operation     <= WRITE_BURST ;
-    TransactionRec.Address       <= ToTransaction(iAddr) ;
+    TransactionRec.Address       <= ToTransaction(iAddr, TransactionRec.Address'length) ;
     TransactionRec.AddrWidth     <= iAddr'length ;
 --    TransactionRec.DataToModel   <= (TransactionRec.DataToModel'range => 'X') ;
     TransactionRec.DataWidth     <= NumFifoWords ;
---    TransactionRec.DataToModel   <= ToTransaction(to_slv(NumFifoWords, TransactionRec.DataToModel'length)) ;
---    TransactionRec.DataWidth     <= 0 ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
@@ -1115,12 +1112,10 @@ package body AddressBusTransactionPkg is
   begin
     -- Put values in record
     TransactionRec.Operation     <= ASYNC_WRITE_BURST ;
-    TransactionRec.Address       <= ToTransaction(iAddr) ;
+    TransactionRec.Address       <= ToTransaction(iAddr, TransactionRec.Address'length) ;
     TransactionRec.AddrWidth     <= iAddr'length ;
 --    TransactionRec.DataToModel   <= (TransactionRec.DataToModel'range => 'X') ;
     TransactionRec.DataWidth     <= NumFifoWords ;
---    TransactionRec.DataToModel   <= ToTransaction(to_slv(NumFifoWords, TransactionRec.DataToModel'length)) ;
---    TransactionRec.DataWidth     <= 0 ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
@@ -1139,7 +1134,7 @@ package body AddressBusTransactionPkg is
   begin
     -- Put values in record
     TransactionRec.Operation     <= READ_OP ;
-    TransactionRec.Address       <= ToTransaction(iAddr) ;
+    TransactionRec.Address       <= ToTransaction(iAddr, TransactionRec.Address'length) ;
     TransactionRec.AddrWidth     <= iAddr'length ;
     TransactionRec.DataWidth     <= oData'length ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
@@ -1147,7 +1142,7 @@ package body AddressBusTransactionPkg is
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
     -- Return Results
-    oData := Reduce(FromTransaction(TransactionRec.DataFromModel), oData'Length) ;
+    oData  := FromTransaction(TransactionRec.DataFromModel, oData'length) ;
   end procedure Read ;
 
   ------------------------------------------------------------
@@ -1162,9 +1157,9 @@ package body AddressBusTransactionPkg is
   begin
     -- Put values in record
     TransactionRec.Operation     <= READ_CHECK ;
-    TransactionRec.Address       <= ToTransaction(iAddr) ;
+    TransactionRec.Address       <= ToTransaction(iAddr, TransactionRec.Address'length) ;
     TransactionRec.AddrWidth     <= iAddr'length ;
-    TransactionRec.DataToModel   <= ToTransaction(Extend(iData, TransactionRec.DataToModel'length)) ;
+    TransactionRec.DataToModel   <= ToTransaction(iData, TransactionRec.DataToModel'length) ;
     TransactionRec.DataWidth     <= iData'length ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
@@ -1183,7 +1178,7 @@ package body AddressBusTransactionPkg is
   begin
     -- Put values in record
     TransactionRec.Operation     <= ASYNC_READ_ADDRESS ;
-    TransactionRec.Address       <= ToTransaction(iAddr) ;
+    TransactionRec.Address       <= ToTransaction(iAddr, TransactionRec.Address'length) ;
     TransactionRec.AddrWidth     <= iAddr'length ;
     TransactionRec.DataToModel   <= (TransactionRec.DataToModel'range => 'X') ;
     TransactionRec.DataWidth     <= 0 ;
@@ -1211,7 +1206,7 @@ package body AddressBusTransactionPkg is
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
     -- Return Results
-    oData := Reduce(FromTransaction(TransactionRec.DataFromModel), oData'Length) ;
+    oData  := FromTransaction(TransactionRec.DataFromModel, oData'length) ;
   end procedure ReadData ;
 
   ------------------------------------------------------------
@@ -1226,7 +1221,7 @@ package body AddressBusTransactionPkg is
     -- Put values in record
     TransactionRec.Operation     <= READ_DATA_CHECK ;
     TransactionRec.Address       <= (TransactionRec.Address'range => 'X') ;
-    TransactionRec.DataToModel   <= ToTransaction(Extend(iData, TransactionRec.DataToModel'length)) ;
+    TransactionRec.DataToModel   <= ToTransaction(iData, TransactionRec.DataToModel'length) ;
     TransactionRec.DataWidth     <= iData'length ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
@@ -1255,7 +1250,7 @@ package body AddressBusTransactionPkg is
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
     -- Return Results
-    oData := Reduce(FromTransaction(TransactionRec.DataFromModel), oData'Length) ;
+    oData  := FromTransaction(TransactionRec.DataFromModel, oData'length) ;
     Available := TransactionRec.BoolFromModel ;
   end procedure TryReadData ;
 
@@ -1274,7 +1269,7 @@ package body AddressBusTransactionPkg is
     -- Put values in record
     TransactionRec.Operation     <= ASYNC_READ_DATA_CHECK ;
     TransactionRec.Address       <= (TransactionRec.Address'range => 'X') ;
-    TransactionRec.DataToModel   <= ToTransaction(Extend(iData, TransactionRec.DataToModel'length)) ;
+    TransactionRec.DataToModel   <= ToTransaction(iData, TransactionRec.DataToModel'length) ;
     TransactionRec.DataWidth     <= iData'length ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
@@ -1306,7 +1301,7 @@ package body AddressBusTransactionPkg is
 
     GetAlertLogID(TransactionRec, ModelID) ;
     Log(ModelID, "CpuPoll: address" & to_hstring(iAddr) &
-      "  Data: " & to_hstring(FromTransaction(vData)), INFO, StatusMsgOn) ;
+      "  Data: " & to_hstring(vData), INFO, StatusMsgOn) ;
     oData := vData ;
   end procedure ReadPoll ;
 
@@ -1338,7 +1333,7 @@ package body AddressBusTransactionPkg is
   begin
     -- Put values in record
     TransactionRec.Operation     <= READ_BURST ;
-    TransactionRec.Address       <= ToTransaction(iAddr) ;
+    TransactionRec.Address       <= ToTransaction(iAddr, TransactionRec.Address'length) ;
     TransactionRec.AddrWidth     <= iAddr'length ;
     TransactionRec.DataWidth     <= NumFifoWords ;
 --??    TransactionRec.DataWidth     <= 0 ;
@@ -1347,7 +1342,7 @@ package body AddressBusTransactionPkg is
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
 --??    -- Return Results
---??    NumFifoWords := to_integer(Reduce(FromTransaction(TransactionRec.DataFromModel), 31)) ;
+--??    NumFifoWords := TransactionRec.IntFromModel ;
   end procedure ReadBurst ;
   
   ------------------------------------------------------------

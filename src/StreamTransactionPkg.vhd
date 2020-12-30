@@ -1000,8 +1000,8 @@ package body StreamTransactionPkg is
   ) is 
   begin
     TransactionRec.Operation     <= Operation ;
-    TransactionRec.DataToModel   <= std_logic_vector_max_c(Data) ; 
-    TransactionRec.ParamToModel  <= std_logic_vector_max_c(Param) ; 
+    TransactionRec.DataToModel   <= ToTransaction(Data, TransactionRec.DataToModel'length) ; 
+    TransactionRec.ParamToModel  <= ToTransaction(Param, TransactionRec.ParamToModel'length) ; 
     TransactionRec.IntToModel    <= Data'length ;
     TransactionRec.BoolToModel   <= StatusMsgOn ; 
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
@@ -1086,7 +1086,7 @@ package body StreamTransactionPkg is
   begin
     TransactionRec.Operation     <= Operation ;
     TransactionRec.IntToModel    <= NumFifoWords ; 
-    TransactionRec.ParamToModel  <= std_logic_vector_max_c(Param) ; 
+    TransactionRec.ParamToModel  <= ToTransaction(Param, TransactionRec.ParamToModel'length) ; 
     TransactionRec.BoolToModel   <= StatusMsgOn ; 
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
   end procedure LocalSendBurst ; 
@@ -1174,7 +1174,7 @@ package body StreamTransactionPkg is
     TransactionRec.IntToModel  <= Data'length ;
     TransactionRec.BoolToModel <= StatusMsgOn ;     
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
-    Data  := std_logic_vector(TransactionRec.DataFromModel) ; 
+    Data  := FromTransaction(TransactionRec.DataFromModel, Data'length) ; 
   end procedure Get ; 
   
   ------------------------------------------------------------
@@ -1187,7 +1187,7 @@ package body StreamTransactionPkg is
   ) is 
   begin
     Get(TransactionRec, Data, StatusMsgOn) ;
-    Param := std_logic_vector(TransactionRec.ParamFromModel) ; 
+    Param := FromTransaction(TransactionRec.ParamFromModel, Param'length) ; 
   end procedure Get ;  
 
   -- ========================================================
@@ -1212,7 +1212,7 @@ package body StreamTransactionPkg is
     TransactionRec.IntToModel  <= Data'length ;
     TransactionRec.BoolToModel <= StatusMsgOn ;     
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
-    Data      := std_logic_vector(TransactionRec.DataFromModel) ; 
+    Data      := FromTransaction(TransactionRec.DataFromModel, Data'length) ; 
     Available := TransactionRec.BoolFromModel ;
   end procedure TryGet ; 
   
@@ -1227,7 +1227,7 @@ package body StreamTransactionPkg is
   ) is 
   begin
     TryGet(TransactionRec, Data, Available, StatusMsgOn) ;
-    Param := std_logic_vector(TransactionRec.ParamFromModel) ; 
+    Param := FromTransaction(TransactionRec.ParamFromModel, Param'length) ; 
   end procedure TryGet ;  
 
 
@@ -1251,7 +1251,7 @@ package body StreamTransactionPkg is
     TransactionRec.BoolToModel <= StatusMsgOn ;     
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
 --    Last word of data, it maybe there, we don't return it, it is also in the BurstFifo
---    Data  := std_logic_vector(TransactionRec.DataFromModel) ; 
+--        Data  := FromTransaction(TransactionRec.DataFromModel, Data'length) ; 
     NumFifoWords := TransactionRec.IntFromModel ;
   end procedure GetBurst ; 
   
@@ -1265,7 +1265,7 @@ package body StreamTransactionPkg is
   ) is 
   begin
     GetBurst(TransactionRec, NumFifoWords, StatusMsgOn) ;
-    Param := std_logic_vector(TransactionRec.ParamFromModel) ; 
+    Param := FromTransaction(TransactionRec.ParamFromModel, Param'length) ; 
   end procedure GetBurst ;  
 
   -- ========================================================
@@ -1291,7 +1291,7 @@ package body StreamTransactionPkg is
     TransactionRec.BoolToModel <= StatusMsgOn ;     
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
 --    Last word of data, it maybe there, we don't return it, it is also in the BurstFifo
---    Data  := std_logic_vector(TransactionRec.DataFromModel) ; 
+--        Data  := FromTransaction(TransactionRec.DataFromModel, Data'length) ; 
     NumFifoWords  := TransactionRec.IntFromModel ;
     Available := TransactionRec.BoolFromModel ;
   end procedure TryGetBurst ; 
@@ -1307,7 +1307,7 @@ package body StreamTransactionPkg is
   ) is 
   begin
     TryGetBurst(TransactionRec, NumFifoWords, Available, StatusMsgOn) ;
-    Param := std_logic_vector(TransactionRec.ParamFromModel) ; 
+    Param := FromTransaction(TransactionRec.ParamFromModel, Param'length) ; 
   end procedure TryGetBurst ;  
 
 
@@ -1331,8 +1331,8 @@ package body StreamTransactionPkg is
   begin
     LocalParam(Param'length-1 downto 0) := Param ; 
     TransactionRec.Operation     <= CHECK ;
-    TransactionRec.DataToModel   <= std_logic_vector_max_c(Data) ; 
-    TransactionRec.ParamToModel  <= std_logic_vector_max_c(LocalParam) ; 
+    TransactionRec.DataToModel   <= ToTransaction(Data, TransactionRec.DataToModel'length) ; 
+    TransactionRec.ParamToModel  <= ToTransaction(LocalParam, TransactionRec.ParamToModel'length) ; 
     TransactionRec.IntToModel    <= Data'length ;
     TransactionRec.BoolToModel   <= StatusMsgOn ;     
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
@@ -1373,8 +1373,8 @@ package body StreamTransactionPkg is
   begin
     LocalParam(Param'length-1 downto 0) := Param ; 
     TransactionRec.Operation     <= TRY_CHECK ;
-    TransactionRec.DataToModel   <= std_logic_vector_max_c(Data) ; 
-    TransactionRec.ParamToModel  <= std_logic_vector_max_c(LocalParam) ; 
+    TransactionRec.DataToModel   <= ToTransaction(Data, TransactionRec.DataToModel'length) ; 
+    TransactionRec.ParamToModel  <= ToTransaction(LocalParam, TransactionRec.ParamToModel'length) ; 
     TransactionRec.IntToModel    <= Data'length ;
     TransactionRec.BoolToModel   <= StatusMsgOn ;     
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
@@ -1414,7 +1414,7 @@ package body StreamTransactionPkg is
   begin
     TransactionRec.Operation     <= Operation ;
     TransactionRec.IntToModel    <= NumFifoWords ; 
-    TransactionRec.ParamToModel  <= std_logic_vector_max_c(Param) ; 
+    TransactionRec.ParamToModel  <= ToTransaction(Param, TransactionRec.ParamToModel'length) ; 
     TransactionRec.BoolToModel   <= StatusMsgOn ; 
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
   end procedure LocalCheckBurst ; 
