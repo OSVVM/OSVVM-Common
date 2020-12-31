@@ -1,14 +1,31 @@
 # OSVVM Common Library Change Log
 
-Revision      Date             Comments
-**2020.10**   October 2020     Added Bursting to Stream MOdel Independent Transactions 
-**2020.07**   July 2020        Major release.  
-                               Package names have changed.
-                               Transaction naming updated to remove
-                               names master and slave.
-                               All OSVVM models now use the 
-                               Model Independent Transactions.
-**2020.02**   February 2020    Created by refactoring  Axi4LiteMasterTransactionPkg    
+| Revision  | Revision Date |  Release Summary | 
+------------|---------------|----------- 
+| 2020.12   | December 2020 |  Consistency updates to AddressBus and Stream MIT
+| 2020.10   | October 2020  |  Added Bursting to Stream Model Independent Transactions 
+| 2020.07   | July 2020     |  Updated for MIT and freed the slaves
+| 2020.02   | February 2020 |  Created by refactoring Axi4LiteMasterTransactionPkg
+
+
+## 2020.12 December 2020
+- Added Word/Byte Based Bursting controls. 
+- Consistency updates to AddressBus and Stream MIT
+
+## 2020.10 October 2020
+- Added Byte and Word based bursting to Stream.
+- Supports Burst modes: Byte, Word, Word + Parameter
+
+## 2020.07 July 2020
+Major release.
+Package names have changed.
+Transaction naming updated to remove
+names master and slave.
+All OSVVM models now use the 
+Model Independent Transactions.
+
+## 2020.02   February 2020    
+Created by refactoring Axi4LiteMasterTransactionPkg.    
  
 ## Copyright and License
 Copyright (C) 2006-2020 by [SynthWorks Design Inc.](http://www.synthworks.com/)   
