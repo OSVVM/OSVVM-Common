@@ -101,18 +101,20 @@ package AddressBusTransactionPkg is
     --  burst operations
     --                       ----------------------------
     WRITE_BURST,             -- Blocking BURST (Tx Addr & Data)
-    WRITE_BURST_ADDRESS,
-    WRITE_BURST_DATA,
     ASYNC_WRITE_BURST,       -- Non-blocking BURST (Tx Addr & Data)
-    ASYNC_WRITE_BURST_ADDRESS,
-    ASYNC_WRITE_BURST_DATA,
+-- Potential future expansion, but not implemented yet
+--    WRITE_BURST_ADDRESS,
+--    WRITE_BURST_DATA,
+--    ASYNC_WRITE_BURST_ADDRESS,
+--    ASYNC_WRITE_BURST_DATA,
     
     READ_BURST,              -- Blocking BURST (Tx Addr, Rx Data)
-    READ_BURST_ADDRESS,
-    READ_BURST_DATA,
-    ASYNC_READ_BURST,       -- Non-blocking BURST (Tx Addr & Data)
-    ASYNC_READ_BURST_ADDRESS,
-    ASYNC_READ_BURST_DATA,
+-- Potential future expansion, but not implemented yet
+--    READ_BURST_ADDRESS,
+--    READ_BURST_DATA,
+--    ASYNC_READ_BURST_ADDRESS,
+--    ASYNC_READ_BURST_DATA,
+--    ASYNC_READ_BURST,  -- Master cannot do this - Address, but data not ready.  Responder?  
 
     MULTIPLE_DRIVER_DETECT  -- value used when multiple drivers are present
   ) ;
@@ -139,8 +141,8 @@ package AddressBusTransactionPkg is
     --   Used by RequestTransaction in the Transaction Procedures
     --   Used by WaitForTransaction in the Verification Component
     --   RequestTransaction and WaitForTransaction are in osvvm.TbUtilPkg
-    Rdy                : bit_max ;
-    Ack                : bit_max ;
+    Rdy                : RdyType ;
+    Ack                : AckType ;
     -- Transaction Type
     Operation          : AddressBusOperationType ;
     -- Address to verification component and its width
@@ -159,8 +161,8 @@ package AddressBusTransactionPkg is
     StatusMsgOn        : boolean_max ;
     -- Verification Component Options Parameters - used by SetModelOptions
     IntToModel         : integer_max ;
-    BoolToModel        : boolean_max ; 
     IntFromModel       : integer_max ; 
+    BoolToModel        : boolean_max ; 
     BoolFromModel      : boolean_max ;
     -- Verification Component Options Type - currently aliased to type integer_max 
     Options            : integer_max ;  
@@ -610,6 +612,23 @@ package AddressBusTransactionPkg is
              StatusMsgOn    : In    boolean := false
   ) ;
 
+  -- ========================================================
+  --  Pseudo Transactions
+  --  Interact with the record only.
+  -- ========================================================
+  ------------------------------------------------------------
+  procedure ReleaseTransactionRecord (
+  --  Must run on same delta cycle as AcquireTransactionRecord
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout AddressBusRecType 
+  ) ; 
+  
+  ------------------------------------------------------------
+  procedure AcquireTransactionRecord (
+  --  Must run on same delta cycle as ReleaseTransactionRecord
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout AddressBusRecType 
+  ) ; 
 
   -- ========================================================
   --  Verification Component Support Functions
@@ -716,11 +735,27 @@ end package AddressBusTransactionPkg ;
 package body AddressBusTransactionPkg is
 
   function resolved_max ( s : UnresolvedAddressBusOperationVectorType) return UnresolvedAddressBusOperationType is
+    variable Result : UnresolvedAddressBusOperationType := NOT_DRIVEN ;
   begin
-    return maximum(s) ;
+    for i in s'range loop 
+      if s(i) > NOT_DRIVEN then 
+        if result = NOT_DRIVEN then 
+          result := s(i) ;
+        else
+          result := MULTIPLE_DRIVER_DETECT ;
+        end if ; 
+      end if ; 
+    end loop ;
+    return result ; 
+--    return maximum(s) ;
   end function resolved_max ;
 
 
+
+  -- ========================================================
+  --  Directive Transactions
+  --  Interact with verification component but not interface.
+  -- ========================================================
   ------------------------------------------------------------
   procedure WaitForTransaction (
   --  Wait until pending transaction completes
@@ -730,7 +765,6 @@ package body AddressBusTransactionPkg is
   begin
     TransactionRec.Operation     <= WAIT_FOR_TRANSACTION ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
   end procedure WaitForTransaction ; 
 
   ------------------------------------------------------------
@@ -742,7 +776,6 @@ package body AddressBusTransactionPkg is
   begin
     TransactionRec.Operation     <= WAIT_FOR_WRITE_TRANSACTION ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
   end procedure WaitForWriteTransaction ; 
 
   ------------------------------------------------------------
@@ -754,7 +787,6 @@ package body AddressBusTransactionPkg is
   begin
     TransactionRec.Operation     <= WAIT_FOR_READ_TRANSACTION ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
   end procedure WaitForReadTransaction ; 
 
   ------------------------------------------------------------
@@ -768,7 +800,6 @@ package body AddressBusTransactionPkg is
     TransactionRec.Operation     <= WAIT_FOR_CLOCK ;
     TransactionRec.IntToModel    <= NumberOfClocks ; 
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
   end procedure WaitForClock ;
 
   ------------------------------------------------------------
@@ -780,7 +811,6 @@ package body AddressBusTransactionPkg is
   begin
     TransactionRec.Operation     <= GET_TRANSACTION_COUNT ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
 
     -- Return AlertLogID
     Count := TransactionRec.IntFromModel ;
@@ -795,7 +825,6 @@ package body AddressBusTransactionPkg is
   begin
     TransactionRec.Operation     <= GET_WRITE_TRANSACTION_COUNT ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
 
     -- Return AlertLogID
     Count := TransactionRec.IntFromModel ;
@@ -810,7 +839,6 @@ package body AddressBusTransactionPkg is
   begin
     TransactionRec.Operation     <= GET_READ_TRANSACTION_COUNT ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
 
     -- Return AlertLogID
     Count := TransactionRec.IntFromModel ;
@@ -825,7 +853,6 @@ package body AddressBusTransactionPkg is
   begin
     TransactionRec.Operation     <= GET_ALERTLOG_ID ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
 
     -- Return AlertLogID
     AlertLogID := AlertLogIDType(TransactionRec.IntFromModel) ;
@@ -860,7 +887,6 @@ package body AddressBusTransactionPkg is
     TransactionRec.Operation     <= SET_BURST_MODE ;
     TransactionRec.IntToModel    <= OptVal ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
   end procedure SetBurstMode ;
 
   ------------------------------------------------------------
@@ -872,7 +898,6 @@ package body AddressBusTransactionPkg is
   begin
     TransactionRec.Operation     <= GET_BURST_MODE ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
     OptVal := TransactionRec.IntFromModel ; 
   end procedure GetBurstMode ;
 
@@ -902,7 +927,6 @@ package body AddressBusTransactionPkg is
     TransactionRec.Options       <= Option ;
     TransactionRec.BoolToModel   <= OptVal ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
   end procedure SetModelOptions ;
 
   ------------------------------------------------------------
@@ -917,7 +941,6 @@ package body AddressBusTransactionPkg is
     TransactionRec.Options       <= Option ;
     TransactionRec.IntToModel    <= OptVal ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
   end procedure SetModelOptions ;
 
   ------------------------------------------------------------
@@ -932,7 +955,6 @@ package body AddressBusTransactionPkg is
     TransactionRec.Options       <= Option ;
     TransactionRec.IntToModel    <= to_integer(OptVal) ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
   end procedure SetModelOptions ;
   
   ------------------------------------------------------------
@@ -947,7 +969,6 @@ package body AddressBusTransactionPkg is
     TransactionRec.Options       <= Option ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     OptVal := TransactionRec.BoolFromModel    ;
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
   end procedure GetModelOptions ;
 
   ------------------------------------------------------------
@@ -962,7 +983,6 @@ package body AddressBusTransactionPkg is
     TransactionRec.Options       <= Option ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     OptVal := TransactionRec.IntFromModel ; 
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
   end procedure GetModelOptions ;
 
   ------------------------------------------------------------
@@ -977,7 +997,6 @@ package body AddressBusTransactionPkg is
     TransactionRec.Options       <= Option ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     OptVal := to_slv(TransactionRec.IntFromModel, OptVal'length) ; 
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
   end procedure GetModelOptions ;
   
   
@@ -1000,7 +1019,6 @@ package body AddressBusTransactionPkg is
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
   end procedure Write ;
 
   ------------------------------------------------------------
@@ -1022,7 +1040,6 @@ package body AddressBusTransactionPkg is
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
   end procedure WriteAsync ;
 
   ------------------------------------------------------------
@@ -1042,7 +1059,6 @@ package body AddressBusTransactionPkg is
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
   end procedure WriteAddressAsync ;
 
   ------------------------------------------------------------
@@ -1064,7 +1080,6 @@ package body AddressBusTransactionPkg is
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
   end procedure WriteDataAsync ;
   
   ------------------------------------------------------------
@@ -1097,7 +1112,6 @@ package body AddressBusTransactionPkg is
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
   end procedure WriteBurst ;
 
   ------------------------------------------------------------
@@ -1119,7 +1133,6 @@ package body AddressBusTransactionPkg is
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
   end procedure WriteBurstAsync ;
   
   ------------------------------------------------------------
@@ -1140,7 +1153,6 @@ package body AddressBusTransactionPkg is
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
     -- Return Results
     oData  := FromTransaction(TransactionRec.DataFromModel, oData'length) ;
   end procedure Read ;
@@ -1164,7 +1176,6 @@ package body AddressBusTransactionPkg is
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
   end procedure ReadCheck ;
 
   ------------------------------------------------------------
@@ -1185,7 +1196,6 @@ package body AddressBusTransactionPkg is
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
   end procedure ReadAddressAsync ;
 
   ------------------------------------------------------------
@@ -1204,7 +1214,6 @@ package body AddressBusTransactionPkg is
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
     -- Return Results
     oData  := FromTransaction(TransactionRec.DataFromModel, oData'length) ;
   end procedure ReadData ;
@@ -1226,7 +1235,6 @@ package body AddressBusTransactionPkg is
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
   end procedure ReadCheckData ;
 
   ------------------------------------------------------------
@@ -1248,7 +1256,6 @@ package body AddressBusTransactionPkg is
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
     -- Return Results
     oData  := FromTransaction(TransactionRec.DataFromModel, oData'length) ;
     Available := TransactionRec.BoolFromModel ;
@@ -1274,7 +1281,6 @@ package body AddressBusTransactionPkg is
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
     Available := TransactionRec.BoolFromModel ;
   end procedure TryReadCheckData ;
 
@@ -1340,11 +1346,45 @@ package body AddressBusTransactionPkg is
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
-    TransactionRec.Operation     <= MULTIPLE_DRIVER_DETECT ; 
 --??    -- Return Results
 --??    NumFifoWords := TransactionRec.IntFromModel ;
   end procedure ReadBurst ;
   
+  -- ========================================================
+  --  Pseudo Transactions
+  --  Interact with the record only.
+  -- ========================================================
+  ------------------------------------------------------------
+  procedure ReleaseTransactionRecord (
+  --  Must run on same delta cycle as AcquireTransactionRecord
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout AddressBusRecType 
+  ) is
+  begin
+    -- Set everything driven by TestCtrl to type'left (except Rdy)
+    TransactionRec.Rdy           <= RdyType'left ;   
+    TransactionRec.Operation     <= NOT_DRIVEN ;
+    TransactionRec.Address       <= (TransactionRec.Address'range => 'U') ;
+    TransactionRec.AddrWidth     <= integer'left ; 
+    TransactionRec.DataToModel   <= (TransactionRec.DataToModel'range => 'U') ;
+    TransactionRec.DataWidth     <= integer'left ; 
+    TransactionRec.StatusMsgOn   <= boolean'left ; 
+    TransactionRec.IntToModel    <= integer'left ; 
+    TransactionRec.BoolToModel   <= boolean'left ;  
+    TransactionRec.Options       <= integer'left ;    
+  end procedure ReleaseTransactionRecord ; 
+  
+  ------------------------------------------------------------
+  procedure AcquireTransactionRecord (
+  --  Must run on same delta cycle as ReleaseTransactionRecord
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout AddressBusRecType 
+  ) is
+  begin
+    -- Start Driving Rdy on next delta cycle with the current value.  
+    TransactionRec.Rdy           <= TransactionRec.Rdy ; 
+  end procedure AcquireTransactionRecord ; 
+    
   ------------------------------------------------------------
   function IsWriteAddress (
   -----------------------------------------------------------
@@ -1352,14 +1392,14 @@ package body AddressBusTransactionPkg is
   ) return boolean is
   begin
     return
-      (Operation = WRITE_OP) or
-      (Operation = WRITE_ADDRESS) or
-      (Operation = ASYNC_WRITE) or
-      (Operation = ASYNC_WRITE_ADDRESS) or 
-      (Operation = WRITE_BURST) or
-      (Operation = WRITE_BURST_ADDRESS) or 
-      (Operation = ASYNC_WRITE_BURST) or
-      (Operation = ASYNC_WRITE_BURST_ADDRESS) ;
+      (Operation = WRITE_OP) 
+      or (Operation = WRITE_ADDRESS) 
+      or (Operation = ASYNC_WRITE) 
+      or (Operation = ASYNC_WRITE_ADDRESS)  
+      or (Operation = WRITE_BURST) 
+      or (Operation = ASYNC_WRITE_BURST) ; 
+--    or (Operation = WRITE_BURST_ADDRESS)  
+--    or  (Operation = ASYNC_WRITE_BURST_ADDRESS) ;
   end function IsWriteAddress ;
 
   ------------------------------------------------------------
@@ -1369,10 +1409,10 @@ package body AddressBusTransactionPkg is
   ) return boolean is
   begin
     return
-      (Operation = WRITE_OP) or
-      (Operation = WRITE_ADDRESS) or
-      (Operation = WRITE_BURST) or
-      (Operation = WRITE_BURST_ADDRESS) ;
+      (Operation = WRITE_OP) 
+      or (Operation = WRITE_ADDRESS) 
+      or (Operation = WRITE_BURST) ; 
+--      (Operation = WRITE_BURST_ADDRESS) ;
   end function IsBlockOnWriteAddress ;
 
   ------------------------------------------------------------
@@ -1382,10 +1422,10 @@ package body AddressBusTransactionPkg is
   ) return boolean is
   begin
     return
-      (Operation = ASYNC_WRITE) or
-      (Operation = ASYNC_WRITE_ADDRESS) or 
-      (Operation = ASYNC_WRITE_BURST) or
-      (Operation = ASYNC_WRITE_BURST_ADDRESS) ;
+      (Operation = ASYNC_WRITE) 
+      or (Operation = ASYNC_WRITE_ADDRESS)  
+      or (Operation = ASYNC_WRITE_BURST) ; 
+--      (Operation = ASYNC_WRITE_BURST_ADDRESS) ;
   end function IsTryWriteAddress ;
 
   ------------------------------------------------------------
@@ -1395,14 +1435,14 @@ package body AddressBusTransactionPkg is
   ) return boolean is
   begin
     return
-      (Operation = WRITE_OP) or
-      (Operation = WRITE_DATA) or
-      (Operation = ASYNC_WRITE) or
-      (Operation = ASYNC_WRITE_DATA) or 
-      (Operation = WRITE_BURST) or
-      (Operation = WRITE_BURST_DATA) or 
-      (Operation = ASYNC_WRITE_BURST) or
-      (Operation = ASYNC_WRITE_BURST_DATA) ;
+      (Operation = WRITE_OP) 
+      or (Operation = WRITE_DATA)
+      or (Operation = ASYNC_WRITE)
+      or (Operation = ASYNC_WRITE_DATA) 
+      or (Operation = WRITE_BURST) 
+      or (Operation = ASYNC_WRITE_BURST) ; 
+--      or (Operation = WRITE_BURST_DATA) 
+--      or (Operation = ASYNC_WRITE_BURST_DATA) ;
   end function IsWriteData ;
 
   ------------------------------------------------------------
@@ -1412,10 +1452,10 @@ package body AddressBusTransactionPkg is
   ) return boolean is
   begin
     return 
-      (Operation = WRITE_OP) or
-      (Operation = WRITE_DATA) or
-      (Operation = WRITE_BURST) or
-      (Operation = WRITE_BURST_DATA) ;
+      (Operation = WRITE_OP)
+      or (Operation = WRITE_DATA)
+      or (Operation = WRITE_BURST) ;
+--      or (Operation = WRITE_BURST_DATA) ;
   end function IsBlockOnWriteData ;
 
   ------------------------------------------------------------
@@ -1425,10 +1465,10 @@ package body AddressBusTransactionPkg is
   ) return boolean is
   begin
     return
-      (Operation = ASYNC_WRITE) or
-      (Operation = ASYNC_WRITE_DATA) or 
-      (Operation = ASYNC_WRITE_BURST) or
-      (Operation = ASYNC_WRITE_BURST_DATA) ;
+      (Operation = ASYNC_WRITE)
+      or (Operation = ASYNC_WRITE_DATA)
+      or (Operation = ASYNC_WRITE_BURST) ;
+--      or (Operation = ASYNC_WRITE_BURST_DATA) ;
   end function IsTryWriteData ;
 
   ------------------------------------------------------------
@@ -1438,15 +1478,14 @@ package body AddressBusTransactionPkg is
   ) return boolean is
   begin
     return
-      (Operation = READ_OP) or
-      (Operation = READ_ADDRESS) or
-      (Operation = READ_CHECK) or
-      (Operation = ASYNC_READ) or
-      (Operation = ASYNC_READ_ADDRESS) or
-      (Operation = READ_BURST) or
-      (Operation = READ_BURST_ADDRESS) or
-      (Operation = ASYNC_READ_BURST) or
-      (Operation = ASYNC_READ_BURST_ADDRESS) ;
+      (Operation = READ_OP)
+      or (Operation = READ_ADDRESS)
+      or (Operation = READ_CHECK)
+      or (Operation = ASYNC_READ)
+      or (Operation = ASYNC_READ_ADDRESS)
+      or (Operation = READ_BURST) ;
+--      or (Operation = READ_BURST_ADDRESS)
+--      or (Operation = ASYNC_READ_BURST_ADDRESS) ;
   end function IsReadAddress ;
 
   ------------------------------------------------------------
@@ -1456,10 +1495,10 @@ package body AddressBusTransactionPkg is
   ) return boolean is
   begin
     return
-      (Operation = ASYNC_READ) or
-      (Operation = ASYNC_READ_ADDRESS) or
-      (Operation = ASYNC_READ_BURST) or
-      (Operation = ASYNC_READ_BURST_ADDRESS) ;
+      (Operation = ASYNC_READ)
+      or (Operation = ASYNC_READ_ADDRESS) ;
+--      or (Operation = ASYNC_READ_BURST)
+--      or (Operation = ASYNC_READ_BURST_ADDRESS) ;
   end function IsTryReadAddress ;
   
   ------------------------------------------------------------
@@ -1469,17 +1508,17 @@ package body AddressBusTransactionPkg is
   ) return boolean is
   begin
     return
-      (Operation = READ_OP) or
-      (Operation = READ_DATA) or
-      (Operation = READ_CHECK) or
-      (Operation = READ_DATA_CHECK) or
-      (Operation = ASYNC_READ) or
-      (Operation = ASYNC_READ_DATA) or
-      (Operation = ASYNC_READ_DATA_CHECK) or
-      (Operation = READ_BURST) or
-      (Operation = READ_BURST_DATA) or
-      (Operation = ASYNC_READ_BURST) or
-      (Operation = ASYNC_READ_BURST_DATA) ;
+      (Operation = READ_OP)
+      or (Operation = READ_DATA)
+      or (Operation = READ_CHECK)
+      or (Operation = READ_DATA_CHECK)
+      or (Operation = ASYNC_READ)
+      or (Operation = ASYNC_READ_DATA)
+      or (Operation = ASYNC_READ_DATA_CHECK)
+      or (Operation = READ_BURST) ;
+--      or (Operation = READ_BURST_DATA)
+--      or (Operation = ASYNC_READ_BURST)
+--       or(Operation = ASYNC_READ_BURST_DATA) ;
   end function IsReadData ;
 
   ------------------------------------------------------------
@@ -1489,12 +1528,12 @@ package body AddressBusTransactionPkg is
   ) return boolean is
   begin
     return
-      (Operation = READ_OP) or
-      (Operation = READ_DATA) or
-      (Operation = READ_CHECK) or
-      (Operation = READ_DATA_CHECK) or
-      (Operation = READ_BURST) or
-      (Operation = READ_BURST_DATA) ;
+      (Operation = READ_OP)
+      or (Operation = READ_DATA)
+      or (Operation = READ_CHECK)
+      or (Operation = READ_DATA_CHECK)
+      or (Operation = READ_BURST) ;
+--      or (Operation = READ_BURST_DATA) ;
   end function IsBlockOnReadData ;
 
   ------------------------------------------------------------
@@ -1504,11 +1543,11 @@ package body AddressBusTransactionPkg is
   ) return boolean is
   begin
     return 
-      (Operation = ASYNC_READ) or
-      (Operation = ASYNC_READ_DATA) or
-      (Operation = ASYNC_READ_DATA_CHECK) or
-      (Operation = ASYNC_READ_BURST) or
-      (Operation = ASYNC_READ_BURST_DATA) ;
+      (Operation = ASYNC_READ)
+      or (Operation = ASYNC_READ_DATA)
+      or (Operation = ASYNC_READ_DATA_CHECK) ;
+--      or (Operation = ASYNC_READ_BURST)
+--      or (Operation = ASYNC_READ_BURST_DATA) ;
   end function IsTryReadData ;
 
   ------------------------------------------------------------
@@ -1530,18 +1569,17 @@ package body AddressBusTransactionPkg is
   ) return boolean is
   begin
     return
-      (Operation = WRITE_BURST) or
-      (Operation = WRITE_BURST_ADDRESS) or
-      (Operation = WRITE_BURST_DATA) or
-      (Operation = ASYNC_WRITE_BURST) or
-      (Operation = ASYNC_WRITE_BURST_ADDRESS) or
-      (Operation = ASYNC_WRITE_BURST_DATA) or
-      (Operation = READ_BURST) or
-      (Operation = READ_BURST_ADDRESS) or
-      (Operation = READ_BURST_DATA) or
-      (Operation = ASYNC_READ_BURST) or
-      (Operation = ASYNC_READ_BURST_ADDRESS) or
-      (Operation = ASYNC_READ_BURST_DATA) ;
+      (Operation = WRITE_BURST)
+      or (Operation = ASYNC_WRITE_BURST)
+--      or (Operation = WRITE_BURST_ADDRESS)
+--      or (Operation = WRITE_BURST_DATA)
+--      or (Operation = ASYNC_WRITE_BURST_ADDRESS)
+--      or (Operation = ASYNC_WRITE_BURST_DATA)
+      or (Operation = READ_BURST) ;
+--      or (Operation = READ_BURST_ADDRESS)
+--      or (Operation = READ_BURST_DATA)
+--      or (Operation = ASYNC_READ_BURST_ADDRESS)
+--      or (Operation = ASYNC_READ_BURST_DATA) ;
   end function IsBurst ;
 
 end package body AddressBusTransactionPkg ;

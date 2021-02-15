@@ -21,11 +21,11 @@
 --
 --  Revision History:
 --    Date      Version    Description
---    09/2020   2020.09    Updating comments to serve as documentation
---    07/2019   2019.07    Refactored from UartTbPkg and AxiStreamTransactionPkg
---    01/2020   2020.01    Updated license notice
---    07/2020   2020.07    Updated
 --    10/2020   2020.10    Added bursting to stream transactions
+--    09/2020   2020.09    Updating comments to serve as documentation
+--    07/2020   2020.07    Updated
+--    01/2020   2020.01    Updated license notice
+--    07/2019   2019.07    Refactored from UartTbPkg and AxiStreamTransactionPkg
 --
 --
 --  This file is part of OSVVM.
@@ -63,6 +63,8 @@ package StreamTransactionPkg is
   --  to the model via the transaction interface
   -- ========================================================
   type StreamUnresolvedOperationType is (
+    -- Default. Used for Multiple Driver Detection
+    NOT_DRIVEN,  
     -- Directives
     WAIT_FOR_CLOCK, 
     WAIT_FOR_TRANSACTION,
@@ -88,7 +90,7 @@ package StreamTransactionPkg is
     TRY_CHECK,
     CHECK_BURST,
     TRY_CHECK_BURST,
-    THE_END
+    MULTIPLE_DRIVER_DETECT  -- value used when multiple drivers are present
   ) ;
   type StreamUnresolvedOperationVectorType is array (natural range <>) of StreamUnresolvedOperationType ;
   -- Maximum is implicitly defined for any array type in VHDL-2008.   
@@ -115,8 +117,8 @@ package StreamTransactionPkg is
     --   Used by RequestTransaction in the Transaction Procedures
     --   Used by WaitForTransaction in the Verification Component
     --   RequestTransaction and WaitForTransaction are in osvvm.TbUtilPkg
-    Rdy             : bit_max ;
-    Ack             : bit_max ;
+    Rdy             : RdyType ;
+    Ack             : AckType ;
     -- Transaction Type
     Operation       : StreamOperationType ;
     -- Data and Transaction Parameter to and from verification component 
@@ -126,8 +128,8 @@ package StreamTransactionPkg is
     ParamFromModel  : std_logic_vector_max_c ; 
     -- Verification Component Options Parameters - used by SetModelOptions
     IntToModel      : integer_max ;
-    BoolToModel     : boolean_max ; 
     IntFromModel    : integer_max ; 
+    BoolToModel     : boolean_max ; 
     BoolFromModel   : boolean_max ;
     TimeToModel     : time_max ; 
     TimeFromModel   : time_max ; 
@@ -690,6 +692,24 @@ package StreamTransactionPkg is
     variable  Available       : out   boolean ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) ; 
+  
+  -- ========================================================
+  --  Pseudo Transactions
+  --  Interact with the record only.
+  -- ========================================================
+  ------------------------------------------------------------
+  procedure ReleaseTransactionRecord (
+  --  Must run on same delta cycle as AcquireTransactionRecord
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType 
+  ) ; 
+  
+  ------------------------------------------------------------
+  procedure AcquireTransactionRecord (
+  --  Must run on same delta cycle as ReleaseTransactionRecord
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType 
+  ) ; 
 
   -- ========================================================
   --  Verification Component Support Functions
@@ -723,8 +743,19 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   function resolved_max ( s : StreamUnresolvedOperationVectorType) return StreamUnresolvedOperationType is
   ------------------------------------------------------------
+    variable Result : StreamUnresolvedOperationType := NOT_DRIVEN ;
   begin
-    return maximum(s) ;
+    for i in s'range loop 
+      if s(i) > NOT_DRIVEN then 
+        if result = NOT_DRIVEN then 
+          result := s(i) ;
+        else
+          result := MULTIPLE_DRIVER_DETECT ;
+        end if ; 
+      end if ; 
+    end loop ;
+    return result ; 
+--    return maximum(s) ;
   end function resolved_max ; 
 
 
@@ -1480,6 +1511,40 @@ package body StreamTransactionPkg is
     LocalCheckBurst(TransactionRec, TRY_CHECK_BURST, NumFifoWords, LocalParam, StatusMsgOn) ;
     Available := TransactionRec.BoolFromModel ;
   end procedure TryCheckBurst ; 
+
+
+  -- ========================================================
+  --  Pseudo Transactions
+  --  Interact with the record only.
+  -- ========================================================
+  ------------------------------------------------------------
+  procedure ReleaseTransactionRecord (
+  --  Must run on same delta cycle as AcquireTransactionRecord
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType 
+  ) is
+  begin
+    -- Set everything driven by TestCtrl to type'left (except Rdy)
+    TransactionRec.Rdy           <= RdyType'left ;   
+    TransactionRec.Operation     <= NOT_DRIVEN ;
+    TransactionRec.DataToModel   <= (TransactionRec.DataToModel'range => 'U') ;
+    TransactionRec.ParamToModel  <= (TransactionRec.ParamToModel'range => 'U') ;
+    TransactionRec.IntToModel    <= integer'left ; 
+    TransactionRec.BoolToModel   <= boolean'left ; 
+    TransactionRec.TimeToModel   <= time'left ; 
+    TransactionRec.Options       <= integer'left ;    
+  end procedure ReleaseTransactionRecord ; 
+  
+  ------------------------------------------------------------
+  procedure AcquireTransactionRecord (
+  --  Must run on same delta cycle as ReleaseTransactionRecord
+  ------------------------------------------------------------
+    signal    TransactionRec  : inout StreamRecType 
+  ) is
+  begin
+    -- Start Driving Rdy on next delta cycle with the current value.  
+    TransactionRec.Rdy           <= TransactionRec.Rdy ; 
+  end procedure AcquireTransactionRecord ; 
 
 
   -- ========================================================
