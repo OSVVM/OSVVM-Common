@@ -47,8 +47,7 @@ library ieee ;
 library osvvm ;
   context osvvm.OsvvmContext ;
 
-library osvvm_common ;
-  context osvvm_common.OsvvmCommonContext ;
+  use work.AddressBusTransactionPkg.all; 
 
 
 entity InterruptHandler is
@@ -58,7 +57,7 @@ port (
 
   -- From TestCtrl
   TransRec    : inout AddressBusRecType ;
-  IntRec      : inout AddressBusRecType ;
+  InterruptRec      : inout AddressBusRecType ;
   
   -- To Verification Component
   VCRec       : inout AddressBusRecType
@@ -72,13 +71,13 @@ begin
   -- Generate Interrupts only when Interrupt Present and
   -- there are interrupt transactions pending 
   iIntReq <= '1' when IntReq = POLARITY and 
-                      IntRec.Rdy /= IntRec.Ack else '0' ;
+                      InterruptRec.Rdy /= InterruptRec.Ack else '0' ;
 
   TransactionHandler : process 
     variable IntState : boolean := FALSE ;
   begin
     Increment(TransRec.Ack) ; -- due to differences in handling
-    Increment(IntRec.Ack) ;   -- due to differences in handling
+    Increment(InterruptRec.Ack) ;   -- due to differences in handling
     wait for 0 ns ; 
     loop
       if not IntState then 
@@ -110,30 +109,30 @@ begin
       end if ; 
       
       if IntState then 
-        if not(IntRec.Ack /= IntRec.Rdy) then 
-          wait until IntRec.Ack /= IntRec.Rdy ;
+        if not(InterruptRec.Ack /= InterruptRec.Rdy) then 
+          wait until InterruptRec.Ack /= InterruptRec.Rdy ;
         end if ; 
-        if IntRec.Operation = INTERRUPT_RETURN then 
+        if InterruptRec.Operation = INTERRUPT_RETURN then 
           IntState := FALSE ; 
         else
           -- Copy transaction info to VC
-          VCRec.Operation     <=  IntRec.Operation   ;
-          VCRec.Address       <=  IntRec.Address     ;
-          VCRec.AddrWidth     <=  IntRec.AddrWidth   ;
-          VCRec.DataToModel   <=  IntRec.DataToModel ;
-          VCRec.DataWidth     <=  IntRec.DataWidth   ;
-          VCRec.StatusMsgOn   <=  IntRec.StatusMsgOn ;
-          VCRec.IntToModel    <=  IntRec.IntToModel  ;
-          VCRec.BoolToModel   <=  IntRec.BoolToModel ;
-          VCRec.Options       <=  IntRec.Options     ;
+          VCRec.Operation     <=  InterruptRec.Operation   ;
+          VCRec.Address       <=  InterruptRec.Address     ;
+          VCRec.AddrWidth     <=  InterruptRec.AddrWidth   ;
+          VCRec.DataToModel   <=  InterruptRec.DataToModel ;
+          VCRec.DataWidth     <=  InterruptRec.DataWidth   ;
+          VCRec.StatusMsgOn   <=  InterruptRec.StatusMsgOn ;
+          VCRec.IntToModel    <=  InterruptRec.IntToModel  ;
+          VCRec.BoolToModel   <=  InterruptRec.BoolToModel ;
+          VCRec.Options       <=  InterruptRec.Options     ;
           RequestTransaction(Rdy => VCRec.Rdy, Ack => VCRec.Ack) ; 
           
           -- Copy transaction results back
-          IntRec.DataFromModel <= VCRec.DataFromModel ;
-          IntRec.IntFromModel  <= VCRec.IntFromModel  ;
-          IntRec.BoolFromModel <= VCRec.BoolFromModel ;
+          InterruptRec.DataFromModel <= VCRec.DataFromModel ;
+          InterruptRec.IntFromModel  <= VCRec.IntFromModel  ;
+          InterruptRec.BoolFromModel <= VCRec.BoolFromModel ;
         end if ; 
-        increment(IntRec.Ack) ; 
+        increment(InterruptRec.Ack) ; 
         wait for 0 ns ; 
       end if ; 
     end loop ; 

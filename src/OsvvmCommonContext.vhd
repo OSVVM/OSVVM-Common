@@ -46,5 +46,6 @@ context OsvvmCommonContext is
     use OSVVM_Common.AddressBusVersionCompatibilityPkg.all ;     
     use OSVVM_Common.ModelParametersPkg.all ; 
     use OSVVM_Common.FifoFillPkg_slv.all ; 
+    use OSVVM_Common.InterruptHandlerComponentPkg.all ;
 end context OsvvmCommonContext ; 
 

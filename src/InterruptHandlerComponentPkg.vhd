@@ -47,25 +47,24 @@ library ieee ;
 library osvvm ;
   context osvvm.OsvvmContext ;
 
-library osvvm_common ;
-  context osvvm_common.OsvvmCommonContext ;
+  use work.AddressBusTransactionPkg.all; 
 
 package InterruptHandlerComponentPkg is
 
   ------------------------------------------------------------
-  component InterruptHandlerComponentPkg is
+  component InterruptHandler is
   ------------------------------------------------------------
   port (
     -- Interrupt Input
-    IntReq      : in   std_logic ;
+    IntReq       : in   std_logic ;
 
     -- From TestCtrl
-    TransRec    : inout AddressBusRecType ;
-    IntRec      : inout AddressBusRecType ;
+    TransRec     : inout AddressBusRecType ;
+    InterruptRec : inout AddressBusRecType ;
     
     -- To Verification Component
-    VCRec       : inout AddressBusRecType
+    VCRec        : inout AddressBusRecType
   ) ;
-  end component InterruptHandlerComponentPkg ;
+  end component InterruptHandler ;
   
 end package InterruptHandlerComponentPkg ;
