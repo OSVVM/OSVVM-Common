@@ -78,6 +78,8 @@ package AddressBusTransactionPkg is
     -- Model Options
     SET_MODEL_OPTIONS, 
     GET_MODEL_OPTIONS,
+    
+    INTERRUPT_RETURN,  -- Handled by InterruptHandler Component
     --
     --  bus operations                        Master                Responder
     --                       --------------------------------------------------------
@@ -394,8 +396,14 @@ package AddressBusTransactionPkg is
     constant Option         : In    integer ;
     variable OptVal         : Out   std_logic_vector
   ) ;
-  
-  
+
+  ------------------------------------------------------------
+  procedure InterruptReturn (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType 
+  ) ;
+
+
   -- ========================================================
   --  Master / Initiator Transactions  
   -- ========================================================
@@ -998,8 +1006,17 @@ package body AddressBusTransactionPkg is
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     OptVal := to_slv(TransactionRec.IntFromModel, OptVal'length) ; 
   end procedure GetModelOptions ;
-  
-  
+
+  ------------------------------------------------------------
+  procedure InterruptReturn (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType 
+  ) is
+  begin
+    TransactionRec.Operation     <= INTERRUPT_RETURN ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+  end procedure InterruptReturn ;
+
   ------------------------------------------------------------
   procedure Write (
   -- do CPU Write Cycle

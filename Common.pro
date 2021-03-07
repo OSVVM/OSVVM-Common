@@ -44,4 +44,6 @@ analyze ./src/AddressBusResponderTransactionPkg.vhd
 analyze ./src/AddressBusVersionCompatibilityPkg.vhd
 analyze ./src/ModelParametersPkg.vhd
 analyze ./src/FifoFillPkg_slv.vhd
+analyze ./src/InterruptHandler.vhd
+analyze ./src/InterruptHandlerComponentPkg.vhd
 analyze ./src/OsvvmCommonContext.vhd
