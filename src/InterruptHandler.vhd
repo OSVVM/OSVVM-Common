@@ -76,8 +76,8 @@ begin
   TransactionHandler : process 
     variable IntState : boolean := FALSE ;
   begin
-    Increment(TransRec.Ack) ; -- due to differences in handling
-    Increment(InterruptRec.Ack) ;   -- due to differences in handling
+    TransRec.Ack     <= Increment(TransRec.Ack) ;       -- due to differences in handling
+    InterruptRec.Ack <= Increment(InterruptRec.Ack) ;   -- due to differences in handling
     wait for 0 ns ; 
     loop
       if not IntState then 
@@ -103,7 +103,7 @@ begin
           TransRec.DataFromModel <= VCRec.DataFromModel ;
           TransRec.IntFromModel  <= VCRec.IntFromModel  ;
           TransRec.BoolFromModel <= VCRec.BoolFromModel ;
-          increment(TransRec.Ack) ; 
+          TransRec.Ack           <= Increment(TransRec.Ack) ; 
           wait for 0 ns ; 
         end if ; 
       end if ; 
@@ -132,7 +132,7 @@ begin
           InterruptRec.IntFromModel  <= VCRec.IntFromModel  ;
           InterruptRec.BoolFromModel <= VCRec.BoolFromModel ;
         end if ; 
-        increment(InterruptRec.Ack) ; 
+        InterruptRec.Ack <= Increment(InterruptRec.Ack) ;
         wait for 0 ns ; 
       end if ; 
     end loop ; 
