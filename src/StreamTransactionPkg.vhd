@@ -21,6 +21,7 @@
 --
 --  Revision History:
 --    Date      Version    Description
+--    05/2021   2021.05    Added bursting to stream transactions
 --    10/2020   2020.10    Added bursting to stream transactions
 --    09/2020   2020.09    Updating comments to serve as documentation
 --    07/2020   2020.07    Updated
@@ -30,7 +31,7 @@
 --
 --  This file is part of OSVVM.
 --  
---  Copyright (c) 2019 - 2020 by SynthWorks Design Inc.  
+--  Copyright (c) 2019 - 2021 by SynthWorks Design Inc.  
 --  
 --  Licensed under the Apache License, Version 2.0 (the "License");
 --  you may not use this file except in compliance with the License.
@@ -52,8 +53,9 @@ library ieee ;
 
   use std.textio.all ;
 
-library OSVVM ; 
-  context OSVVM.OsvvmContext ;  
+library osvvm ; 
+  context osvvm.OsvvmContext ;  
+  use osvvm.ScoreboardPkg_slv.all ; 
   
 package StreamTransactionPkg is 
 
@@ -126,6 +128,8 @@ package StreamTransactionPkg is
     ParamToModel    : std_logic_vector_max_c ; 
     DataFromModel   : std_logic_vector_max_c ; 
     ParamFromModel  : std_logic_vector_max_c ; 
+    -- BurstFifo
+    BurstFifo       : ScoreboardIdType ; 
     -- Verification Component Options Parameters - used by SetModelOptions
     IntToModel      : integer_max ;
     IntFromModel    : integer_max ; 
