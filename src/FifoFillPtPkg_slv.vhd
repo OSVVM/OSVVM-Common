@@ -1,6 +1,6 @@
 --
---  File Name:         FifoFillPkg_slv.vhd
---  Design Unit Name:  FifoFillPkg_slv
+--  File Name:         FifoFillPtPkg_slv.vhd
+--  Design Unit Name:  FifoFillPtPkg_slv
 --  Revision:          STANDARD VERSION
 --
 --  Maintainer:        Jim Lewis      email:  jim@synthworks.com
@@ -21,9 +21,9 @@
 --
 --  Revision History:
 --    Date      Version      Description
---    10/2020   2020.10     Updating comments to serve as documentation
---    09/2020   2020.09     Updating comments to serve as documentation
 --    05/2020   2020.05     Initial revision
+--    09/2020   2020.09     Updating comments to serve as documentation
+--    10/2020   2020.10     Updating comments to serve as documentation
 --
 --  This file is part of OSVVM.
 --  
@@ -56,13 +56,13 @@ library osvvm ;
 
 --!! Can this be made a generic package.   
 
-package FifoFillPkg_slv is
+package FifoFillPtPkg_slv is
   ------------------------------------------------------------
   procedure PushBurst (
   -- Push each value in the VectorOfWords parameter into the FIFO.   
   -- Only FifoWidth bits of each value will be pushed.    
   ------------------------------------------------------------
-    constant Fifo           : in    ScoreboardIdType ;
+    variable Fifo           : inout ScoreboardPType ;
     constant VectorOfWords  : in    integer_vector ;
     constant FifoWidth      : in    integer := 8
   ) ;
@@ -74,7 +74,7 @@ package FifoFillPkg_slv is
   -- than the previous one.  
   -- Only FifoWidth bits of each value will be pushed.    
   ------------------------------------------------------------
-    constant Fifo      : in    ScoreboardIdType ;
+    variable Fifo      : inout ScoreboardPType ;
     constant FirstWord : in    integer ;
     constant Count     : in    integer ;
     constant FifoWidth : in    integer := 8
@@ -87,7 +87,7 @@ package FifoFillPkg_slv is
   -- using the first value as the randomization seed.
   -- Only FifoWidth bits of each value will be pushed.    
   ------------------------------------------------------------
-    constant Fifo      : in    ScoreboardIdType ;
+    variable Fifo      : inout ScoreboardPType ;
     constant FirstWord : in    integer ;
     constant Count     : in    integer ;
     constant FifoWidth : in    integer := 8
@@ -98,7 +98,7 @@ package FifoFillPkg_slv is
   -- Pop values from the FIFO into the VectorOfWords parameter.
   -- Each value popped will be FifoWidth bits wide.   
   ------------------------------------------------------------
-    constant Fifo           : in    ScoreboardIdType ;
+    variable Fifo           : inout ScoreboardPType ;
     variable VectorOfWords  : out   integer_vector ;
     constant FifoWidth      : in    integer := 8
   ) ;
@@ -109,7 +109,7 @@ package FifoFillPkg_slv is
   -- in the VectorOfWords parameter.   
   -- Each value popped will be FifoWidth bits wide.   
   ------------------------------------------------------------
-    constant Fifo           : in    ScoreboardIdType ;
+    variable Fifo           : inout ScoreboardPType ;
     constant VectorOfWords  : in    integer_vector ;
     constant FifoWidth      : in    integer := 8
   ) ;
@@ -121,7 +121,7 @@ package FifoFillPkg_slv is
   -- and the following check values are one greater than the previous one.  
   -- Each value popped will be FifoWidth bits wide.   
   ------------------------------------------------------------
-    constant Fifo      : in    ScoreboardIdType ;
+    variable Fifo      : inout ScoreboardPType ;
     constant FirstWord : in    integer ;
     constant Count     : in    integer ;
     constant FifoWidth : in    integer := 8
@@ -135,7 +135,7 @@ package FifoFillPkg_slv is
   -- value as the randomization seed.  
   -- Each value popped will be FifoWidth bits wide.   
   ------------------------------------------------------------
-    constant Fifo      : in    ScoreboardIdType ;
+    variable Fifo      : inout ScoreboardPType ;
     constant FirstWord : in    integer ;
     constant Count     : in    integer ;
     constant FifoWidth : in    integer := 8
@@ -152,7 +152,7 @@ package FifoFillPkg_slv is
   -- Current implementation for now assumes it is assembling bytes.   
   --
   ------------------------------------------------------------
-    constant Fifo              : in    ScoreboardIdType ;
+    variable Fifo              : inout ScoreboardPType ;
     variable Valid             : out   boolean ;
     variable Data              : out   std_logic_vector ; 
     variable BytesToSend       : inout integer ;
@@ -165,7 +165,7 @@ package FifoFillPkg_slv is
   -- Current implementation for now assumes it is assembling bytes.   
   --
   ------------------------------------------------------------
-    constant Fifo              : in    ScoreboardIdType ;
+    variable Fifo              : inout ScoreboardPType ;
     variable Data              : in    std_logic_vector ; 
     constant DropUndriven      : in    boolean := FALSE ;
     constant ByteAddress       : in    natural := 0 
@@ -177,43 +177,33 @@ package FifoFillPkg_slv is
   -- Current implementation for now assumes it is assembling bytes.   
   --
   ------------------------------------------------------------
-    constant Fifo              : in    ScoreboardIdType ;
+    variable Fifo              : inout ScoreboardPType ;
     variable Data              : in    std_logic_vector ; 
     constant DropUndriven      : in    boolean := FALSE ;
     constant ByteAddress       : in    natural := 0 
   ) ;
-
-  ------------------------------------------------------------
-  function CountBytes(
-  -- Count number of bytes in a word
-  --
-  ------------------------------------------------------------
-    constant Data              : std_logic_vector ;
-    constant DropUndriven      : in    boolean := FALSE ;
-    constant ByteAddress       : in    natural := 0 
-  ) return integer ;
   
-end package FifoFillPkg_slv ;
+end package FifoFillPtPkg_slv ;
 
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-package body FifoFillPkg_slv is
+package body FifoFillPtPkg_slv is
 
   ------------------------------------------------------------
   procedure PushBurst (
   ------------------------------------------------------------
-    constant Fifo           : in    ScoreboardIdType ;
+    variable Fifo           : inout ScoreboardPType ;
     constant VectorOfWords  : in    integer_vector ;
     constant FifoWidth      : in    integer := 8
   ) is
   begin
     for i in VectorOfWords'range loop 
       if VectorOfWords(i) < 0 then 
-        Push(Fifo, (FifoWidth downto 1 => 'U')) ;
+        Fifo.Push((FifoWidth downto 1 => 'U')) ;
       else 
-        Push(Fifo, to_slv(VectorOfWords(i), FifoWidth)) ;
+        Fifo.Push(to_slv(VectorOfWords(i), FifoWidth)) ;
       end if ;
     end loop ;
   end procedure PushBurst ;
@@ -221,7 +211,7 @@ package body FifoFillPkg_slv is
   ------------------------------------------------------------
   procedure PushBurstIncrement (
   ------------------------------------------------------------
-    constant Fifo      : in    ScoreboardIdType ;
+    variable Fifo      : inout ScoreboardPType ;
     constant FirstWord : in    integer ;
     constant Count     : in    integer ;
     constant FifoWidth : in    integer := 8
@@ -229,9 +219,9 @@ package body FifoFillPkg_slv is
   begin
     for i in FirstWord to Count+FirstWord-1 loop 
       if FifoWidth < 31 then 
-        Push(Fifo, to_slv(i mod (2**FifoWidth), FifoWidth)) ;
+        Fifo.Push(to_slv(i mod (2**FifoWidth), FifoWidth)) ;
       else 
-        Push(Fifo, to_slv(i, FifoWidth)) ;
+        Fifo.Push(to_slv(i, FifoWidth)) ;
       end if ; 
     end loop ;
   end procedure PushBurstIncrement ;
@@ -239,7 +229,7 @@ package body FifoFillPkg_slv is
   ------------------------------------------------------------
   procedure PushBurstRandom (
   ------------------------------------------------------------
-    constant Fifo      : in    ScoreboardIdType ;
+    variable Fifo      : inout ScoreboardPType ;
     constant FirstWord : in    integer ;
     constant Count     : in    integer ;
     constant FifoWidth : in    integer := 8
@@ -253,30 +243,30 @@ package body FifoFillPkg_slv is
     JunkValue := RV.RandInt(1, 10) ;  -- toss
     
     if FifoWidth < 31 then 
-      Push(Fifo, to_slv(FirstWord mod (2**FifoWidth), FifoWidth)) ;
+      Fifo.Push(to_slv(FirstWord mod (2**FifoWidth), FifoWidth)) ;
     else 
-      Push(Fifo, to_slv(FirstWord, FifoWidth)) ;
+      Fifo.Push(to_slv(FirstWord, FifoWidth)) ;
     end if ; 
     
     for i in 2 to Count loop 
       Data := RV.RandSlv(FifoWidth) ;
-      Push(Fifo, Data) ;
+      Fifo.Push(Data) ;
     end loop ;
   end procedure PushBurstRandom ;
   
   ------------------------------------------------------------
   procedure PopBurst (
   ------------------------------------------------------------
-    constant Fifo           : in    ScoreboardIdType ;
+    variable Fifo           : inout ScoreboardPType ;
     variable VectorOfWords  : out   integer_vector ;
     constant FifoWidth      : in    integer := 8
   ) is
   begin
     for i in VectorOfWords'range loop 
       if VectorOfWords(i) < 0 then 
-        Push(Fifo, (FifoWidth downto 1 => 'U')) ;
+        Fifo.Push((FifoWidth downto 1 => 'U')) ;
       else 
-        Push(Fifo, to_slv(VectorOfWords(i), FifoWidth)) ;
+        Fifo.Push(to_slv(VectorOfWords(i), FifoWidth)) ;
       end if ;
     end loop ;
   end procedure PopBurst ;
@@ -284,16 +274,16 @@ package body FifoFillPkg_slv is
   ------------------------------------------------------------
   procedure CheckBurst (
   ------------------------------------------------------------
-    constant Fifo           : in    ScoreboardIdType ;
+    variable Fifo           : inout ScoreboardPType ;
     constant VectorOfWords  : in    integer_vector ;
     constant FifoWidth      : in    integer := 8
   ) is
     variable AlertLogID : AlertLogIDType ; 
     variable RxVal : std_logic_vector(FifoWidth-1 downto 0) ;
   begin
-    AlertLogID := GetAlertLogID(Fifo) ; 
+    AlertLogID := Fifo.GetAlertLogID ; 
     for i in VectorOfWords'range loop 
-      RxVal := Pop(Fifo) ;
+      RxVal := Fifo.Pop ;
       if VectorOfWords(i) < 0 then 
         AffirmIfEqual(AlertLogID, RxVal, (FifoWidth downto 1 => 'U')) ;
       else 
@@ -305,7 +295,7 @@ package body FifoFillPkg_slv is
   ------------------------------------------------------------
   procedure CheckBurstIncrement (
   ------------------------------------------------------------
-    constant Fifo      : in    ScoreboardIdType ;
+    variable Fifo      : inout ScoreboardPType ;
     constant FirstWord : in    integer ;
     constant Count     : in    integer ;
     constant FifoWidth : in    integer := 8
@@ -313,9 +303,9 @@ package body FifoFillPkg_slv is
     variable AlertLogID : AlertLogIDType ; 
     variable RxVal : std_logic_vector(FifoWidth-1 downto 0) ;
   begin
-    AlertLogID := GetAlertLogID(Fifo) ; 
+    AlertLogID := Fifo.GetAlertLogID ; 
     for i in FirstWord to Count+FirstWord-1 loop 
-      RxVal := Pop(Fifo) ;
+      RxVal := Fifo.Pop ;
       if FifoWidth < 31 then 
         AffirmIfEqual(AlertLogID, RxVal, to_slv(i mod (2**FifoWidth), FifoWidth)) ;
       else 
@@ -327,7 +317,7 @@ package body FifoFillPkg_slv is
   ------------------------------------------------------------
   procedure CheckBurstRandom (
   ------------------------------------------------------------
-    constant Fifo      : in    ScoreboardIdType ;
+    variable Fifo      : inout ScoreboardPType ;
     constant FirstWord : in    integer ;
     constant Count     : in    integer ;
     constant FifoWidth : in    integer := 8
@@ -337,12 +327,12 @@ package body FifoFillPkg_slv is
     variable AlertLogID : AlertLogIDType ; 
     variable RxVal, ExpVal : std_logic_vector(FifoWidth-1 downto 0) ;
   begin
-    AlertLogID := GetAlertLogID(Fifo) ; 
+    AlertLogID := Fifo.GetAlertLogID ; 
     -- Initialize seed and toss first random value 
     RV.InitSeed(FirstWord) ;
     JunkValue := RV.RandInt(1, 10) ;  -- Toss
     
-    RxVal := Pop(Fifo) ;
+    RxVal := Fifo.Pop ;
     -- Check First Value      Received    Expected, First Value
     if FifoWidth < 31 then 
       AffirmIfEqual(AlertLogID, RxVal, to_slv(FirstWord mod (2**FifoWidth), FifoWidth)) ;
@@ -351,7 +341,7 @@ package body FifoFillPkg_slv is
     end if ; 
     
     for i in 2 to Count loop 
-      RxVal := Pop(Fifo) ;
+      RxVal := Fifo.Pop ;
       ExpVal := RV.RandSlv(FifoWidth) ;
       -- Check Remaining Values   Received    Expected
       AffirmIfEqual(AlertLogID,   RxVal,      ExpVal ) ;
@@ -369,7 +359,7 @@ package body FifoFillPkg_slv is
   -- Current implementation for now assumes it is assembling bytes.   
   --
   ------------------------------------------------------------
-    constant Fifo              : in    ScoreboardIdType ;
+    variable Fifo              : inout ScoreboardPType ;
     variable Valid             : out   boolean ;
     variable Data              : out   std_logic_vector ; 
     variable BytesToSend       : inout integer ;
@@ -382,8 +372,8 @@ package body FifoFillPkg_slv is
     aData := (aData'range => 'U') ;  -- Default Undriven
     Valid := TRUE ; 
     GetWord : while Index <= DataLeft loop  
-      if not Empty(Fifo) then 
-        aData(Index+7 downto Index) := Pop(Fifo) ; 
+      if not Fifo.empty then 
+        aData(Index+7 downto Index) := Fifo.pop ; 
         BytesToSend := BytesToSend - 1 ; 
         exit when BytesToSend = 0 ; 
       else
@@ -400,18 +390,18 @@ package body FifoFillPkg_slv is
   -- Current implementation for now assumes it is assembling bytes.   
   --
   ------------------------------------------------------------
-    constant Fifo              : in    ScoreboardIdType ;
+    variable Fifo              : inout ScoreboardPType ;
     variable Data              : in    std_logic_vector ; 
     constant DropUndriven      : in    boolean := FALSE ;
     constant ByteAddress       : in    natural := 0 
   ) is
     variable Index    : integer := ByteAddress * 8 ; 
     constant DataLeft : integer := Data'length-1; 
-    alias    aData    : std_logic_vector(DataLeft downto 0) is Data;
+    alias aData       : std_logic_vector(DataLeft downto 0) is Data;
   begin
     PushBytes : while Index <= DataLeft loop  
       if not ((DropUndriven and aData(Index) = 'U') or aData(Index) = '-') then 
-        Push(Fifo, aData(Index+7 downto Index)) ; 
+        Fifo.push(aData(Index+7 downto Index)) ; 
       end if ;
       Index := Index + 8 ; 
     end loop PushBytes ; 
@@ -423,7 +413,7 @@ package body FifoFillPkg_slv is
   -- Current implementation for now assumes it is assembling bytes.   
   --
   ------------------------------------------------------------
-    constant Fifo              : in    ScoreboardIdType ;
+    variable Fifo              : inout ScoreboardPType ;
     variable Data              : in    std_logic_vector ; 
     constant DropUndriven      : in    boolean := FALSE ;
     constant ByteAddress       : in    natural := 0 
@@ -434,33 +424,10 @@ package body FifoFillPkg_slv is
   begin
     PushBytes : while Index <= DataLeft loop  
       if not ((DropUndriven and aData(Index) = 'U') or aData(Index) = '-') then 
-        Check(Fifo, aData(Index+7 downto Index)) ; 
+        Fifo.Check(aData(Index+7 downto Index)) ; 
       end if ;
       Index := Index + 8 ; 
     end loop PushBytes ; 
   end CheckWord ; 
 
-  ------------------------------------------------------------
-  function CountBytes(
-  -- Count number of bytes in a word
-  --
-  ------------------------------------------------------------
-    constant Data              : std_logic_vector ;
-    constant DropUndriven      : in    boolean := FALSE ;
-    constant ByteAddress       : in    natural := 0 
-  ) return integer is
-    variable Index    : integer := ByteAddress * 8 ; 
-    variable Count    : integer := 0 ; 
-    constant DataLeft : integer := Data'length-1 ;
-    alias aData       : std_logic_vector(DataLeft downto 0) is Data ; 
-  begin
-    while Index <= DataLeft loop
-      if not ((DropUndriven and aData(Index) = 'U') or aData(Index) = '-') then 
-        Count := Count + 1 ; 
-      end if ;
-      Index := Index + 8 ; 
-    end loop ; 
-    return Count ;
-  end function CountBytes ; 
-    
-end FifoFillPkg_slv ;
+end FifoFillPtPkg_slv ;
