@@ -21,7 +21,7 @@
 --
 --  Revision History:
 --    Date      Version    Description
---    05/2021   2021.05    Added bursting to stream transactions
+--    05/2021   2021.05    Updated bursting 
 --    10/2020   2020.10    Added bursting to stream transactions
 --    09/2020   2020.09    Updating comments to serve as documentation
 --    07/2020   2020.07    Updated
