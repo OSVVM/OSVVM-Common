@@ -20,7 +20,8 @@
 --        http://www.SynthWorks.com
 --
 --  Revision History:
---    Date      Version      Description
+--    Date      Version     Description
+--    06/2021   2021.06     Updated to work with new FIFO/Scoreboard data structures
 --    10/2020   2020.10     Updating comments to serve as documentation
 --    09/2020   2020.09     Updating comments to serve as documentation
 --    05/2020   2020.05     Initial revision
@@ -200,6 +201,7 @@ end package FifoFillPkg_slv ;
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 package body FifoFillPkg_slv is
+  constant NUMBER_POSITIVE_INTEGER_BITS : integer := 31 ; 
 
   ------------------------------------------------------------
   procedure PushBurst (
@@ -228,7 +230,7 @@ package body FifoFillPkg_slv is
   ) is
   begin
     for i in FirstWord to Count+FirstWord-1 loop 
-      if FifoWidth < 31 then 
+      if FifoWidth < NUMBER_POSITIVE_INTEGER_BITS then 
         Push(Fifo, to_slv(i mod (2**FifoWidth), FifoWidth)) ;
       else 
         Push(Fifo, to_slv(i, FifoWidth)) ;
@@ -252,7 +254,7 @@ package body FifoFillPkg_slv is
     RV.InitSeed(FirstWord) ;
     JunkValue := RV.RandInt(1, 10) ;  -- toss
     
-    if FifoWidth < 31 then 
+    if FifoWidth < NUMBER_POSITIVE_INTEGER_BITS then 
       Push(Fifo, to_slv(FirstWord mod (2**FifoWidth), FifoWidth)) ;
     else 
       Push(Fifo, to_slv(FirstWord, FifoWidth)) ;
@@ -316,7 +318,7 @@ package body FifoFillPkg_slv is
     AlertLogID := GetAlertLogID(Fifo) ; 
     for i in FirstWord to Count+FirstWord-1 loop 
       RxVal := Pop(Fifo) ;
-      if FifoWidth < 31 then 
+      if FifoWidth < NUMBER_POSITIVE_INTEGER_BITS then 
         AffirmIfEqual(AlertLogID, RxVal, to_slv(i mod (2**FifoWidth), FifoWidth)) ;
       else 
         AffirmIfEqual(AlertLogID, RxVal, to_slv(i, FifoWidth)) ;
@@ -344,7 +346,7 @@ package body FifoFillPkg_slv is
     
     RxVal := Pop(Fifo) ;
     -- Check First Value      Received    Expected, First Value
-    if FifoWidth < 31 then 
+    if FifoWidth < NUMBER_POSITIVE_INTEGER_BITS then 
       AffirmIfEqual(AlertLogID, RxVal, to_slv(FirstWord mod (2**FifoWidth), FifoWidth)) ;
     else 
       AffirmIfEqual(AlertLogID, RxVal, to_slv(FirstWord, FifoWidth)) ;

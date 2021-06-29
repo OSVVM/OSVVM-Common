@@ -20,14 +20,16 @@
 --        http://www.SynthWorks.com
 --
 --  Revision History:
---    Date      Version      Description
---    05/2020   2020.05     Initial revision
---    09/2020   2020.09     Updating comments to serve as documentation
+--    Date      Version     Description
+--    06/2021   2021.06     For use with FIFO implemented as a PT.
+--                          Renamed from FifoFillPkg_slv.vhd.  
 --    10/2020   2020.10     Updating comments to serve as documentation
+--    09/2020   2020.09     Updating comments to serve as documentation
+--    05/2020   2020.05     Initial revision
 --
 --  This file is part of OSVVM.
 --  
---  Copyright (c) 2020 by SynthWorks Design Inc.  
+--  Copyright (c) 2021 by SynthWorks Design Inc.  
 --  
 --  Licensed under the Apache License, Version 2.0 (the "License");
 --  you may not use this file except in compliance with the License.
@@ -190,6 +192,7 @@ end package FifoFillPtPkg_slv ;
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 package body FifoFillPtPkg_slv is
+  constant NUMBER_POSITIVE_INTEGER_BITS : integer := 31 ; 
 
   ------------------------------------------------------------
   procedure PushBurst (
@@ -218,7 +221,7 @@ package body FifoFillPtPkg_slv is
   ) is
   begin
     for i in FirstWord to Count+FirstWord-1 loop 
-      if FifoWidth < 31 then 
+      if FifoWidth < NUMBER_POSITIVE_INTEGER_BITS then 
         Fifo.Push(to_slv(i mod (2**FifoWidth), FifoWidth)) ;
       else 
         Fifo.Push(to_slv(i, FifoWidth)) ;
@@ -242,7 +245,7 @@ package body FifoFillPtPkg_slv is
     RV.InitSeed(FirstWord) ;
     JunkValue := RV.RandInt(1, 10) ;  -- toss
     
-    if FifoWidth < 31 then 
+    if FifoWidth < NUMBER_POSITIVE_INTEGER_BITS then 
       Fifo.Push(to_slv(FirstWord mod (2**FifoWidth), FifoWidth)) ;
     else 
       Fifo.Push(to_slv(FirstWord, FifoWidth)) ;
@@ -306,7 +309,7 @@ package body FifoFillPtPkg_slv is
     AlertLogID := Fifo.GetAlertLogID ; 
     for i in FirstWord to Count+FirstWord-1 loop 
       RxVal := Fifo.Pop ;
-      if FifoWidth < 31 then 
+      if FifoWidth < NUMBER_POSITIVE_INTEGER_BITS then 
         AffirmIfEqual(AlertLogID, RxVal, to_slv(i mod (2**FifoWidth), FifoWidth)) ;
       else 
         AffirmIfEqual(AlertLogID, RxVal, to_slv(i, FifoWidth)) ;
@@ -334,7 +337,7 @@ package body FifoFillPtPkg_slv is
     
     RxVal := Fifo.Pop ;
     -- Check First Value      Received    Expected, First Value
-    if FifoWidth < 31 then 
+    if FifoWidth < NUMBER_POSITIVE_INTEGER_BITS then 
       AffirmIfEqual(AlertLogID, RxVal, to_slv(FirstWord mod (2**FifoWidth), FifoWidth)) ;
     else 
       AffirmIfEqual(AlertLogID, RxVal, to_slv(FirstWord, FifoWidth)) ;

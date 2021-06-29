@@ -2,11 +2,16 @@
 
 | Revision  | Revision Date |  Release Summary | 
 ------------|---------------|----------- 
+| 2021.06   | June 2021     |  Updated FifoFillPkg_slv.vhd ...
 | 2020.12   | December 2020 |  Consistency updates to AddressBus and Stream MIT
 | 2020.10   | October 2020  |  Added Bursting to Stream Model Independent Transactions 
 | 2020.07   | July 2020     |  Updated for MIT and freed the slaves
 | 2020.02   | February 2020 |  Created by refactoring Axi4LiteMasterTransactionPkg
 
+
+## 2021.06  June 2021
+- Revised FifoFillPkg_slv.vhd to support new FIFO/Scoreboard data structures
+- Added FifoFillPtPkg_slv.vhd as a variant of FifoFillPkg_slv to maintain backward compatibility with older shared variable FIFO/Scoreboard data structures.
 
 ## 2020.12 December 2020
 - Added Word/Byte Based Bursting controls. 
