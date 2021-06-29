@@ -10,7 +10,8 @@
 
 
 ## 2021.06  June 2021
-- Revised FifoFillPkg_slv.vhd to support new FIFO/Scoreboard data structures
+- Updated AddressBusTransactionPkg and StreamTransactionPkg for new Burst FIFO/scoreboard data structures
+- Revised FifoFillPkg_slv.vhd to support new burst FIFO/Scoreboard data structures
 - Added FifoFillPtPkg_slv.vhd as a variant of FifoFillPkg_slv to maintain backward compatibility with older shared variable FIFO/Scoreboard data structures.
 
 ## 2020.12 December 2020

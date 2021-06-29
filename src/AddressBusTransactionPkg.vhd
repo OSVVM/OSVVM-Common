@@ -21,7 +21,7 @@
 --
 --  Revision History:
 --    Date      Version    Description
---    05/2021   2021.05    Updated bursting 
+--    06/2021   2021.06    Updated bursting 
 --    12/2020   2020.12    Added SetBurstMode, updated parameter names for consistency
 --    09/2020   2020.09    Updating comments to serve as documentation
 --    07/2020   2020.07    Unified M/S packages - dropping M/S terminology
