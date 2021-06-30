@@ -21,16 +21,17 @@
 --
 --  Revision History:
 --    Date      Version    Description
---    09/2017   2017       Initial revision
---    01/2020   2020.01    Updated license notice
---    02/2020   2020.02    Refactored from Axi4LiteMasterTransactionPkg
---    07/2020   2020.07    Unified M/S packages - dropping M/S terminology
---    09/2020   2020.09    Updating comments to serve as documentation
+--    06/2021   2021.06    Updated bursting 
 --    12/2020   2020.12    Added SetBurstMode, updated parameter names for consistency
+--    09/2020   2020.09    Updating comments to serve as documentation
+--    07/2020   2020.07    Unified M/S packages - dropping M/S terminology
+--    02/2020   2020.02    Refactored from Axi4LiteMasterTransactionPkg
+--    01/2020   2020.01    Updated license notice
+--    09/2017   2017       Initial revision
 --
 --  This file is part of OSVVM.
 --  
---  Copyright (c) 2017 - 2020 by SynthWorks Design Inc.  
+--  Copyright (c) 2017 - 2021 by SynthWorks Design Inc.  
 --  
 --  Licensed under the Apache License, Version 2.0 (the "License");
 --  you may not use this file except in compliance with the License.
@@ -51,7 +52,8 @@ library ieee ;
   use ieee.math_real.all ;
 
 library osvvm ;
-    context osvvm.OsvvmContext ;
+  context osvvm.OsvvmContext ;
+  use osvvm.ScoreboardPkg_slv.all ; 
     
 package AddressBusTransactionPkg is
 
@@ -157,6 +159,9 @@ package AddressBusTransactionPkg is
     DataToModel        : std_logic_vector_max_c ;
     DataFromModel      : std_logic_vector_max_c ;
     DataWidth          : integer_max ;
+    -- Burst FIFOs
+    WriteBurstFifo     : ScoreboardIdType ; 
+    ReadBurstFifo      : ScoreboardIdType ; 
     -- StatusMsgOn provides transaction messaging override.
     -- When true, print transaction messaging independent of 
     -- other verification based based controls.
