@@ -182,7 +182,7 @@ package AddressBusTransactionPkg is
   -- These fields will be sized when used as a record signal in the test harness 
   -- of the testbench.  Such a declaration is shown below:
   --
-  --   signal AxiInitiatorTransactionRec : AddressBusRecType(
+  --   signal AxiManagerRec : AddressBusRecType(
   --           Address      (27 downto 0),
   --           DataToModel  (31 downto 0),
   --           DataFromModel(31 downto 0)
