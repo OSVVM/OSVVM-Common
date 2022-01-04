@@ -1461,8 +1461,12 @@ package body AddressBusTransactionPkg is
              StatusMsgOn    : In    boolean := false
   ) is
     variable RV : RandomPType ; 
+    alias aAddr        : std_logic_vector(iAddr'length-1 downto 0) is iAddr ; 
+    constant ADDR_LEFT : integer := minimum(29, iAddr'length) ;
+    alias aFirstWord   : std_logic_vector(FirstWord'length-1 downto 0) is FirstWord ; 
+    constant FW_LEFT   : integer := minimum(29, FirstWord'length) ;
   begin
-    RV.InitSeed(to_integer(iAddr+MetaTo01(FirstWord))) ;
+    RV.InitSeed(to_integer(aAddr(ADDR_LEFT downto 0) + MetaTo01(aFirstWord(FW_LEFT downto 0)))) ;
     Push( TransactionRec.WriteBurstFifo, FirstWord ) ;
     for i in 2 to NumFifoWords loop
       Push( TransactionRec.WriteBurstFifo, RV.RandSlv(FirstWord'length) ) ;
@@ -1532,8 +1536,12 @@ package body AddressBusTransactionPkg is
              StatusMsgOn    : In    boolean := false
   ) is
     variable RV : RandomPType ; 
+    alias aAddr        : std_logic_vector(iAddr'length-1 downto 0) is iAddr ; 
+    constant ADDR_LEFT : integer := minimum(29, iAddr'length) ;
+    alias aFirstWord   : std_logic_vector(FirstWord'length-1 downto 0) is FirstWord ; 
+    constant FW_LEFT   : integer := minimum(29, FirstWord'length) ;
   begin
-    RV.InitSeed(to_integer(iAddr+FirstWord)) ;
+    RV.InitSeed(to_integer(aAddr(ADDR_LEFT downto 0) + MetaTo01(aFirstWord(FW_LEFT downto 0)))) ;
     Push( TransactionRec.WriteBurstFifo, FirstWord ) ;
     for i in 2 to NumFifoWords loop
       Push( TransactionRec.WriteBurstFifo, RV.RandSlv(FirstWord'length) ) ;
@@ -1605,8 +1613,12 @@ package body AddressBusTransactionPkg is
              StatusMsgOn    : In    boolean := false
   ) is
     variable RV : RandomPType ; 
+    alias aAddr        : std_logic_vector(iAddr'length-1 downto 0) is iAddr ; 
+    constant ADDR_LEFT : integer := minimum(29, iAddr'length) ;
+    alias aFirstWord   : std_logic_vector(FirstWord'length-1 downto 0) is FirstWord ; 
+    constant FW_LEFT   : integer := minimum(29, FirstWord'length) ;
   begin
-    RV.InitSeed(to_integer(iAddr+MetaTo01(FirstWord))) ;
+    RV.InitSeed(to_integer(aAddr(ADDR_LEFT downto 0) + MetaTo01(aFirstWord(FW_LEFT downto 0)))) ;
     ReadBurst(TransactionRec, iAddr, NumFifoWords, StatusMsgOn) ; 
     CheckExpected( TransactionRec.ReadBurstFifo, FirstWord ) ;
     for i in 2 to NumFifoWords loop

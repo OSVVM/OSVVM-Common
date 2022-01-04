@@ -1449,8 +1449,10 @@ package body StreamTransactionPkg is
     constant StatusMsgOn    : In    boolean := false
   ) is
     variable RV : RandomPType ; 
+    alias aFirstWord   : std_logic_vector(FirstWord'length-1 downto 0) is FirstWord ; 
+    constant FW_LEFT   : integer := minimum(29, FirstWord'length) ;
   begin
-    RV.InitSeed(to_integer(FirstWord) + NumFifoWords) ;
+    RV.InitSeed(to_integer(MetaTo01(aFirstWord(FW_LEFT downto 0))) + NumFifoWords) ;
     Push( TransactionRec.BurstFifo, FirstWord ) ;
     for i in 2 to NumFifoWords loop
       Push( TransactionRec.BurstFifo, RV.RandSlv(FirstWord'length) ) ;
@@ -1565,8 +1567,10 @@ package body StreamTransactionPkg is
     constant StatusMsgOn    : In    boolean := false
   ) is
     variable RV : RandomPType ; 
+    alias aFirstWord   : std_logic_vector(FirstWord'length-1 downto 0) is FirstWord ; 
+    constant FW_LEFT   : integer := minimum(29, FirstWord'length) ;
   begin
-    RV.InitSeed(to_integer(FirstWord) + NumFifoWords) ;
+    RV.InitSeed(to_integer(MetaTo01(aFirstWord(FW_LEFT downto 0))) + NumFifoWords) ;
     Push( TransactionRec.BurstFifo, FirstWord ) ;
     for i in 2 to NumFifoWords loop
       Push( TransactionRec.BurstFifo, RV.RandSlv(FirstWord'length) ) ;
@@ -1804,7 +1808,7 @@ package body StreamTransactionPkg is
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) is 
   begin
-    Check(TransactionRec, Data, "", StatusMsgOn) ;
+    CheckExpected(TransactionRec, Data, "", StatusMsgOn) ;
   end procedure Check ; 
 
 
@@ -1910,7 +1914,7 @@ package body StreamTransactionPkg is
   begin
     LocalGetBurst(TransactionRec, VectorOfWords'length, StatusMsgOn) ; 
     for i in VectorOfWords'range loop
-      Check( TransactionRec.BurstFifo, VectorOfWords(i) ) ;
+      CheckExpected( TransactionRec.BurstFifo, VectorOfWords(i) ) ;
     end loop ; 
   end procedure CheckBurst ;
   
@@ -1942,7 +1946,7 @@ package body StreamTransactionPkg is
   begin
     LocalGetBurst(TransactionRec, NumFifoWords, StatusMsgOn) ; 
     for i in 0 to NumFifoWords-1 loop
-      Check( TransactionRec.BurstFifo, FirstWord+i ) ;
+      CheckExpected( TransactionRec.BurstFifo, FirstWord+i ) ;
     end loop ; 
   end procedure CheckBurstIncrement ;
 
@@ -1973,12 +1977,14 @@ package body StreamTransactionPkg is
     constant StatusMsgOn    : In    boolean := false
   ) is
     variable RV : RandomPType ; 
+    alias aFirstWord   : std_logic_vector(FirstWord'length-1 downto 0) is FirstWord ; 
+    constant FW_LEFT   : integer := minimum(29, FirstWord'length) ;
   begin
     LocalGetBurst(TransactionRec, NumFifoWords, StatusMsgOn) ; 
-    RV.InitSeed(to_integer(FirstWord) + NumFifoWords) ;
-    Check( TransactionRec.BurstFifo, FirstWord ) ;
+    RV.InitSeed(to_integer(MetaTo01(aFirstWord(FW_LEFT downto 0))) + NumFifoWords) ;
+    CheckExpected( TransactionRec.BurstFifo, FirstWord ) ;
     for i in 2 to NumFifoWords loop
-      Check( TransactionRec.BurstFifo, RV.RandSlv(FirstWord'length) ) ;
+      CheckExpected( TransactionRec.BurstFifo, RV.RandSlv(FirstWord'length) ) ;
     end loop ; 
   end procedure CheckBurstRandom ;
 
@@ -2048,7 +2054,7 @@ package body StreamTransactionPkg is
     LocalTryGetBurst(TransactionRec, VectorOfWords'length, Available, StatusMsgOn) ; 
     if Available then
       for i in VectorOfWords'range loop
-        Check( TransactionRec.BurstFifo, VectorOfWords(i) ) ;
+        CheckExpected( TransactionRec.BurstFifo, VectorOfWords(i) ) ;
       end loop ; 
     end if ; 
   end procedure TryCheckBurst ;
@@ -2122,13 +2128,15 @@ package body StreamTransactionPkg is
     constant StatusMsgOn    : In    boolean := false
   ) is
     variable RV : RandomPType ; 
+    alias aFirstWord   : std_logic_vector(FirstWord'length-1 downto 0) is FirstWord ; 
+    constant FW_LEFT   : integer := minimum(29, FirstWord'length) ;
   begin
     LocalTryGetBurst(TransactionRec, NumFifoWords, Available, StatusMsgOn) ; 
     if Available then
-      RV.InitSeed(to_integer(FirstWord) + NumFifoWords) ;
-      Check( TransactionRec.BurstFifo, FirstWord ) ;
+      RV.InitSeed(to_integer(MetaTo01(aFirstWord(FW_LEFT downto 0))) + NumFifoWords) ;
+      CheckExpected( TransactionRec.BurstFifo, FirstWord ) ;
       for i in 2 to NumFifoWords loop
-        Check( TransactionRec.BurstFifo, RV.RandSlv(FirstWord'length) ) ;
+        CheckExpected( TransactionRec.BurstFifo, RV.RandSlv(FirstWord'length) ) ;
       end loop ;
     end if ; 
   end procedure TryCheckBurstRandom ;
