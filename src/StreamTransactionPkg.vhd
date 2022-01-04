@@ -1928,7 +1928,7 @@ package body StreamTransactionPkg is
     CheckBurst(TransactionRec, VectorOfWords, StatusMsgOn) ; 
     LocalParam(Param'length-1 downto 0) := Param ; 
     GetAlertLogID(TransactionRec, AlertLogID) ;
-    AffirmIfEqual(AlertLogID, LocalParam, std_logic_vector(TransactionRec.ParamFromModel), "CheckBurst: Parameters") ; 
+    AffirmIfEqual(AlertLogID, std_logic_vector(TransactionRec.ParamFromModel), LocalParam, "CheckBurst: Parameters") ; 
   end procedure CheckBurst ;
   
   ------------------------------------------------------------
@@ -1961,7 +1961,7 @@ package body StreamTransactionPkg is
     CheckBurstIncrement(TransactionRec, FirstWord, NumFifoWords, StatusMsgOn) ; 
     LocalParam(Param'length-1 downto 0) := Param ; 
     GetAlertLogID(TransactionRec, AlertLogID) ;
-    AffirmIfEqual(AlertLogID, LocalParam, std_logic_vector(TransactionRec.ParamFromModel), "CheckBurstIncrement: Parameters") ; 
+    AffirmIfEqual(AlertLogID, std_logic_vector(TransactionRec.ParamFromModel), LocalParam, "CheckBurstIncrement: Parameters") ; 
   end procedure CheckBurstIncrement ;
 
   ------------------------------------------------------------
@@ -1997,7 +1997,7 @@ package body StreamTransactionPkg is
     CheckBurstRandom(TransactionRec, FirstWord, NumFifoWords, StatusMsgOn) ; 
     LocalParam(Param'length-1 downto 0) := Param ; 
     GetAlertLogID(TransactionRec, AlertLogID) ;
-    AffirmIfEqual(AlertLogID, LocalParam, std_logic_vector(TransactionRec.ParamFromModel), "CheckBurstIncrement: Parameters") ; 
+    AffirmIfEqual(AlertLogID, std_logic_vector(TransactionRec.ParamFromModel), LocalParam, "CheckBurstIncrement: Parameters") ; 
   end procedure CheckBurstRandom ;
   
 
@@ -2069,7 +2069,7 @@ package body StreamTransactionPkg is
     if Available then
       LocalParam(Param'length-1 downto 0) := Param ; 
       GetAlertLogID(TransactionRec, AlertLogID) ;
-      AffirmIfEqual(AlertLogID, LocalParam, std_logic_vector(TransactionRec.ParamFromModel), "TryCheckBurst: Parameters") ; 
+      AffirmIfEqual(AlertLogID, std_logic_vector(TransactionRec.ParamFromModel), LocalParam, "TryCheckBurst: Parameters") ; 
     end if ; 
   end procedure TryCheckBurst ;
     
@@ -2108,7 +2108,7 @@ package body StreamTransactionPkg is
     if Available then
       LocalParam(Param'length-1 downto 0) := Param ; 
       GetAlertLogID(TransactionRec, AlertLogID) ;
-      AffirmIfEqual(AlertLogID, LocalParam, std_logic_vector(TransactionRec.ParamFromModel), "TryCheckBurstIncrement: Parameters") ; 
+      AffirmIfEqual(AlertLogID, std_logic_vector(TransactionRec.ParamFromModel), LocalParam, "TryCheckBurstIncrement: Parameters") ; 
     end if ; 
   end procedure TryCheckBurstIncrement ;
 
@@ -2150,7 +2150,7 @@ package body StreamTransactionPkg is
     if Available then
       LocalParam(Param'length-1 downto 0) := Param ; 
       GetAlertLogID(TransactionRec, AlertLogID) ;
-      AffirmIfEqual(AlertLogID, LocalParam, std_logic_vector(TransactionRec.ParamFromModel), "TryCheckBurstRandom: Parameters") ; 
+      AffirmIfEqual(AlertLogID, std_logic_vector(TransactionRec.ParamFromModel), LocalParam, "TryCheckBurstRandom: Parameters") ; 
     end if ; 
   end procedure TryCheckBurstRandom ;
 

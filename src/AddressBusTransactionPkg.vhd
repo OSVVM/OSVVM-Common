@@ -1462,7 +1462,7 @@ package body AddressBusTransactionPkg is
   ) is
     variable RV : RandomPType ; 
   begin
-    RV.InitSeed(to_integer(iAddr+FirstWord)) ;
+    RV.InitSeed(to_integer(iAddr+MetaTo01(FirstWord))) ;
     Push( TransactionRec.WriteBurstFifo, FirstWord ) ;
     for i in 2 to NumFifoWords loop
       Push( TransactionRec.WriteBurstFifo, RV.RandSlv(FirstWord'length) ) ;
@@ -1575,7 +1575,7 @@ package body AddressBusTransactionPkg is
   begin
     ReadBurst(TransactionRec, iAddr, VectorOfWords'length, StatusMsgOn) ; 
     for i in VectorOfWords'range loop
-      Check( TransactionRec.WriteBurstFifo, VectorOfWords(i) ) ;
+      CheckExpected( TransactionRec.ReadBurstFifo, VectorOfWords(i) ) ;
     end loop ; 
   end procedure ReadCheckBurst ;
   
@@ -1591,7 +1591,7 @@ package body AddressBusTransactionPkg is
   begin
     ReadBurst(TransactionRec, iAddr, NumFifoWords, StatusMsgOn) ; 
     for i in 0 to NumFifoWords-1 loop
-      Check( TransactionRec.WriteBurstFifo, FirstWord+i ) ;
+      CheckExpected( TransactionRec.ReadBurstFifo, FirstWord+i ) ;
     end loop ; 
   end procedure ReadCheckBurstIncrement ;
 
@@ -1606,11 +1606,11 @@ package body AddressBusTransactionPkg is
   ) is
     variable RV : RandomPType ; 
   begin
-    RV.InitSeed(to_integer(iAddr+FirstWord)) ;
+    RV.InitSeed(to_integer(iAddr+MetaTo01(FirstWord))) ;
     ReadBurst(TransactionRec, iAddr, NumFifoWords, StatusMsgOn) ; 
-    Check( TransactionRec.WriteBurstFifo, FirstWord ) ;
+    CheckExpected( TransactionRec.ReadBurstFifo, FirstWord ) ;
     for i in 2 to NumFifoWords loop
-      Check( TransactionRec.WriteBurstFifo, RV.RandSlv(FirstWord'length) ) ;
+      CheckExpected( TransactionRec.ReadBurstFifo, RV.RandSlv(FirstWord'length) ) ;
     end loop ; 
   end procedure ReadCheckBurstRandom ;
   
