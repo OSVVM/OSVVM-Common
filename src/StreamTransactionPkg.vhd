@@ -1450,7 +1450,7 @@ package body StreamTransactionPkg is
   ) is
     variable RV : RandomPType ; 
     alias aFirstWord   : std_logic_vector(FirstWord'length-1 downto 0) is FirstWord ; 
-    constant FW_LEFT   : integer := minimum(29, FirstWord'length) ;
+    constant FW_LEFT   : integer := minimum(30, FirstWord'length) - 1 ;
   begin
     RV.InitSeed(to_integer(MetaTo01(aFirstWord(FW_LEFT downto 0))) + NumFifoWords) ;
     Push( TransactionRec.BurstFifo, FirstWord ) ;
@@ -1568,7 +1568,7 @@ package body StreamTransactionPkg is
   ) is
     variable RV : RandomPType ; 
     alias aFirstWord   : std_logic_vector(FirstWord'length-1 downto 0) is FirstWord ; 
-    constant FW_LEFT   : integer := minimum(29, FirstWord'length) ;
+    constant FW_LEFT   : integer := minimum(30, FirstWord'length) - 1 ;
   begin
     RV.InitSeed(to_integer(MetaTo01(aFirstWord(FW_LEFT downto 0))) + NumFifoWords) ;
     Push( TransactionRec.BurstFifo, FirstWord ) ;
@@ -1978,7 +1978,7 @@ package body StreamTransactionPkg is
   ) is
     variable RV : RandomPType ; 
     alias aFirstWord   : std_logic_vector(FirstWord'length-1 downto 0) is FirstWord ; 
-    constant FW_LEFT   : integer := minimum(29, FirstWord'length) ;
+    constant FW_LEFT   : integer := minimum(30, FirstWord'length) - 1 ;
   begin
     LocalGetBurst(TransactionRec, NumFifoWords, StatusMsgOn) ; 
     RV.InitSeed(to_integer(MetaTo01(aFirstWord(FW_LEFT downto 0))) + NumFifoWords) ;
@@ -2129,7 +2129,7 @@ package body StreamTransactionPkg is
   ) is
     variable RV : RandomPType ; 
     alias aFirstWord   : std_logic_vector(FirstWord'length-1 downto 0) is FirstWord ; 
-    constant FW_LEFT   : integer := minimum(29, FirstWord'length) ;
+    constant FW_LEFT   : integer := minimum(30, FirstWord'length) - 1 ;
   begin
     LocalTryGetBurst(TransactionRec, NumFifoWords, Available, StatusMsgOn) ; 
     if Available then

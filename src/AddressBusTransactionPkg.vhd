@@ -1462,9 +1462,9 @@ package body AddressBusTransactionPkg is
   ) is
     variable RV : RandomPType ; 
     alias aAddr        : std_logic_vector(iAddr'length-1 downto 0) is iAddr ; 
-    constant ADDR_LEFT : integer := minimum(29, iAddr'length) ;
+    constant ADDR_LEFT : integer := minimum(30, iAddr'length) - 1 ;
     alias aFirstWord   : std_logic_vector(FirstWord'length-1 downto 0) is FirstWord ; 
-    constant FW_LEFT   : integer := minimum(29, FirstWord'length) ;
+    constant FW_LEFT   : integer := minimum(30, FirstWord'length) - 1 ;
   begin
     RV.InitSeed(to_integer(aAddr(ADDR_LEFT downto 0) + MetaTo01(aFirstWord(FW_LEFT downto 0)))) ;
     Push( TransactionRec.WriteBurstFifo, FirstWord ) ;
@@ -1537,9 +1537,9 @@ package body AddressBusTransactionPkg is
   ) is
     variable RV : RandomPType ; 
     alias aAddr        : std_logic_vector(iAddr'length-1 downto 0) is iAddr ; 
-    constant ADDR_LEFT : integer := minimum(29, iAddr'length) ;
+    constant ADDR_LEFT : integer := minimum(30, iAddr'length) - 1 ;
     alias aFirstWord   : std_logic_vector(FirstWord'length-1 downto 0) is FirstWord ; 
-    constant FW_LEFT   : integer := minimum(29, FirstWord'length) ;
+    constant FW_LEFT   : integer := minimum(30, FirstWord'length) - 1 ;
   begin
     RV.InitSeed(to_integer(aAddr(ADDR_LEFT downto 0) + MetaTo01(aFirstWord(FW_LEFT downto 0)))) ;
     Push( TransactionRec.WriteBurstFifo, FirstWord ) ;
@@ -1614,9 +1614,9 @@ package body AddressBusTransactionPkg is
   ) is
     variable RV : RandomPType ; 
     alias aAddr        : std_logic_vector(iAddr'length-1 downto 0) is iAddr ; 
-    constant ADDR_LEFT : integer := minimum(29, iAddr'length) ;
+    constant ADDR_LEFT : integer := minimum(30, iAddr'length) - 1 ;
     alias aFirstWord   : std_logic_vector(FirstWord'length-1 downto 0) is FirstWord ; 
-    constant FW_LEFT   : integer := minimum(29, FirstWord'length) ;
+    constant FW_LEFT   : integer := minimum(30, FirstWord'length) - 1 ;
   begin
     RV.InitSeed(to_integer(aAddr(ADDR_LEFT downto 0) + MetaTo01(aFirstWord(FW_LEFT downto 0)))) ;
     ReadBurst(TransactionRec, iAddr, NumFifoWords, StatusMsgOn) ; 
