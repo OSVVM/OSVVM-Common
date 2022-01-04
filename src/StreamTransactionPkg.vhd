@@ -1808,7 +1808,7 @@ package body StreamTransactionPkg is
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) is 
   begin
-    CheckExpected(TransactionRec, Data, "", StatusMsgOn) ;
+    Check(TransactionRec, Data, "", StatusMsgOn) ;
   end procedure Check ; 
 
 
