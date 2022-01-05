@@ -543,7 +543,6 @@ package AddressBusTransactionPkg is
              StatusMsgOn    : In    boolean := false
   ) ;
 
-
   ------------------------------------------------------------
   procedure WriteBurstAsync (
   -- Asynchronous / Non-Blocking Write Burst.   
@@ -839,7 +838,7 @@ package body AddressBusTransactionPkg is
     variable Result : UnresolvedAddressBusOperationType := NOT_DRIVEN ;
   begin
     for i in s'range loop 
-      if s(i) > NOT_DRIVEN then 
+      if s(i) /= NOT_DRIVEN then 
         if result = NOT_DRIVEN then 
           result := s(i) ;
         else

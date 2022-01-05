@@ -979,7 +979,7 @@ package body StreamTransactionPkg is
     variable Result : StreamUnresolvedOperationType := NOT_DRIVEN ;
   begin
     for i in s'range loop 
-      if s(i) > NOT_DRIVEN then 
+      if s(i) /= NOT_DRIVEN then 
         if result = NOT_DRIVEN then 
           result := s(i) ;
         else
@@ -2092,7 +2092,7 @@ package body StreamTransactionPkg is
     LocalTryGetBurst(TransactionRec, NumFifoWords, Available, StatusMsgOn) ; 
     if Available then
       for i in 0 to NumFifoWords-1 loop
-        Push( TransactionRec.BurstFifo, FirstWord+i ) ;
+        CheckExpected( TransactionRec.BurstFifo, FirstWord+i ) ;
       end loop ; 
     end if ; 
   end procedure TryCheckBurstIncrement ;
