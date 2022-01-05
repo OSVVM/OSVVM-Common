@@ -76,6 +76,8 @@ package StreamTransactionPkg is
     -- Burst FIFO Configuration
     SET_BURST_MODE,
     GET_BURST_MODE,
+    -- Check to see if Read Burst is available
+    GOT_BURST, 
     -- Model Options
     SET_MODEL_OPTIONS,
     GET_MODEL_OPTIONS,
@@ -294,6 +296,18 @@ package StreamTransactionPkg is
     variable OptVal          : Out   StreamFifoBurstModeType
   ) ;
 
+  ------------------------------------------------------------
+  --  GotBurst   
+  --  Check to see if Read Burst is available
+  --  Primarily used internally
+  ------------------------------------------------------------
+  ------------------------------------------------------------
+  procedure GotBurst (
+  ------------------------------------------------------------
+    signal   TransactionRec    : InOut StreamRecType ;
+    constant NumFifoWords      : In    integer ;
+    variable Available         : Out   boolean
+  ) ;
 
   -- ========================================================
   --  Set and Get Model Options  
@@ -1000,6 +1014,53 @@ package body StreamTransactionPkg is
 --      return Param ;
 --    end function FillParam ; 
 
+  -- ========================================================
+  --  Burst Helpers
+  --  package local
+  --  used to fill the BurstFifo with Patterns
+  -- ========================================================
+  ------------------------------------------------------------
+  procedure PushVectorOfWords (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut StreamRecType ;
+    constant VectorOfWords  : In    slv_vector 
+  ) is
+  begin
+    for i in VectorOfWords'range loop
+      Push( TransactionRec.BurstFifo, VectorOfWords(i) ) ;
+    end loop ; 
+  end procedure PushVectorOfWords ;
+  
+  ------------------------------------------------------------
+  procedure PushIncrementWords (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut StreamRecType ;
+    constant FirstWord      : In    std_logic_vector ;
+    constant NumFifoWords   : In    integer 
+  ) is
+  begin
+    for i in 0 to NumFifoWords-1 loop
+      Push( TransactionRec.BurstFifo, FirstWord+i ) ;
+    end loop ; 
+  end procedure PushIncrementWords ;
+  
+  ------------------------------------------------------------
+  procedure PushRandomWords (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut StreamRecType ;
+    constant FirstWord      : In    std_logic_vector ;
+    constant NumFifoWords   : In    integer 
+  ) is
+    variable RV : RandomPType ; 
+    alias aFirstWord   : std_logic_vector(FirstWord'length-1 downto 0) is FirstWord ; 
+    constant FW_LEFT   : integer := minimum(30, FirstWord'length) - 1 ;
+  begin
+    RV.InitSeed(to_integer(MetaTo01(aFirstWord(FW_LEFT downto 0))) + NumFifoWords) ;
+    Push( TransactionRec.BurstFifo, FirstWord ) ;
+    for i in 2 to NumFifoWords loop
+      Push( TransactionRec.BurstFifo, RV.RandSlv(FirstWord'length) ) ;
+    end loop ; 
+  end procedure PushRandomWords ;
 
   -- ========================================================
   --  Directive Transactions  
@@ -1082,7 +1143,7 @@ package body StreamTransactionPkg is
   procedure SetBurstMode (
   ------------------------------------------------------------
     signal   TransactionRec    : InOut StreamRecType ;
-    constant OptVal      : In    StreamFifoBurstModeType
+    constant OptVal            : In    StreamFifoBurstModeType
   ) is
   begin
     TransactionRec.Operation     <= SET_BURST_MODE ;
@@ -1094,7 +1155,7 @@ package body StreamTransactionPkg is
   procedure GetBurstMode (
   ------------------------------------------------------------
     signal   TransactionRec    : InOut StreamRecType ;
-    variable OptVal      : Out   StreamFifoBurstModeType
+    variable OptVal            : Out   StreamFifoBurstModeType
   ) is
   begin
     TransactionRec.Operation     <= GET_BURST_MODE ;
@@ -1102,6 +1163,24 @@ package body StreamTransactionPkg is
     OptVal := TransactionRec.IntFromModel ; 
   end procedure GetBurstMode ;
 
+  ------------------------------------------------------------
+  --  GotBurst   
+  -- Check to see if Read Burst is available
+  ------------------------------------------------------------
+  ------------------------------------------------------------
+  procedure GotBurst (
+  ------------------------------------------------------------
+    signal   TransactionRec    : InOut StreamRecType ;
+    constant NumFifoWords      : In    integer ;
+    variable Available         : Out   boolean
+  ) is
+  begin
+    TransactionRec.Operation   <= GOT_BURST ;
+    -- NumFifoWords not used in all implementations - needed when interface has no burst capability
+    TransactionRec.IntToModel  <= NumFifoWords ; 
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+    Available := TransactionRec.BoolFromModel ; 
+  end procedure GotBurst ;
 
   -- ========================================================
   --  Set and Get Model Options  
@@ -1394,9 +1473,7 @@ package body StreamTransactionPkg is
     constant StatusMsgOn    : In    boolean := false
   ) is
   begin
-    for i in VectorOfWords'range loop
-      Push( TransactionRec.BurstFifo, VectorOfWords(i) ) ;
-    end loop ; 
+    PushVectorOfWords(TransactionRec, VectorOfWords) ;
     LocalSendBurst(TransactionRec, SEND_BURST, VectorOfWords'length, Param, StatusMsgOn) ; 
   end procedure SendBurst ;
   
@@ -1421,9 +1498,7 @@ package body StreamTransactionPkg is
     constant StatusMsgOn    : In    boolean := false
   ) is
   begin
-    for i in 0 to NumFifoWords-1 loop
-      Push( TransactionRec.BurstFifo, FirstWord+i ) ;
-    end loop ; 
+    PushIncrementWords(TransactionRec, FirstWord, NumFifoWords) ;
     LocalSendBurst(TransactionRec, SEND_BURST, NumFifoWords, Param, StatusMsgOn) ; 
   end procedure SendBurstIncrement ;
   
@@ -1448,15 +1523,8 @@ package body StreamTransactionPkg is
     constant Param          : In    std_logic_vector ;
     constant StatusMsgOn    : In    boolean := false
   ) is
-    variable RV : RandomPType ; 
-    alias aFirstWord   : std_logic_vector(FirstWord'length-1 downto 0) is FirstWord ; 
-    constant FW_LEFT   : integer := minimum(30, FirstWord'length) - 1 ;
   begin
-    RV.InitSeed(to_integer(MetaTo01(aFirstWord(FW_LEFT downto 0))) + NumFifoWords) ;
-    Push( TransactionRec.BurstFifo, FirstWord ) ;
-    for i in 2 to NumFifoWords loop
-      Push( TransactionRec.BurstFifo, RV.RandSlv(FirstWord'length) ) ;
-    end loop ; 
+    PushRandomWords(TransactionRec, FirstWord, NumFifoWords) ;
     LocalSendBurst(TransactionRec, SEND_BURST, NumFifoWords, Param, StatusMsgOn) ; 
   end procedure SendBurstRandom ;
 
@@ -1512,9 +1580,7 @@ package body StreamTransactionPkg is
     constant StatusMsgOn    : In    boolean := false
   ) is
   begin
-    for i in VectorOfWords'range loop
-      Push( TransactionRec.BurstFifo, VectorOfWords(i) ) ;
-    end loop ; 
+    PushVectorOfWords(TransactionRec, VectorOfWords) ;
     LocalSendBurst(TransactionRec, SEND_BURST_ASYNC, VectorOfWords'length, Param, StatusMsgOn) ; 
   end procedure SendBurstAsync ;
   
@@ -1539,9 +1605,7 @@ package body StreamTransactionPkg is
     constant StatusMsgOn    : In    boolean := false
   ) is
   begin
-    for i in 0 to NumFifoWords-1 loop
-      Push( TransactionRec.BurstFifo, FirstWord+i ) ;
-    end loop ; 
+    PushIncrementWords(TransactionRec, FirstWord, NumFifoWords) ;
     LocalSendBurst(TransactionRec, SEND_BURST_ASYNC, NumFifoWords, Param, StatusMsgOn) ; 
   end procedure SendBurstIncrementAsync ;
 
@@ -1566,15 +1630,8 @@ package body StreamTransactionPkg is
     constant Param          : In    std_logic_vector ;
     constant StatusMsgOn    : In    boolean := false
   ) is
-    variable RV : RandomPType ; 
-    alias aFirstWord   : std_logic_vector(FirstWord'length-1 downto 0) is FirstWord ; 
-    constant FW_LEFT   : integer := minimum(30, FirstWord'length) - 1 ;
   begin
-    RV.InitSeed(to_integer(MetaTo01(aFirstWord(FW_LEFT downto 0))) + NumFifoWords) ;
-    Push( TransactionRec.BurstFifo, FirstWord ) ;
-    for i in 2 to NumFifoWords loop
-      Push( TransactionRec.BurstFifo, RV.RandSlv(FirstWord'length) ) ;
-    end loop ; 
+    PushRandomWords(TransactionRec, FirstWord, NumFifoWords) ;
     LocalSendBurst(TransactionRec, SEND_BURST_ASYNC, NumFifoWords, Param, StatusMsgOn) ; 
   end procedure SendBurstRandomAsync ;
 
@@ -1909,13 +1966,12 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
     signal   TransactionRec : InOut StreamRecType ;
     constant VectorOfWords  : In    slv_vector ;
+    constant Param          : In    std_logic_vector ;
     constant StatusMsgOn    : In    boolean := false
   ) is
   begin
-    LocalGetBurst(TransactionRec, VectorOfWords'length, StatusMsgOn) ; 
-    for i in VectorOfWords'range loop
-      CheckExpected( TransactionRec.BurstFifo, VectorOfWords(i) ) ;
-    end loop ; 
+    PushVectorOfWords(TransactionRec, VectorOfWords) ;
+    LocalCheckBurst(TransactionRec, CHECK_BURST, VectorOfWords'length, Param, StatusMsgOn) ;
   end procedure CheckBurst ;
   
   ------------------------------------------------------------
@@ -1923,16 +1979,10 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
     signal   TransactionRec : InOut StreamRecType ;
     constant VectorOfWords  : In    slv_vector ;
-    constant Param          : In    std_logic_vector ;
     constant StatusMsgOn    : In    boolean := false
   ) is
-    variable LocalParam : std_logic_vector(TransactionRec.ParamToModel'range) := (others => '-') ;
-    variable  AlertLogID : AlertLogIDType ;
   begin
-    CheckBurst(TransactionRec, VectorOfWords, StatusMsgOn) ; 
-    LocalParam(Param'length-1 downto 0) := Param ; 
-    GetAlertLogID(TransactionRec, AlertLogID) ;
-    AffirmIfEqual(AlertLogID, std_logic_vector(TransactionRec.ParamFromModel), LocalParam, "CheckBurst: Parameters") ; 
+    CheckBurst(TransactionRec, VectorOfWords, "", StatusMsgOn) ; 
   end procedure CheckBurst ;
   
   ------------------------------------------------------------
@@ -1941,13 +1991,12 @@ package body StreamTransactionPkg is
     signal   TransactionRec : InOut StreamRecType ;
     constant FirstWord      : In    std_logic_vector ;
     constant NumFifoWords   : In    integer ;
+    constant Param          : In    std_logic_vector ;
     constant StatusMsgOn    : In    boolean := false
   ) is
   begin
-    LocalGetBurst(TransactionRec, NumFifoWords, StatusMsgOn) ; 
-    for i in 0 to NumFifoWords-1 loop
-      CheckExpected( TransactionRec.BurstFifo, FirstWord+i ) ;
-    end loop ; 
+    PushIncrementWords(TransactionRec, FirstWord, NumFifoWords) ;
+    LocalCheckBurst(TransactionRec, CHECK_BURST, NumFifoWords, Param, StatusMsgOn) ;
   end procedure CheckBurstIncrement ;
 
   ------------------------------------------------------------
@@ -1956,16 +2005,10 @@ package body StreamTransactionPkg is
     signal   TransactionRec : InOut StreamRecType ;
     constant FirstWord      : In    std_logic_vector ;
     constant NumFifoWords   : In    integer ;
-    constant Param          : In    std_logic_vector ;
     constant StatusMsgOn    : In    boolean := false
   ) is
-    variable LocalParam : std_logic_vector(TransactionRec.ParamToModel'range) := (others => '-') ;
-    variable  AlertLogID : AlertLogIDType ;
   begin
-    CheckBurstIncrement(TransactionRec, FirstWord, NumFifoWords, StatusMsgOn) ; 
-    LocalParam(Param'length-1 downto 0) := Param ; 
-    GetAlertLogID(TransactionRec, AlertLogID) ;
-    AffirmIfEqual(AlertLogID, std_logic_vector(TransactionRec.ParamFromModel), LocalParam, "CheckBurstIncrement: Parameters") ; 
+    CheckBurstIncrement(TransactionRec, FirstWord, NumFifoWords, "", StatusMsgOn) ; 
   end procedure CheckBurstIncrement ;
 
   ------------------------------------------------------------
@@ -1974,38 +2017,25 @@ package body StreamTransactionPkg is
     signal   TransactionRec : InOut StreamRecType ;
     constant FirstWord      : In    std_logic_vector ;
     constant NumFifoWords   : In    integer ;
+    constant Param          : In    std_logic_vector ;
     constant StatusMsgOn    : In    boolean := false
   ) is
-    variable RV : RandomPType ; 
-    alias aFirstWord   : std_logic_vector(FirstWord'length-1 downto 0) is FirstWord ; 
-    constant FW_LEFT   : integer := minimum(30, FirstWord'length) - 1 ;
   begin
-    LocalGetBurst(TransactionRec, NumFifoWords, StatusMsgOn) ; 
-    RV.InitSeed(to_integer(MetaTo01(aFirstWord(FW_LEFT downto 0))) + NumFifoWords) ;
-    CheckExpected( TransactionRec.BurstFifo, FirstWord ) ;
-    for i in 2 to NumFifoWords loop
-      CheckExpected( TransactionRec.BurstFifo, RV.RandSlv(FirstWord'length) ) ;
-    end loop ; 
+    PushRandomWords(TransactionRec, FirstWord, NumFifoWords) ;
+    LocalCheckBurst(TransactionRec, CHECK_BURST, NumFifoWords, Param, StatusMsgOn) ;
   end procedure CheckBurstRandom ;
-
+  
   ------------------------------------------------------------
   procedure CheckBurstRandom (
   ------------------------------------------------------------
     signal   TransactionRec : InOut StreamRecType ;
     constant FirstWord      : In    std_logic_vector ;
     constant NumFifoWords   : In    integer ;
-    constant Param          : In    std_logic_vector ;
     constant StatusMsgOn    : In    boolean := false
   ) is
-    variable LocalParam : std_logic_vector(TransactionRec.ParamToModel'range) := (others => '-') ;
-    variable  AlertLogID : AlertLogIDType ;
   begin
-    CheckBurstRandom(TransactionRec, FirstWord, NumFifoWords, StatusMsgOn) ; 
-    LocalParam(Param'length-1 downto 0) := Param ; 
-    GetAlertLogID(TransactionRec, AlertLogID) ;
-    AffirmIfEqual(AlertLogID, std_logic_vector(TransactionRec.ParamFromModel), LocalParam, "CheckBurstIncrement: Parameters") ; 
+    CheckBurstRandom(TransactionRec, FirstWord, NumFifoWords, "", StatusMsgOn) ; 
   end procedure CheckBurstRandom ;
-  
 
   -- ========================================================
   -- TryCheckBurst
@@ -2022,10 +2052,8 @@ package body StreamTransactionPkg is
     variable  Available       : out   boolean ;
     constant  StatusMsgOn     : in    boolean := FALSE 
   ) is 
-    variable LocalParam : std_logic_vector(TransactionRec.ParamToModel'length -1 downto 0) := (others => '-') ;
   begin
-    LocalParam(Param'length-1 downto 0) := Param ; 
-    LocalCheckBurst(TransactionRec, TRY_CHECK_BURST, NumFifoWords, LocalParam, StatusMsgOn) ;
+    LocalCheckBurst(TransactionRec, TRY_CHECK_BURST, NumFifoWords, Param, StatusMsgOn) ;
     Available := TransactionRec.BoolFromModel ;
   end procedure TryCheckBurst ; 
 
@@ -2047,56 +2075,30 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
     signal   TransactionRec : InOut StreamRecType ;
     constant VectorOfWords  : In    slv_vector ;
+    constant Param          : In    std_logic_vector ;
     variable Available      : Out   boolean ;
     constant StatusMsgOn    : In    boolean := false
   ) is
   begin
-    LocalTryGetBurst(TransactionRec, VectorOfWords'length, Available, StatusMsgOn) ; 
-    if Available then
-      for i in VectorOfWords'range loop
-        CheckExpected( TransactionRec.BurstFifo, VectorOfWords(i) ) ;
-      end loop ; 
+    GotBurst(TransactionRec, VectorOfWords'length, Available) ; 
+    if Available then 
+      PushVectorOfWords(TransactionRec, VectorOfWords) ;
+      LocalCheckBurst(TransactionRec, CHECK_BURST, VectorOfWords'length, Param, StatusMsgOn) ;
     end if ; 
   end procedure TryCheckBurst ;
-  
+    
   ------------------------------------------------------------
   procedure TryCheckBurst (
   ------------------------------------------------------------
     signal   TransactionRec : InOut StreamRecType ;
     constant VectorOfWords  : In    slv_vector ;
-    constant Param          : In    std_logic_vector ;
     variable Available      : Out   boolean ;
     constant StatusMsgOn    : In    boolean := false
   ) is
-    variable LocalParam : std_logic_vector(TransactionRec.ParamToModel'length -1 downto 0) := (others => '-') ;
-    variable  AlertLogID : AlertLogIDType ;
   begin
-    TryCheckBurst(TransactionRec, VectorOfWords, Available, StatusMsgOn) ; 
-    if Available then
-      LocalParam(Param'length-1 downto 0) := Param ; 
-      GetAlertLogID(TransactionRec, AlertLogID) ;
-      AffirmIfEqual(AlertLogID, std_logic_vector(TransactionRec.ParamFromModel), LocalParam, "TryCheckBurst: Parameters") ; 
-    end if ; 
+    TryCheckBurst(TransactionRec, VectorOfWords, "", Available, StatusMsgOn) ;
   end procedure TryCheckBurst ;
-    
-  ------------------------------------------------------------
-  procedure TryCheckBurstIncrement (
-  ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    variable Available      : Out   boolean ;
-    constant StatusMsgOn    : In    boolean := false
-  ) is
-  begin
-    LocalTryGetBurst(TransactionRec, NumFifoWords, Available, StatusMsgOn) ; 
-    if Available then
-      for i in 0 to NumFifoWords-1 loop
-        CheckExpected( TransactionRec.BurstFifo, FirstWord+i ) ;
-      end loop ; 
-    end if ; 
-  end procedure TryCheckBurstIncrement ;
-
+  
   ------------------------------------------------------------
   procedure TryCheckBurstIncrement (
   ------------------------------------------------------------
@@ -2107,19 +2109,16 @@ package body StreamTransactionPkg is
     variable Available      : Out   boolean ;
     constant StatusMsgOn    : In    boolean := false
   ) is
-    variable LocalParam : std_logic_vector(TransactionRec.ParamToModel'length -1 downto 0) := (others => '-') ;
-    variable  AlertLogID : AlertLogIDType ;
   begin
-    TryCheckBurstIncrement(TransactionRec, FirstWord, NumFifoWords, Available, StatusMsgOn) ; 
+    GotBurst(TransactionRec, NumFifoWords, Available) ; 
     if Available then
-      LocalParam(Param'length-1 downto 0) := Param ; 
-      GetAlertLogID(TransactionRec, AlertLogID) ;
-      AffirmIfEqual(AlertLogID, std_logic_vector(TransactionRec.ParamFromModel), LocalParam, "TryCheckBurstIncrement: Parameters") ; 
+      PushIncrementWords(TransactionRec, FirstWord, NumFifoWords) ;
+      LocalCheckBurst(TransactionRec, CHECK_BURST, NumFifoWords, Param, StatusMsgOn) ;
     end if ; 
   end procedure TryCheckBurstIncrement ;
 
   ------------------------------------------------------------
-  procedure TryCheckBurstRandom (
+  procedure TryCheckBurstIncrement (
   ------------------------------------------------------------
     signal   TransactionRec : InOut StreamRecType ;
     constant FirstWord      : In    std_logic_vector ;
@@ -2127,19 +2126,9 @@ package body StreamTransactionPkg is
     variable Available      : Out   boolean ;
     constant StatusMsgOn    : In    boolean := false
   ) is
-    variable RV : RandomPType ; 
-    alias aFirstWord   : std_logic_vector(FirstWord'length-1 downto 0) is FirstWord ; 
-    constant FW_LEFT   : integer := minimum(30, FirstWord'length) - 1 ;
   begin
-    LocalTryGetBurst(TransactionRec, NumFifoWords, Available, StatusMsgOn) ; 
-    if Available then
-      RV.InitSeed(to_integer(MetaTo01(aFirstWord(FW_LEFT downto 0))) + NumFifoWords) ;
-      CheckExpected( TransactionRec.BurstFifo, FirstWord ) ;
-      for i in 2 to NumFifoWords loop
-        CheckExpected( TransactionRec.BurstFifo, RV.RandSlv(FirstWord'length) ) ;
-      end loop ;
-    end if ; 
-  end procedure TryCheckBurstRandom ;
+    TryCheckBurstIncrement(TransactionRec, FirstWord, NumFifoWords, "", Available, StatusMsgOn) ; 
+  end procedure TryCheckBurstIncrement ;
 
   ------------------------------------------------------------
   procedure TryCheckBurstRandom (
@@ -2151,17 +2140,26 @@ package body StreamTransactionPkg is
     variable Available      : Out   boolean ;
     constant StatusMsgOn    : In    boolean := false
   ) is
-    variable LocalParam : std_logic_vector(TransactionRec.ParamToModel'length -1 downto 0) := (others => '-') ;
-    variable  AlertLogID : AlertLogIDType ;
   begin
-    TryCheckBurstRandom(TransactionRec, FirstWord, NumFifoWords, Available, StatusMsgOn) ; 
+    GotBurst(TransactionRec, NumFifoWords, Available) ; 
     if Available then
-      LocalParam(Param'length-1 downto 0) := Param ; 
-      GetAlertLogID(TransactionRec, AlertLogID) ;
-      AffirmIfEqual(AlertLogID, std_logic_vector(TransactionRec.ParamFromModel), LocalParam, "TryCheckBurstRandom: Parameters") ; 
+      PushRandomWords(TransactionRec, FirstWord, NumFifoWords) ;
+      LocalCheckBurst(TransactionRec, CHECK_BURST, NumFifoWords, Param, StatusMsgOn) ;
     end if ; 
   end procedure TryCheckBurstRandom ;
 
+  ------------------------------------------------------------
+  procedure TryCheckBurstRandom (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut StreamRecType ;
+    constant FirstWord      : In    std_logic_vector ;
+    constant NumFifoWords   : In    integer ;
+    variable Available      : Out   boolean ;
+    constant StatusMsgOn    : In    boolean := false
+  ) is
+  begin
+    TryCheckBurstRandom(TransactionRec, FirstWord, NumFifoWords, "", Available, StatusMsgOn) ; 
+  end procedure TryCheckBurstRandom ;
 
 
   -- ========================================================
