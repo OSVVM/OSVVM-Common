@@ -55,17 +55,36 @@ library osvvm ;
   context osvvm.OsvvmContext ;   
   use osvvm.ScoreboardPkg_slv.all ;
 
---!! Can this be made a generic package.   
-
 package FifoFillPkg_slv is
   ------------------------------------------------------------
-  procedure PushBurst (
+  procedure PushBurstVector (
+  -- Push each value in the VectorOfWords parameter into the FIFO.   
+  -- FifoWidth will match the std_logic_vector parameter.    
+  ------------------------------------------------------------
+    constant Fifo          : In    ScoreboardIdType ;
+    constant VectorOfWords : In    slv_vector 
+  ) ;
+
+  ------------------------------------------------------------
+  procedure PushBurstVector (
   -- Push each value in the VectorOfWords parameter into the FIFO.   
   -- Only FifoWidth bits of each value will be pushed.    
   ------------------------------------------------------------
     constant Fifo           : in    ScoreboardIdType ;
     constant VectorOfWords  : in    integer_vector ;
-    constant FifoWidth      : in    integer := 8
+    constant FifoWidth      : in    integer
+  ) ;
+
+  ------------------------------------------------------------
+  procedure PushBurstIncrement (
+  -- Push Count number of values into FIFO.  The first value 
+  -- pushed will be FirstWord and following values are one greater 
+  -- than the previous one.  
+  -- FifoWidth will match the std_logic_vector parameter.    
+  ------------------------------------------------------------
+    constant Fifo           : In    ScoreboardIdType ;
+    constant FirstWord      : In    std_logic_vector ;
+    constant Count          : In    integer 
   ) ;
 
   ------------------------------------------------------------
@@ -75,10 +94,10 @@ package FifoFillPkg_slv is
   -- than the previous one.  
   -- Only FifoWidth bits of each value will be pushed.    
   ------------------------------------------------------------
-    constant Fifo      : in    ScoreboardIdType ;
-    constant FirstWord : in    integer ;
-    constant Count     : in    integer ;
-    constant FifoWidth : in    integer := 8
+    constant Fifo         : in    ScoreboardIdType ;
+    constant FirstWord    : in    integer ;
+    constant Count        : in    integer ;
+    constant FifoWidth    : in    integer := 8
   ) ;
   
   ------------------------------------------------------------
@@ -86,60 +105,102 @@ package FifoFillPkg_slv is
   -- Push Count number of values into FIFO.  The first value 
   -- pushed will be FirstWord and following values are randomly generated 
   -- using the first value as the randomization seed.
+  -- FifoWidth will match the std_logic_vector parameter.    
+  ------------------------------------------------------------
+    constant Fifo           : In    ScoreboardIdType ;
+    constant FirstWord      : In    std_logic_vector ;
+    constant Count          : In    integer 
+  ) ;
+
+  ------------------------------------------------------------
+  procedure PushBurstRandom (
+  -- Push Count number of values into FIFO.  The first value 
+  -- pushed will be FirstWord and following values are randomly generated 
+  -- using the first value as the randomization seed.
   -- Only FifoWidth bits of each value will be pushed.    
   ------------------------------------------------------------
-    constant Fifo      : in    ScoreboardIdType ;
-    constant FirstWord : in    integer ;
-    constant Count     : in    integer ;
-    constant FifoWidth : in    integer := 8
+    constant Fifo         : in    ScoreboardIdType ;
+    constant FirstWord    : in    integer ;
+    constant Count        : in    integer ;
+    constant FifoWidth    : in    integer := 8
   ) ;
   
   ------------------------------------------------------------
-  procedure PopBurst (
+  procedure PopBurstVector (
   -- Pop values from the FIFO into the VectorOfWords parameter.
   -- Each value popped will be FifoWidth bits wide.   
   ------------------------------------------------------------
     constant Fifo           : in    ScoreboardIdType ;
-    variable VectorOfWords  : out   integer_vector ;
-    constant FifoWidth      : in    integer := 8
+    variable VectorOfWords  : out   integer_vector 
   ) ;
 
   ------------------------------------------------------------
-  procedure CheckBurst (
-  -- Pop values from the FIFO and check them against each value 
+  procedure CheckBurstVector (
+  -- Check values from the FIFO against the values 
   -- in the VectorOfWords parameter.   
-  -- Each value popped will be FifoWidth bits wide.   
+  -- Width of VectorOfWords(i) shall match the width of the Fifo 
+  ------------------------------------------------------------
+    constant Fifo           : in    ScoreboardIdType ;
+    constant VectorOfWords  : in    slv_vector 
+  ) ;
+
+  ------------------------------------------------------------
+  procedure CheckBurstVector (
+  -- Check values from the FIFO against the values 
+  -- in the VectorOfWords parameter.   
+  -- Each value of VectorOfWords shall be converted to FifoWidth bits wide.   
   ------------------------------------------------------------
     constant Fifo           : in    ScoreboardIdType ;
     constant VectorOfWords  : in    integer_vector ;
-    constant FifoWidth      : in    integer := 8
+    constant FifoWidth      : in    integer
   ) ;
 
   ------------------------------------------------------------
   procedure CheckBurstIncrement (
-  -- Pop values from the FIFO and check them against values determined 
-  -- by an incrementing pattern.  The first check value will be FirstWord  
-  -- and the following check values are one greater than the previous one.  
-  -- Each value popped will be FifoWidth bits wide.   
+  -- Check values from the FIFO against the incrementing values 
+  -- that start with the value of the FirstWord.
+  -- Width of FirstWord shall match the width of the Fifo 
   ------------------------------------------------------------
-    constant Fifo      : in    ScoreboardIdType ;
-    constant FirstWord : in    integer ;
-    constant Count     : in    integer ;
-    constant FifoWidth : in    integer := 8
+    constant Fifo         : in    ScoreboardIdType ;
+    constant FirstWord    : in    std_logic_vector ;
+    constant Count        : in    integer 
+  ) ;
+  
+  ------------------------------------------------------------
+  procedure CheckBurstIncrement (
+  -- Check values from the FIFO against the incrementing values 
+  -- that start with the value of the FirstWord.
+  -- Each value of VectorOfWords shall be converted to FifoWidth bits wide.   
+  ------------------------------------------------------------
+    constant Fifo         : in    ScoreboardIdType ;
+    constant FirstWord    : in    integer ;
+    constant Count        : in    integer ;
+    constant FifoWidth    : in    integer := 8
+  ) ;
+
+  ------------------------------------------------------------
+  procedure CheckBurstRandom (
+  -- Check values from the FIFO against the random values 
+  -- that are generated using the value of the FirstWord and 
+  -- NumFifoWords as the randomization seeds.
+  -- Width of FirstWord shall match the width of the Fifo 
+  ------------------------------------------------------------
+    constant Fifo         : in    ScoreboardIdType ;
+    constant FirstWord    : in    std_logic_vector ;
+    constant Count        : in    integer 
   ) ;
   
   ------------------------------------------------------------
   procedure CheckBurstRandom (
-  -- Pop values from the FIFO and check them against values determined 
-  -- by a random pattern.  The first check value will be FirstWord and the
-  -- following check values are randomly generated using the first  
-  -- value as the randomization seed.  
-  -- Each value popped will be FifoWidth bits wide.   
+  -- Check values from the FIFO against the random values 
+  -- that are generated using the value of the FirstWord and 
+  -- Count as the randomization seeds.
+  -- Each value of VectorOfWords shall be converted to FifoWidth bits wide.   
   ------------------------------------------------------------
-    constant Fifo      : in    ScoreboardIdType ;
-    constant FirstWord : in    integer ;
-    constant Count     : in    integer ;
-    constant FifoWidth : in    integer := 8
+    constant Fifo         : in    ScoreboardIdType ;
+    constant FirstWord    : in    integer ;
+    constant Count        : in    integer ;
+    constant FifoWidth    : in    integer := 8
   ) ;
 
 
@@ -189,13 +250,39 @@ package FifoFillPkg_slv is
   -- Count number of bytes in a word
   --
   ------------------------------------------------------------
-    constant Data              : std_logic_vector ;
+    constant Data              : in    std_logic_vector ;
     constant DropUndriven      : in    boolean := FALSE ;
     constant ByteAddress       : in    natural := 0 
   ) return integer ;
   
-end package FifoFillPkg_slv ;
+  -- ========================================================
+  --  Deprecated
+  -- ========================================================
 
+  ------------------------------------------------------------
+  -- Deprecated and replaced by PushBurstVector
+  procedure PushBurst (
+  -- Push each value in the VectorOfWords parameter into the FIFO.   
+  -- Only FifoWidth bits of each value will be pushed.    
+  ------------------------------------------------------------
+    constant Fifo           : in    ScoreboardIdType ;
+    constant VectorOfWords  : in    integer_vector ;
+    constant FifoWidth      : in    integer := 8
+  ) ;
+
+  ------------------------------------------------------------
+  -- Deprecated and replaced by CheckBurstVector
+  procedure CheckBurst (
+  -- Pop values from the FIFO and check them against each value 
+  -- in the VectorOfWords parameter.   
+  -- Each value popped will be FifoWidth bits wide.   
+  ------------------------------------------------------------
+    constant Fifo           : in    ScoreboardIdType ;
+    constant VectorOfWords  : in    integer_vector ;
+    constant FifoWidth      : in    integer := 8
+  ) ;
+
+end package FifoFillPkg_slv ;
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 -- ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -204,159 +291,252 @@ package body FifoFillPkg_slv is
   constant NUMBER_POSITIVE_INTEGER_BITS : integer := 31 ; 
 
   ------------------------------------------------------------
-  procedure PushBurst (
+  procedure PushBurstVector (
+  ------------------------------------------------------------
+    constant Fifo          : In    ScoreboardIdType ;
+    constant VectorOfWords : In    slv_vector 
+  ) is
+  begin
+    for i in VectorOfWords'range loop
+      Push( Fifo, VectorOfWords(i) ) ;
+    end loop ; 
+  end procedure PushBurstVector ;
+
+  ------------------------------------------------------------
+  procedure PushBurstVector (
   ------------------------------------------------------------
     constant Fifo           : in    ScoreboardIdType ;
     constant VectorOfWords  : in    integer_vector ;
-    constant FifoWidth      : in    integer := 8
+    constant FifoWidth      : in    integer
   ) is
   begin
     for i in VectorOfWords'range loop 
       if VectorOfWords(i) < 0 then 
         Push(Fifo, (FifoWidth downto 1 => 'U')) ;
+      elsif FifoWidth < NUMBER_POSITIVE_INTEGER_BITS then 
+        Push(Fifo, to_slv(VectorOfWords(i) mod (2**FifoWidth), FifoWidth)) ;
       else 
         Push(Fifo, to_slv(VectorOfWords(i), FifoWidth)) ;
-      end if ;
+      end if ; 
     end loop ;
-  end procedure PushBurst ;
+  end procedure PushBurstVector ;
 
   ------------------------------------------------------------
   procedure PushBurstIncrement (
   ------------------------------------------------------------
-    constant Fifo      : in    ScoreboardIdType ;
-    constant FirstWord : in    integer ;
-    constant Count     : in    integer ;
-    constant FifoWidth : in    integer := 8
+    constant Fifo           : In    ScoreboardIdType ;
+    constant FirstWord      : In    std_logic_vector ;
+    constant Count          : In    integer 
   ) is
   begin
-    for i in FirstWord to Count+FirstWord-1 loop 
-      if FifoWidth < NUMBER_POSITIVE_INTEGER_BITS then 
-        Push(Fifo, to_slv(i mod (2**FifoWidth), FifoWidth)) ;
-      else 
-        Push(Fifo, to_slv(i, FifoWidth)) ;
-      end if ; 
+    for i in 0 to Count-1 loop
+      Push( Fifo, FirstWord+i ) ;
+    end loop ; 
+  end procedure PushBurstIncrement ;
+  
+  ------------------------------------------------------------
+  procedure PushBurstIncrement (
+  ------------------------------------------------------------
+    constant Fifo         : in    ScoreboardIdType ;
+    constant FirstWord    : in    integer ;
+    constant Count        : in    integer ;
+    constant FifoWidth    : in    integer := 8
+  ) is
+    variable intFirstWord : integer ; 
+    variable AdjFirstWord : std_logic_vector(FifoWidth-1 downto 0) ;
+  begin
+    if FirstWord < 0 then 
+      intFirstWord := -FirstWord ; 
+    else
+      intFirstWord := FirstWord ; 
+    end if ; 
+    if FifoWidth < NUMBER_POSITIVE_INTEGER_BITS then 
+      AdjFirstWord := to_slv(intFirstWord mod (2**FifoWidth), FifoWidth) ;
+    else
+      AdjFirstWord := to_slv(intFirstWord, FifoWidth) ;
+    end if ; 
+    for i in 0 to Count-1 loop 
+      Push( Fifo, AdjFirstWord+i ) ;
     end loop ;
   end procedure PushBurstIncrement ;
   
   ------------------------------------------------------------
   procedure PushBurstRandom (
   ------------------------------------------------------------
-    constant Fifo      : in    ScoreboardIdType ;
-    constant FirstWord : in    integer ;
-    constant Count     : in    integer ;
-    constant FifoWidth : in    integer := 8
+    constant Fifo           : In    ScoreboardIdType ;
+    constant FirstWord      : In    std_logic_vector ;
+    constant Count          : In    integer 
+  ) is
+    variable RV         : RandomPType ; 
+    alias    aFirstWord : std_logic_vector(FirstWord'length-1 downto 0) is FirstWord ; 
+    constant FW_LEFT    : integer := minimum(30, FirstWord'length) - 1 ;
+  begin
+    RV.InitSeed(to_integer(MetaTo01(aFirstWord(FW_LEFT downto 0))) + Count, UseNewSeedMethods => TRUE) ;
+    Push( Fifo, FirstWord ) ;
+    for i in 2 to Count loop
+      Push( Fifo, RV.RandSlv(FirstWord'length) ) ;
+    end loop ; 
+  end procedure PushBurstRandom ;
+
+  ------------------------------------------------------------
+  procedure PushBurstRandom (
+  ------------------------------------------------------------
+    constant Fifo         : in    ScoreboardIdType ;
+    constant FirstWord    : in    integer ;
+    constant Count        : in    integer ;
+    constant FifoWidth    : in    integer := 8
   ) is
     variable RV : RandomPType ; 
-    variable JunkValue : integer ;
-    variable Data : std_logic_vector(FifoWidth-1 downto 0) ;
+    variable intFirstWord : integer ; 
   begin
+    if FirstWord < 0 then 
+      intFirstWord := -FirstWord ; 
+    else
+      intFirstWord := FirstWord ; 
+    end if ; 
+    
     -- Initialize seed and toss first random value  
-    RV.InitSeed(FirstWord) ;
-    JunkValue := RV.RandInt(1, 10) ;  -- toss
+    RV.InitSeed(intFirstWord mod 2**30 + Count, UseNewSeedMethods => TRUE) ;
     
     if FifoWidth < NUMBER_POSITIVE_INTEGER_BITS then 
-      Push(Fifo, to_slv(FirstWord mod (2**FifoWidth), FifoWidth)) ;
+      Push(Fifo, to_slv(intFirstWord mod (2**FifoWidth), FifoWidth)) ;
     else 
-      Push(Fifo, to_slv(FirstWord, FifoWidth)) ;
+      Push(Fifo, to_slv(intFirstWord, FifoWidth)) ;
     end if ; 
     
     for i in 2 to Count loop 
-      Data := RV.RandSlv(FifoWidth) ;
-      Push(Fifo, Data) ;
+      Push(Fifo, RV.RandSlv(FifoWidth)) ;
     end loop ;
   end procedure PushBurstRandom ;
   
   ------------------------------------------------------------
-  procedure PopBurst (
+  procedure PopBurstVector (
   ------------------------------------------------------------
     constant Fifo           : in    ScoreboardIdType ;
-    variable VectorOfWords  : out   integer_vector ;
-    constant FifoWidth      : in    integer := 8
+    variable VectorOfWords  : out   integer_vector 
   ) is
   begin
     for i in VectorOfWords'range loop 
-      if VectorOfWords(i) < 0 then 
-        Push(Fifo, (FifoWidth downto 1 => 'U')) ;
-      else 
-        Push(Fifo, to_slv(VectorOfWords(i), FifoWidth)) ;
-      end if ;
+      VectorOfWords(i) := to_integer(Pop(Fifo)) ; 
     end loop ;
-  end procedure PopBurst ;
-  
+  end procedure PopBurstVector ;
+
   ------------------------------------------------------------
-  procedure CheckBurst (
+  procedure CheckBurstVector (
+  ------------------------------------------------------------
+    constant Fifo           : in    ScoreboardIdType ;
+    constant VectorOfWords  : in    slv_vector 
+  ) is
+  begin
+    for i in VectorOfWords'range loop
+      CheckExpected( Fifo, VectorOfWords(i) ) ;
+    end loop ; 
+  end procedure CheckBurstVector ;
+
+  ------------------------------------------------------------
+  procedure CheckBurstVector (
   ------------------------------------------------------------
     constant Fifo           : in    ScoreboardIdType ;
     constant VectorOfWords  : in    integer_vector ;
-    constant FifoWidth      : in    integer := 8
+    constant FifoWidth      : in    integer 
   ) is
-    variable AlertLogID : AlertLogIDType ; 
-    variable RxVal : std_logic_vector(FifoWidth-1 downto 0) ;
   begin
-    AlertLogID := GetAlertLogID(Fifo) ; 
     for i in VectorOfWords'range loop 
-      RxVal := Pop(Fifo) ;
       if VectorOfWords(i) < 0 then 
-        AffirmIfEqual(AlertLogID, RxVal, (FifoWidth downto 1 => 'U')) ;
+        CheckExpected( Fifo, (FifoWidth downto 1 => 'U') ) ;
+      elsif FifoWidth < NUMBER_POSITIVE_INTEGER_BITS then 
+        CheckExpected( Fifo, to_slv(VectorOfWords(i) mod (2**FifoWidth), FifoWidth) ) ;
       else 
-        AffirmIfEqual(AlertLogID, RxVal, to_slv(VectorOfWords(i), FifoWidth)) ;
-      end if ;
+        CheckExpected( Fifo, to_slv(VectorOfWords(i), FifoWidth) ) ;
+      end if ; 
     end loop ;
-  end procedure CheckBurst ;
+  end procedure CheckBurstVector ;
 
   ------------------------------------------------------------
   procedure CheckBurstIncrement (
   ------------------------------------------------------------
-    constant Fifo      : in    ScoreboardIdType ;
-    constant FirstWord : in    integer ;
-    constant Count     : in    integer ;
-    constant FifoWidth : in    integer := 8
+    constant Fifo         : in    ScoreboardIdType ;
+    constant FirstWord    : in    std_logic_vector ;
+    constant Count        : in    integer 
   ) is
-    variable AlertLogID : AlertLogIDType ; 
-    variable RxVal : std_logic_vector(FifoWidth-1 downto 0) ;
   begin
-    AlertLogID := GetAlertLogID(Fifo) ; 
-    for i in FirstWord to Count+FirstWord-1 loop 
-      RxVal := Pop(Fifo) ;
-      if FifoWidth < NUMBER_POSITIVE_INTEGER_BITS then 
-        AffirmIfEqual(AlertLogID, RxVal, to_slv(i mod (2**FifoWidth), FifoWidth)) ;
-      else 
-        AffirmIfEqual(AlertLogID, RxVal, to_slv(i, FifoWidth)) ;
-      end if ; 
+    for i in 0 to Count-1 loop
+      CheckExpected( Fifo, FirstWord+i ) ;
+    end loop ; 
+  end procedure CheckBurstIncrement ;
+
+  ------------------------------------------------------------
+  procedure CheckBurstIncrement (
+  ------------------------------------------------------------
+    constant Fifo         : in    ScoreboardIdType ;
+    constant FirstWord    : in    integer ;
+    constant Count        : in    integer ;
+    constant FifoWidth    : in    integer := 8
+  ) is
+    variable intFirstWord : integer ; 
+    variable AdjFirstWord : std_logic_vector(FifoWidth-1 downto 0) ;
+  begin
+    if FirstWord < 0 then 
+      intFirstWord := -FirstWord ; 
+    else
+      intFirstWord := FirstWord ; 
+    end if ; 
+    if FifoWidth < NUMBER_POSITIVE_INTEGER_BITS then 
+      AdjFirstWord := to_slv(intFirstWord mod (2**FifoWidth), FifoWidth) ;
+    else
+      AdjFirstWord := to_slv(intFirstWord, FifoWidth) ;
+    end if ; 
+    for i in 0 to Count-1 loop 
+      CheckExpected( Fifo, AdjFirstWord+i ) ;
     end loop ;
   end procedure CheckBurstIncrement ;
   
   ------------------------------------------------------------
   procedure CheckBurstRandom (
   ------------------------------------------------------------
-    constant Fifo      : in    ScoreboardIdType ;
-    constant FirstWord : in    integer ;
-    constant Count     : in    integer ;
-    constant FifoWidth : in    integer := 8
+    constant Fifo         : in    ScoreboardIdType ;
+    constant FirstWord    : in    std_logic_vector ;
+    constant Count        : in    integer 
   ) is
-    variable RV : RandomPType ; 
-    variable JunkValue : integer ;
-    variable AlertLogID : AlertLogIDType ; 
-    variable RxVal, ExpVal : std_logic_vector(FifoWidth-1 downto 0) ;
+    variable RV         : RandomPType ; 
+    alias    aFirstWord : std_logic_vector(FirstWord'length-1 downto 0) is FirstWord ; 
+    constant FW_LEFT    : integer := minimum(30, FirstWord'length) - 1 ;
   begin
-    AlertLogID := GetAlertLogID(Fifo) ; 
-    -- Initialize seed and toss first random value 
-    RV.InitSeed(FirstWord) ;
-    JunkValue := RV.RandInt(1, 10) ;  -- Toss
+    RV.InitSeed(to_integer(MetaTo01(aFirstWord(FW_LEFT downto 0))) + Count, UseNewSeedMethods => TRUE) ;
+    CheckExpected( Fifo, FirstWord ) ;
+    for i in 2 to Count loop
+      CheckExpected( Fifo, RV.RandSlv(FirstWord'length) ) ;
+    end loop ; 
+  end procedure CheckBurstRandom ;
+
+  ------------------------------------------------------------
+  procedure CheckBurstRandom (
+  ------------------------------------------------------------
+    constant Fifo         : in    ScoreboardIdType ;
+    constant FirstWord    : in    integer ;
+    constant Count        : in    integer ;
+    constant FifoWidth    : in    integer := 8
+  ) is
+    variable RV           : RandomPType ; 
+    variable intFirstWord : integer ; 
+  begin
+    if FirstWord < 0 then 
+      intFirstWord := -FirstWord ; 
+    else
+      intFirstWord := FirstWord ; 
+    end if ; 
     
-    RxVal := Pop(Fifo) ;
-    -- Check First Value      Received    Expected, First Value
+    -- Initialize seed and toss first random value  
+    RV.InitSeed(intFirstWord mod 2**30 + Count, UseNewSeedMethods => TRUE) ;
+    
     if FifoWidth < NUMBER_POSITIVE_INTEGER_BITS then 
-      AffirmIfEqual(AlertLogID, RxVal, to_slv(FirstWord mod (2**FifoWidth), FifoWidth)) ;
+      CheckExpected(Fifo, to_slv(intFirstWord mod (2**FifoWidth), FifoWidth)) ;
     else 
-      AffirmIfEqual(AlertLogID, RxVal, to_slv(FirstWord, FifoWidth)) ;
+      CheckExpected(Fifo, to_slv(intFirstWord, FifoWidth)) ;
     end if ; 
     
     for i in 2 to Count loop 
-      RxVal := Pop(Fifo) ;
-      ExpVal := RV.RandSlv(FifoWidth) ;
-      -- Check Remaining Values   Received    Expected
-      AffirmIfEqual(AlertLogID,   RxVal,      ExpVal ) ;
+      CheckExpected(Fifo, RV.RandSlv(FifoWidth)) ;
     end loop ;
   end procedure CheckBurstRandom ;
   
@@ -447,7 +627,7 @@ package body FifoFillPkg_slv is
   -- Count number of bytes in a word
   --
   ------------------------------------------------------------
-    constant Data              : std_logic_vector ;
+    constant Data              : in    std_logic_vector ;
     constant DropUndriven      : in    boolean := FALSE ;
     constant ByteAddress       : in    natural := 0 
   ) return integer is
@@ -464,5 +644,36 @@ package body FifoFillPkg_slv is
     end loop ; 
     return Count ;
   end function CountBytes ; 
-    
+
+  -- ========================================================
+  --  Deprecated
+  -- ========================================================
+
+  ------------------------------------------------------------
+  -- Deprecated.  Replaced by PushBurstVector
+  procedure PushBurst (
+  ------------------------------------------------------------
+    constant Fifo           : in    ScoreboardIdType ;
+    constant VectorOfWords  : in    integer_vector ;
+    constant FifoWidth      : in    integer := 8
+  ) is
+  begin
+    PushBurstVector(Fifo, VectorOfWords, FifoWidth) ; 
+  end procedure PushBurst ;
+
+  ------------------------------------------------------------
+  -- Deprecated and replaced by CheckBurstVector
+  procedure CheckBurst (
+  -- Pop values from the FIFO and check them against each value 
+  -- in the VectorOfWords parameter.   
+  -- Each value popped will be FifoWidth bits wide.   
+  ------------------------------------------------------------
+    constant Fifo           : in    ScoreboardIdType ;
+    constant VectorOfWords  : in    integer_vector ;
+    constant FifoWidth      : in    integer := 8
+  ) is
+  begin
+    CheckBurstVector(Fifo, VectorOfWords, FifoWidth) ; 
+  end procedure CheckBurst ;
+  
 end FifoFillPkg_slv ;

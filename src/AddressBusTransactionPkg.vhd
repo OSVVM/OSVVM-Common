@@ -55,7 +55,9 @@ library ieee ;
 library osvvm ;
   context osvvm.OsvvmContext ;
   use osvvm.ScoreboardPkg_slv.all ; 
-    
+
+  use work.FifoFillPkg_slv.all ; 
+
 package AddressBusTransactionPkg is
 
   -- ========================================================
@@ -515,7 +517,7 @@ package AddressBusTransactionPkg is
   ) ;
 
   ------------------------------------------------------------
-  procedure WriteBurst (
+  procedure WriteBurstVector (
   ------------------------------------------------------------
     signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
@@ -556,7 +558,7 @@ package AddressBusTransactionPkg is
   ) ;
   
 ------------------------------------------------------------
-  procedure WriteBurstAsync (
+  procedure WriteBurstVectorAsync (
   ------------------------------------------------------------
     signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
@@ -595,7 +597,7 @@ package AddressBusTransactionPkg is
   ) ;
 
   ------------------------------------------------------------
-  procedure ReadCheckBurst (
+  procedure ReadCheckBurstVector (
   ------------------------------------------------------------
     signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
@@ -1420,7 +1422,7 @@ package body AddressBusTransactionPkg is
   end procedure WriteBurst ;
   
   ------------------------------------------------------------
-  procedure WriteBurst (
+  procedure WriteBurstVector (
   ------------------------------------------------------------
     signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
@@ -1428,11 +1430,9 @@ package body AddressBusTransactionPkg is
              StatusMsgOn    : In    boolean := false
   ) is
   begin
-    for i in VectorOfWords'range loop
-      Push( TransactionRec.WriteBurstFifo, VectorOfWords(i) ) ;
-    end loop ; 
+    PushBurstVector(TransactionRec.WriteBurstFifo, VectorOfWords) ; 
     WriteBurst(TransactionRec, iAddr, VectorOfWords'length, StatusMsgOn) ; 
-  end procedure WriteBurst ;
+  end procedure WriteBurstVector ;
   
   ------------------------------------------------------------
   procedure WriteBurstIncrement (
@@ -1444,9 +1444,7 @@ package body AddressBusTransactionPkg is
              StatusMsgOn    : In    boolean := false
   ) is
   begin
-    for i in 0 to NumFifoWords-1 loop
-      Push( TransactionRec.WriteBurstFifo, FirstWord+i ) ;
-    end loop ; 
+    PushBurstIncrement(TransactionRec.WriteBurstFifo, FirstWord, NumFifoWords) ; 
     WriteBurst(TransactionRec, iAddr, NumFifoWords, StatusMsgOn) ; 
   end procedure WriteBurstIncrement ;
 
@@ -1459,17 +1457,8 @@ package body AddressBusTransactionPkg is
              NumFifoWords   : In    integer ;
              StatusMsgOn    : In    boolean := false
   ) is
-    variable RV : RandomPType ; 
-    alias aAddr        : std_logic_vector(iAddr'length-1 downto 0) is iAddr ; 
-    constant ADDR_LEFT : integer := minimum(30, iAddr'length) - 1 ;
-    alias aFirstWord   : std_logic_vector(FirstWord'length-1 downto 0) is FirstWord ; 
-    constant FW_LEFT   : integer := minimum(30, FirstWord'length) - 1 ;
   begin
-    RV.InitSeed(to_integer(aAddr(ADDR_LEFT downto 0) + MetaTo01(aFirstWord(FW_LEFT downto 0)))) ;
-    Push( TransactionRec.WriteBurstFifo, FirstWord ) ;
-    for i in 2 to NumFifoWords loop
-      Push( TransactionRec.WriteBurstFifo, RV.RandSlv(FirstWord'length) ) ;
-    end loop ; 
+    PushBurstRandom(TransactionRec.WriteBurstFifo, FirstWord, NumFifoWords) ; 
     WriteBurst(TransactionRec, iAddr, NumFifoWords, StatusMsgOn) ; 
   end procedure WriteBurstRandom ;
 
@@ -1495,7 +1484,7 @@ package body AddressBusTransactionPkg is
   end procedure WriteBurstAsync ;
   
   ------------------------------------------------------------
-  procedure WriteBurstAsync (
+  procedure WriteBurstVectorAsync (
   ------------------------------------------------------------
     signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
@@ -1503,11 +1492,9 @@ package body AddressBusTransactionPkg is
              StatusMsgOn    : In    boolean := false
   ) is
   begin
-    for i in VectorOfWords'range loop
-      Push( TransactionRec.WriteBurstFifo, VectorOfWords(i) ) ;
-    end loop ; 
+    PushBurstVector(TransactionRec.WriteBurstFifo, VectorOfWords) ; 
     WriteBurstAsync(TransactionRec, iAddr, VectorOfWords'length, StatusMsgOn) ; 
-  end procedure WriteBurstAsync ;
+  end procedure WriteBurstVectorAsync ;
   
   ------------------------------------------------------------
   procedure WriteBurstIncrementAsync (
@@ -1519,9 +1506,7 @@ package body AddressBusTransactionPkg is
              StatusMsgOn    : In    boolean := false
   ) is
   begin
-    for i in 0 to NumFifoWords-1 loop
-      Push( TransactionRec.WriteBurstFifo, FirstWord+i ) ;
-    end loop ; 
+    PushBurstIncrement(TransactionRec.WriteBurstFifo, FirstWord, NumFifoWords) ; 
     WriteBurstAsync(TransactionRec, iAddr, NumFifoWords, StatusMsgOn) ; 
   end procedure WriteBurstIncrementAsync ;
 
@@ -1534,17 +1519,8 @@ package body AddressBusTransactionPkg is
              NumFifoWords   : In    integer ;
              StatusMsgOn    : In    boolean := false
   ) is
-    variable RV : RandomPType ; 
-    alias aAddr        : std_logic_vector(iAddr'length-1 downto 0) is iAddr ; 
-    constant ADDR_LEFT : integer := minimum(30, iAddr'length) - 1 ;
-    alias aFirstWord   : std_logic_vector(FirstWord'length-1 downto 0) is FirstWord ; 
-    constant FW_LEFT   : integer := minimum(30, FirstWord'length) - 1 ;
   begin
-    RV.InitSeed(to_integer(aAddr(ADDR_LEFT downto 0) + MetaTo01(aFirstWord(FW_LEFT downto 0)))) ;
-    Push( TransactionRec.WriteBurstFifo, FirstWord ) ;
-    for i in 2 to NumFifoWords loop
-      Push( TransactionRec.WriteBurstFifo, RV.RandSlv(FirstWord'length) ) ;
-    end loop ; 
+    PushBurstRandom(TransactionRec.WriteBurstFifo, FirstWord, NumFifoWords) ; 
     WriteBurstAsync(TransactionRec, iAddr, NumFifoWords, StatusMsgOn) ; 
   end procedure WriteBurstRandomAsync ;  
   
@@ -1572,7 +1548,7 @@ package body AddressBusTransactionPkg is
   end procedure ReadBurst ;
   
   ------------------------------------------------------------
-  procedure ReadCheckBurst (
+  procedure ReadCheckBurstVector (
   ------------------------------------------------------------
     signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
@@ -1581,10 +1557,8 @@ package body AddressBusTransactionPkg is
   ) is
   begin
     ReadBurst(TransactionRec, iAddr, VectorOfWords'length, StatusMsgOn) ; 
-    for i in VectorOfWords'range loop
-      CheckExpected( TransactionRec.ReadBurstFifo, VectorOfWords(i) ) ;
-    end loop ; 
-  end procedure ReadCheckBurst ;
+    CheckBurstVector(TransactionRec.ReadBurstFifo, VectorOfWords) ;
+  end procedure ReadCheckBurstVector ;
   
   ------------------------------------------------------------
   procedure ReadCheckBurstIncrement (
@@ -1597,9 +1571,7 @@ package body AddressBusTransactionPkg is
   ) is
   begin
     ReadBurst(TransactionRec, iAddr, NumFifoWords, StatusMsgOn) ; 
-    for i in 0 to NumFifoWords-1 loop
-      CheckExpected( TransactionRec.ReadBurstFifo, FirstWord+i ) ;
-    end loop ; 
+    CheckBurstIncrement(TransactionRec.ReadBurstFifo, FirstWord, NumFifoWords) ; 
   end procedure ReadCheckBurstIncrement ;
 
   ------------------------------------------------------------
@@ -1617,12 +1589,8 @@ package body AddressBusTransactionPkg is
     alias aFirstWord   : std_logic_vector(FirstWord'length-1 downto 0) is FirstWord ; 
     constant FW_LEFT   : integer := minimum(30, FirstWord'length) - 1 ;
   begin
-    RV.InitSeed(to_integer(aAddr(ADDR_LEFT downto 0) + MetaTo01(aFirstWord(FW_LEFT downto 0)))) ;
     ReadBurst(TransactionRec, iAddr, NumFifoWords, StatusMsgOn) ; 
-    CheckExpected( TransactionRec.ReadBurstFifo, FirstWord ) ;
-    for i in 2 to NumFifoWords loop
-      CheckExpected( TransactionRec.ReadBurstFifo, RV.RandSlv(FirstWord'length) ) ;
-    end loop ; 
+    CheckBurstRandom(TransactionRec.ReadBurstFifo, FirstWord, NumFifoWords) ; 
   end procedure ReadCheckBurstRandom ;
   
   -- ========================================================
