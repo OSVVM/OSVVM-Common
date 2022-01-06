@@ -388,6 +388,7 @@ package body FifoFillPkg_slv is
   ) is
     variable RV : RandomPType ; 
     variable intFirstWord : integer ; 
+    variable slvFirstWord : std_logic_vector(FifoWidth-1 downto 0) ; 
   begin
     if FirstWord < 0 then 
       intFirstWord := -FirstWord ; 
@@ -405,7 +406,9 @@ package body FifoFillPkg_slv is
     end if ; 
     
     for i in 2 to Count loop 
-      Push(Fifo, RV.RandSlv(FifoWidth)) ;
+      -- Extra Var added for QuestaSim
+      slvFirstWord := RV.RandSlv(FifoWidth) ;
+      Push(Fifo, slvFirstWord) ;
     end loop ;
   end procedure PushBurstRandom ;
   
@@ -519,6 +522,7 @@ package body FifoFillPkg_slv is
   ) is
     variable RV           : RandomPType ; 
     variable intFirstWord : integer ; 
+    variable slvFirstWord : std_logic_vector(FifoWidth-1 downto 0) ; 
   begin
     if FirstWord < 0 then 
       intFirstWord := -FirstWord ; 
@@ -536,7 +540,9 @@ package body FifoFillPkg_slv is
     end if ; 
     
     for i in 2 to Count loop 
-      CheckExpected(Fifo, RV.RandSlv(FifoWidth)) ;
+      -- Extra Var added for QuestaSim
+      slvFirstWord := RV.RandSlv(FifoWidth) ; 
+      CheckExpected(Fifo, slvFirstWord) ;
     end loop ;
   end procedure CheckBurstRandom ;
   
