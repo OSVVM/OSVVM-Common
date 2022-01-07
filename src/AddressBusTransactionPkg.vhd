@@ -546,6 +546,17 @@ package AddressBusTransactionPkg is
   ) ;
 
   ------------------------------------------------------------
+  procedure WriteBurstRandom (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             CoverID        : In    CoverageIDType ;
+             NumFifoWords   : In    integer ;
+             FifoWidth      : In    integer ;
+             StatusMsgOn    : In    boolean := false
+  ) ;
+
+  ------------------------------------------------------------
   procedure WriteBurstAsync (
   -- Asynchronous / Non-Blocking Write Burst.   
   -- Data is provided separately via a WriteBurstFifo.   
@@ -587,6 +598,17 @@ package AddressBusTransactionPkg is
   ) ;
 
   ------------------------------------------------------------
+  procedure WriteBurstRandomAsync (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             CoverID        : In    CoverageIDType ;
+             NumFifoWords   : In    integer ;
+             FifoWidth      : In    integer ;
+             StatusMsgOn    : In    boolean := false
+  ) ;
+
+  ------------------------------------------------------------
   procedure ReadBurst (
   -- Blocking Read Burst.
   ------------------------------------------------------------
@@ -622,6 +644,17 @@ package AddressBusTransactionPkg is
              iAddr          : In    std_logic_vector ;
              FirstWord      : In    std_logic_vector ;
              NumFifoWords   : In    integer ;
+             StatusMsgOn    : In    boolean := false
+  ) ;
+
+  ------------------------------------------------------------
+  procedure ReadCheckBurstRandom (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             CoverID        : In    CoverageIDType ;
+             NumFifoWords   : In    integer ;
+             FifoWidth      : In    integer ;
              StatusMsgOn    : In    boolean := false
   ) ;
 
@@ -1463,6 +1496,21 @@ package body AddressBusTransactionPkg is
   end procedure WriteBurstRandom ;
 
   ------------------------------------------------------------
+  procedure WriteBurstRandom (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             CoverID        : In    CoverageIDType ;
+             NumFifoWords   : In    integer ;
+             FifoWidth      : In    integer ;
+             StatusMsgOn    : In    boolean := false
+  ) is
+  begin
+    PushBurstRandom(TransactionRec.WriteBurstFifo, CoverID, NumFifoWords, FifoWidth) ; 
+    WriteBurst(TransactionRec, iAddr, NumFifoWords, StatusMsgOn) ; 
+  end procedure WriteBurstRandom ;
+
+  ------------------------------------------------------------
   procedure WriteBurstAsync (
   -- dispatch CPU Write Cycle
   ------------------------------------------------------------
@@ -1525,6 +1573,21 @@ package body AddressBusTransactionPkg is
   end procedure WriteBurstRandomAsync ;  
   
   ------------------------------------------------------------
+  procedure WriteBurstRandomAsync (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             CoverID        : In    CoverageIDType ;
+             NumFifoWords   : In    integer ;
+             FifoWidth      : In    integer ;
+             StatusMsgOn    : In    boolean := false
+  ) is
+  begin
+    PushBurstRandom(TransactionRec.WriteBurstFifo, CoverID, NumFifoWords, FifoWidth) ; 
+    WriteBurstAsync(TransactionRec, iAddr, NumFifoWords, StatusMsgOn) ; 
+  end procedure WriteBurstRandomAsync ;
+
+  ------------------------------------------------------------
   procedure ReadBurst (
   -- do CPU Read Cycle and return data
   ------------------------------------------------------------
@@ -1583,16 +1646,26 @@ package body AddressBusTransactionPkg is
              NumFifoWords   : In    integer ;
              StatusMsgOn    : In    boolean := false
   ) is
-    variable RV : RandomPType ; 
-    alias aAddr        : std_logic_vector(iAddr'length-1 downto 0) is iAddr ; 
-    constant ADDR_LEFT : integer := minimum(30, iAddr'length) - 1 ;
-    alias aFirstWord   : std_logic_vector(FirstWord'length-1 downto 0) is FirstWord ; 
-    constant FW_LEFT   : integer := minimum(30, FirstWord'length) - 1 ;
   begin
     ReadBurst(TransactionRec, iAddr, NumFifoWords, StatusMsgOn) ; 
     CheckBurstRandom(TransactionRec.ReadBurstFifo, FirstWord, NumFifoWords) ; 
   end procedure ReadCheckBurstRandom ;
-  
+
+  ------------------------------------------------------------
+  procedure ReadCheckBurstRandom (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             CoverID        : In    CoverageIDType ;
+             NumFifoWords   : In    integer ;
+             FifoWidth      : In    integer ;
+             StatusMsgOn    : In    boolean := false
+  ) is
+  begin
+    ReadBurst(TransactionRec, iAddr, NumFifoWords, StatusMsgOn) ; 
+    CheckBurstRandom(TransactionRec.ReadBurstFifo, CoverID, NumFifoWords, FifoWidth) ; 
+  end procedure ReadCheckBurstRandom ;
+
   -- ========================================================
   --  Pseudo Transactions
   --  Interact with the record only.

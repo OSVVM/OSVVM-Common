@@ -533,7 +533,27 @@ package StreamTransactionPkg is
     constant StatusMsgOn    : In    boolean := false
   ) ;
 
-  
+  ------------------------------------------------------------
+  procedure SendBurstRandom (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut StreamRecType ;
+    constant CoverID        : In    CoverageIDType ;
+    constant NumFifoWords   : In    integer ;
+    constant FifoWidth      : In    integer ;
+    constant Param          : In    std_logic_vector ;
+    constant StatusMsgOn    : In    boolean := false
+  ) ;
+
+  ------------------------------------------------------------
+  procedure SendBurstRandom (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut StreamRecType ;
+    constant CoverID        : In    CoverageIDType ;
+    constant NumFifoWords   : In    integer ;
+    constant FifoWidth      : In    integer ;
+    constant StatusMsgOn    : In    boolean := false
+  ) ;
+
   -- ========================================================
   -- SendBurstAsync
   -- Asynchronous / Non-Blocking Send Transaction
@@ -616,6 +636,26 @@ package StreamTransactionPkg is
     constant StatusMsgOn    : In    boolean := false
   ) ;
   
+  ------------------------------------------------------------
+  procedure SendBurstRandomAsync (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut StreamRecType ;
+    constant CoverID        : In    CoverageIDType ;
+    constant NumFifoWords   : In    integer ;
+    constant FifoWidth      : In    integer ;
+    constant Param          : In    std_logic_vector ;
+    constant StatusMsgOn    : In    boolean := false
+  ) ;
+
+  ------------------------------------------------------------
+  procedure SendBurstRandomAsync (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut StreamRecType ;
+    constant CoverID        : In    CoverageIDType ;
+    constant NumFifoWords   : In    integer ;
+    constant FifoWidth      : In    integer ;
+    constant StatusMsgOn    : In    boolean := false
+  ) ;
 
   -- ========================================================
   --  Receiver Transactions
@@ -863,6 +903,27 @@ package StreamTransactionPkg is
     constant StatusMsgOn    : In    boolean := false
   ) ;
 
+  ------------------------------------------------------------
+  procedure CheckBurstRandom (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut StreamRecType ;
+    constant CoverID        : In    CoverageIDType ;
+    constant NumFifoWords   : In    integer ;
+    constant FifoWidth      : In    integer ;
+    constant Param          : In    std_logic_vector ;
+    constant StatusMsgOn    : In    boolean := false
+  ) ;  
+
+  ------------------------------------------------------------
+  procedure CheckBurstRandom (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut StreamRecType ;
+    constant CoverID        : In    CoverageIDType ;
+    constant NumFifoWords   : In    integer ;
+    constant FifoWidth      : In    integer ;
+    constant StatusMsgOn    : In    boolean := false
+  ) ;  
+
   -- ========================================================
   -- TryCheckBurst
   -- Try / Non-Blocking Check Burst Transaction
@@ -952,8 +1013,31 @@ package StreamTransactionPkg is
     variable Available      : Out   boolean ;
     constant StatusMsgOn    : In    boolean := false
   ) ;
-  
-  
+
+  ------------------------------------------------------------
+  procedure TryCheckBurstRandom (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut StreamRecType ;
+    constant CoverID        : In    CoverageIDType ;
+    constant NumFifoWords   : In    integer ;
+    constant FifoWidth      : In    integer ;
+    constant Param          : In    std_logic_vector ;
+    variable Available      : Out   boolean ;
+    constant StatusMsgOn    : In    boolean := false
+  ) ;  
+
+  ------------------------------------------------------------
+  procedure TryCheckBurstRandom (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut StreamRecType ;
+    constant CoverID        : In    CoverageIDType ;
+    constant NumFifoWords   : In    integer ;
+    constant FifoWidth      : In    integer ;
+    variable Available      : Out   boolean ;
+    constant StatusMsgOn    : In    boolean := false
+  ) ;  
+
+
   -- ========================================================
   --  Pseudo Transactions
   --  Interact with the record only.
@@ -1493,7 +1577,7 @@ package body StreamTransactionPkg is
     PushBurstRandom(TransactionRec.BurstFifo, FirstWord, NumFifoWords) ;
     LocalSendBurst(TransactionRec, SEND_BURST, NumFifoWords, Param, StatusMsgOn) ; 
   end procedure SendBurstRandom ;
-
+  
   ------------------------------------------------------------
   procedure SendBurstRandom (
   ------------------------------------------------------------
@@ -1506,7 +1590,35 @@ package body StreamTransactionPkg is
     SendBurstRandom(TransactionRec, FirstWord, NumFifoWords, "", StatusMsgOn) ; 
   end procedure SendBurstRandom ;
 
-  
+  ------------------------------------------------------------
+  procedure SendBurstRandom (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut StreamRecType ;
+    constant CoverID        : In    CoverageIDType ;
+    constant NumFifoWords   : In    integer ;
+    constant FifoWidth      : In    integer ;
+    constant Param          : In    std_logic_vector ;
+    constant StatusMsgOn    : In    boolean := false
+  ) is
+  begin
+    PushBurstRandom(TransactionRec.BurstFifo, CoverID, NumFifoWords, FifoWidth) ;
+    LocalSendBurst(TransactionRec, SEND_BURST, NumFifoWords, Param, StatusMsgOn) ; 
+  end procedure SendBurstRandom ;  
+
+  ------------------------------------------------------------
+  procedure SendBurstRandom (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut StreamRecType ;
+    constant CoverID        : In    CoverageIDType ;
+    constant NumFifoWords   : In    integer ;
+    constant FifoWidth      : In    integer ;
+    constant StatusMsgOn    : In    boolean := false
+  ) is
+  begin
+    SendBurstRandom(TransactionRec, CoverID, NumFifoWords, FifoWidth, "", StatusMsgOn) ; 
+  end procedure SendBurstRandom ;  
+
+
   -- ========================================================
   -- SendBurstAsync
   -- Asynchronous / Non-Blocking Send Transaction
@@ -1613,6 +1725,34 @@ package body StreamTransactionPkg is
   begin
     SendBurstRandomAsync(TransactionRec, FirstWord, NumFifoWords, "", StatusMsgOn) ; 
   end procedure SendBurstRandomAsync ;
+
+  ------------------------------------------------------------
+  procedure SendBurstRandomAsync (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut StreamRecType ;
+    constant CoverID        : In    CoverageIDType ;
+    constant NumFifoWords   : In    integer ;
+    constant FifoWidth      : In    integer ;
+    constant Param          : In    std_logic_vector ;
+    constant StatusMsgOn    : In    boolean := false
+  ) is
+  begin
+    PushBurstRandom(TransactionRec.BurstFifo, CoverID, NumFifoWords, FifoWidth) ;
+    LocalSendBurst(TransactionRec, SEND_BURST_ASYNC, NumFifoWords, Param, StatusMsgOn) ; 
+  end procedure SendBurstRandomAsync ;  
+
+  ------------------------------------------------------------
+  procedure SendBurstRandomAsync (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut StreamRecType ;
+    constant CoverID        : In    CoverageIDType ;
+    constant NumFifoWords   : In    integer ;
+    constant FifoWidth      : In    integer ;
+    constant StatusMsgOn    : In    boolean := false
+  ) is
+  begin
+    SendBurstRandomAsync(TransactionRec, CoverID, NumFifoWords, FifoWidth, "", StatusMsgOn) ; 
+  end procedure SendBurstRandomAsync ;  
 
 
   -- ========================================================
@@ -2003,6 +2143,34 @@ package body StreamTransactionPkg is
     CheckBurstRandom(TransactionRec, FirstWord, NumFifoWords, "", StatusMsgOn) ; 
   end procedure CheckBurstRandom ;
 
+  ------------------------------------------------------------
+  procedure CheckBurstRandom (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut StreamRecType ;
+    constant CoverID        : In    CoverageIDType ;
+    constant NumFifoWords   : In    integer ;
+    constant FifoWidth      : In    integer ;
+    constant Param          : In    std_logic_vector ;
+    constant StatusMsgOn    : In    boolean := false
+  ) is
+  begin
+    PushBurstRandom(TransactionRec.BurstFifo, CoverID, NumFifoWords, FifoWidth) ;
+    LocalCheckBurst(TransactionRec, CHECK_BURST, NumFifoWords, Param, StatusMsgOn) ;
+  end procedure CheckBurstRandom ;  
+
+  ------------------------------------------------------------
+  procedure CheckBurstRandom (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut StreamRecType ;
+    constant CoverID        : In    CoverageIDType ;
+    constant NumFifoWords   : In    integer ;
+    constant FifoWidth      : In    integer ;
+    constant StatusMsgOn    : In    boolean := false
+  ) is
+  begin
+    CheckBurstRandom(TransactionRec, CoverID, NumFifoWords, FifoWidth, "", StatusMsgOn) ;
+  end procedure CheckBurstRandom ;  
+
   -- ========================================================
   -- TryCheckBurst
   -- Try / Non-Blocking Check Burst Transaction
@@ -2127,6 +2295,38 @@ package body StreamTransactionPkg is
     TryCheckBurstRandom(TransactionRec, FirstWord, NumFifoWords, "", Available, StatusMsgOn) ; 
   end procedure TryCheckBurstRandom ;
 
+  ------------------------------------------------------------
+  procedure TryCheckBurstRandom (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut StreamRecType ;
+    constant CoverID        : In    CoverageIDType ;
+    constant NumFifoWords   : In    integer ;
+    constant FifoWidth      : In    integer ;
+    constant Param          : In    std_logic_vector ;
+    variable Available      : Out   boolean ;
+    constant StatusMsgOn    : In    boolean := false
+  ) is
+  begin
+    GotBurst(TransactionRec, NumFifoWords, Available) ; 
+    if Available then
+      PushBurstRandom(TransactionRec.BurstFifo, CoverID, NumFifoWords, FifoWidth) ;
+      LocalCheckBurst(TransactionRec, CHECK_BURST, NumFifoWords, Param, StatusMsgOn) ;
+    end if ; 
+  end procedure TryCheckBurstRandom ;  
+
+  ------------------------------------------------------------
+  procedure TryCheckBurstRandom (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut StreamRecType ;
+    constant CoverID        : In    CoverageIDType ;
+    constant NumFifoWords   : In    integer ;
+    constant FifoWidth      : In    integer ;
+    variable Available      : Out   boolean ;
+    constant StatusMsgOn    : In    boolean := false
+  ) is
+  begin
+    TryCheckBurstRandom(TransactionRec, CoverID, NumFifoWords, FifoWidth, "", Available, StatusMsgOn) ;
+  end procedure TryCheckBurstRandom ;  
 
   -- ========================================================
   --  Pseudo Transactions

@@ -21,6 +21,7 @@
 --
 --  Revision History:
 --    Date      Version     Description
+--    01/2022   2022.01     Added new burst patterns
 --    06/2021   2021.06     Updated to work with new FIFO/Scoreboard data structures
 --    10/2020   2020.10     Updating comments to serve as documentation
 --    09/2020   2020.09     Updating comments to serve as documentation
@@ -126,6 +127,19 @@ package FifoFillPkg_slv is
   ) ;
   
   ------------------------------------------------------------
+  -- Experimental and Provisional
+  procedure PushBurstRandom (
+  -- Push Count number of values into FIFO.  Values are 
+  -- randomly generated using the coverage model.
+  -- Only FifoWidth bits of each value will be pushed.    
+  ------------------------------------------------------------
+    constant Fifo         : in    ScoreboardIdType ;
+    constant CoverID      : in    CoverageIdType ;
+    constant Count        : in    integer ;
+    constant FifoWidth    : in    integer := 8
+  ) ;
+
+  ------------------------------------------------------------
   procedure PopBurstVector (
   -- Pop values from the FIFO into the VectorOfWords parameter.
   -- Each value popped will be FifoWidth bits wide.   
@@ -203,6 +217,15 @@ package FifoFillPkg_slv is
     constant FifoWidth    : in    integer := 8
   ) ;
 
+  ------------------------------------------------------------
+  -- Experimental and Provisional
+  procedure CheckBurstRandom (
+  ------------------------------------------------------------
+    constant Fifo         : in    ScoreboardIdType ;
+    constant CoverID      : in    CoverageIdType ;
+    constant Count        : in    integer ;
+    constant FifoWidth    : in    integer := 8
+  ) ;
 
   -- ========================================================
   --  Verification Component Support
@@ -411,7 +434,25 @@ package body FifoFillPkg_slv is
       Push(Fifo, slvFirstWord) ;
     end loop ;
   end procedure PushBurstRandom ;
-  
+
+  ------------------------------------------------------------
+  -- Experimental and Provisional
+  procedure PushBurstRandom (
+  ------------------------------------------------------------
+    constant Fifo         : in    ScoreboardIdType ;
+    constant CoverID      : in    CoverageIdType ;
+    constant Count        : in    integer ;
+    constant FifoWidth    : in    integer := 8
+  ) is
+    variable RandValue : std_logic_vector(FifoWidth-1 downto 0) ; 
+  begin    
+    for i in 1 to Count loop 
+      RandValue := to_slv(GetRandPoint(CoverID), FifoWidth) ;
+      Push(Fifo, RandValue) ;
+      ICoverLast(CoverID) ; 
+    end loop ;
+  end procedure PushBurstRandom ;
+
   ------------------------------------------------------------
   procedure PopBurstVector (
   ------------------------------------------------------------
@@ -546,7 +587,24 @@ package body FifoFillPkg_slv is
     end loop ;
   end procedure CheckBurstRandom ;
   
-  
+  ------------------------------------------------------------
+  -- Experimental and Provisional
+  procedure CheckBurstRandom (
+  ------------------------------------------------------------
+    constant Fifo         : in    ScoreboardIdType ;
+    constant CoverID      : in    CoverageIdType ;
+    constant Count        : in    integer ;
+    constant FifoWidth    : in    integer := 8
+  ) is
+    variable RandValue : std_logic_vector(FifoWidth-1 downto 0) ; 
+  begin    
+    for i in 1 to Count loop 
+      RandValue := to_slv(GetRandPoint(CoverID), FifoWidth) ;
+      CheckExpected(Fifo, RandValue) ;
+      ICoverLast(CoverID) ; 
+    end loop ;
+  end procedure CheckBurstRandom ;
+
   -- ========================================================
   --  Verification Component Support
   -- ========================================================
