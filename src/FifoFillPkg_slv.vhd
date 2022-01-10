@@ -60,7 +60,7 @@ package FifoFillPkg_slv is
   ------------------------------------------------------------
   procedure PushBurstVector (
   -- Push each value in the VectorOfWords parameter into the FIFO.   
-  -- FifoWidth will match the std_logic_vector parameter.    
+  -- FifoWidth must match the std_logic_vector parameter.    
   ------------------------------------------------------------
     constant Fifo          : In    ScoreboardIdType ;
     constant VectorOfWords : In    slv_vector 
@@ -81,7 +81,7 @@ package FifoFillPkg_slv is
   -- Push Count number of values into FIFO.  The first value 
   -- pushed will be FirstWord and following values are one greater 
   -- than the previous one.  
-  -- FifoWidth will match the std_logic_vector parameter.    
+  -- FifoWidth must match the std_logic_vector parameter.    
   ------------------------------------------------------------
     constant Fifo           : In    ScoreboardIdType ;
     constant FirstWord      : In    std_logic_vector ;
@@ -106,7 +106,7 @@ package FifoFillPkg_slv is
   -- Push Count number of values into FIFO.  The first value 
   -- pushed will be FirstWord and following values are randomly generated 
   -- using the first value as the randomization seed.
-  -- FifoWidth will match the std_logic_vector parameter.    
+  -- FifoWidth must match the std_logic_vector parameter.    
   ------------------------------------------------------------
     constant Fifo           : In    ScoreboardIdType ;
     constant FirstWord      : In    std_logic_vector ;
@@ -137,6 +137,15 @@ package FifoFillPkg_slv is
     constant CoverID      : in    CoverageIdType ;
     constant Count        : in    integer ;
     constant FifoWidth    : in    integer := 8
+  ) ;
+
+  ------------------------------------------------------------
+  procedure PopBurstVector (
+  -- Pop values from the FIFO into the VectorOfWords parameter.
+  -- Width of VectorOfWords(i) shall match the width of the Fifo 
+  ------------------------------------------------------------
+    constant Fifo           : in    ScoreboardIdType ;
+    variable VectorOfWords  : out   slv_vector 
   ) ;
 
   ------------------------------------------------------------
@@ -452,6 +461,18 @@ package body FifoFillPkg_slv is
       ICoverLast(CoverID) ; 
     end loop ;
   end procedure PushBurstRandom ;
+
+  ------------------------------------------------------------
+  procedure PopBurstVector (
+  ------------------------------------------------------------
+    constant Fifo           : in    ScoreboardIdType ;
+    variable VectorOfWords  : out   slv_vector 
+  ) is
+  begin
+    for i in VectorOfWords'range loop 
+      VectorOfWords(i) := Pop(Fifo) ; 
+    end loop ;
+  end procedure PopBurstVector ;
 
   ------------------------------------------------------------
   procedure PopBurstVector (
