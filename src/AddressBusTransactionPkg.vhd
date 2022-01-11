@@ -174,7 +174,7 @@ package AddressBusTransactionPkg is
     IntFromModel       : integer_max ; 
     BoolToModel        : boolean_max ; 
     BoolFromModel      : boolean_max ;
-    -- Verification Component Options Type - currently aliased to type integer_max 
+    -- Verification Component Options Type  
     Options            : integer_max ;  
   end record AddressBusRecType ;
   
