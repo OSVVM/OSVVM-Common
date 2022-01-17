@@ -12,8 +12,8 @@
 
 ## 2022.01  January 2022
 - Updated AddressBusTransactionPkg and StreamTransactionPkg for Burst Patterns
-- Revised FifoFillPkg_slv.vhd to support new burst FIFO/Scoreboard data structures
-- Added FifoFillPtPkg_slv.vhd as a variant of FifoFillPkg_slv to maintain backward compatibility with older shared variable FIFO/Scoreboard data structures.
+- Added GotBurst for Stream MIT
+- Revised FifoFillPkg_slv.vhd to support burst patterns
 
 ## 2021.06  June 2021
 - Updated AddressBusTransactionPkg and StreamTransactionPkg for new Burst FIFO/scoreboard data structures
