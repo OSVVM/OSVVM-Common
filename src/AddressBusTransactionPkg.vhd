@@ -103,7 +103,10 @@ package AddressBusTransactionPkg is
     ASYNC_READ,              -- Non-blocking  --------             (Rx Addr, Tx Data)
     ASYNC_READ_ADDRESS,      -- Non-blocking (Tx Addr)             (Rx Addr)
     ASYNC_READ_DATA,         -- Non-blocking (Rx Data)             (Tx Data)
-    ASYNC_READ_DATA_CHECK,   -- Non-blocking (Tx Data)             
+    ASYNC_READ_DATA_CHECK,   -- Non-blocking (Tx Data)       
+
+    WRITE_AND_READ,          -- Blocking     (Tx Addr & Data, Rx Addr & Data)      
+    ASYNC_WRITE_AND_READ,    -- Non-blocking (Tx Addr & Data, Rx Addr)      
     --
     --  burst operations
     --                       ----------------------------
@@ -492,6 +495,28 @@ package AddressBusTransactionPkg is
              BitValue       : In    std_logic ;
              StatusMsgOn    : In    boolean := false ;
              WaitTime       : In    natural := 10
+  ) ;
+  
+  ------------------------------------------------------------
+  procedure WriteAndRead (
+  -- do CPU Write Cycle
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             iData          : In    std_logic_vector ;
+    variable oData          : Out   std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
+  ) ;
+
+  ------------------------------------------------------------
+  procedure WriteAndReadAsync (
+  -- dispatch CPU Write Cycle
+  -- Only Read Addresss Sent.  Does not wait for Read Data
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             iData          : In    std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
   ) ;
   
   
@@ -944,11 +969,12 @@ package body AddressBusTransactionPkg is
     variable Count          : Out   integer
   ) is
   begin
-    TransactionRec.Operation     <= GET_TRANSACTION_COUNT ;
-    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
-
-    -- Return AlertLogID
-    Count := TransactionRec.IntFromModel ;
+--    TransactionRec.Operation     <= GET_TRANSACTION_COUNT ;
+--    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+--
+--    -- Return AlertLogID
+--    Count := TransactionRec.IntFromModel ;
+    Count := integer(TransactionRec.Rdy) ;
   end procedure GetTransactionCount ;
 
   ------------------------------------------------------------
@@ -1429,6 +1455,52 @@ package body AddressBusTransactionPkg is
     ReadPoll(TransactionRec, iAddr, vData, Index, BitValue, StatusMsgOn, WaitTime) ;
   end procedure ReadPoll ;
 
+  ------------------------------------------------------------
+  procedure WriteAndRead (
+  -- do CPU Write Cycle
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             iData          : In    std_logic_vector ;
+    variable oData          : Out   std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
+  ) is
+  begin
+    -- Put values in record
+    TransactionRec.Operation     <= WRITE_AND_READ ;
+    TransactionRec.Address       <= SafeResize(iAddr, TransactionRec.Address'length) ;
+    TransactionRec.AddrWidth     <= iAddr'length ;
+    TransactionRec.DataToModel   <= SafeResize(iData, TransactionRec.DataToModel'length) ;
+    TransactionRec.DataWidth     <= iData'length ;
+    TransactionRec.StatusMsgOn   <= StatusMsgOn ;
+    -- Start Transaction
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+    -- Return Results
+    oData  := SafeResize(TransactionRec.DataFromModel, oData'length) ;  
+  end procedure WriteAndRead ;
+
+  ------------------------------------------------------------
+  procedure WriteAndReadAsync (
+  -- dispatch CPU Write Cycle
+  -- Only Read Addresss Sent.  Does not wait for Read Data
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             iData          : In    std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
+  ) is
+  begin
+    -- Put values in record
+    TransactionRec.Operation     <= ASYNC_WRITE_AND_READ ;
+    TransactionRec.Address       <= SafeResize(iAddr, TransactionRec.Address'length) ;
+    TransactionRec.AddrWidth     <= iAddr'length ;
+    TransactionRec.DataToModel   <= SafeResize(iData, TransactionRec.DataToModel'length) ;
+    TransactionRec.DataWidth     <= iData'length ;
+    TransactionRec.StatusMsgOn   <= StatusMsgOn ;
+    -- Start Transaction
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+  end procedure WriteAndReadAsync ;
+  
   -- ========================================================
   --  Burst Transactions
   -- ========================================================
