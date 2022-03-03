@@ -145,6 +145,8 @@ package StreamTransactionPkg is
     -- Verification Component Options Type 
     Options         : integer_max ; 
   end record StreamRecType ; 
+  
+  type StreamRecType_Vector is array(natural range <>) of StreamRecType;
 
 
   -- --------------------------------------------------------
