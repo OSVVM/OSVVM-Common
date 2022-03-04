@@ -969,12 +969,12 @@ package body AddressBusTransactionPkg is
     variable Count          : Out   integer
   ) is
   begin
---    TransactionRec.Operation     <= GET_TRANSACTION_COUNT ;
---    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
---
---    -- Return AlertLogID
---    Count := TransactionRec.IntFromModel ;
-    Count := integer(TransactionRec.Rdy) ;
+    TransactionRec.Operation     <= GET_TRANSACTION_COUNT ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+
+    -- Return AlertLogID
+    Count := TransactionRec.IntFromModel ;
+--    Count := integer(TransactionRec.Rdy) ;
   end procedure GetTransactionCount ;
 
   ------------------------------------------------------------
