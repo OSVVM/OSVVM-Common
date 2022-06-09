@@ -499,7 +499,7 @@ package AddressBusTransactionPkg is
   
   ------------------------------------------------------------
   procedure WriteAndRead (
-  -- do CPU Write Cycle
+  -- Write and Read Cycle that use same address and are dispatched together
   ------------------------------------------------------------
     signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
@@ -510,8 +510,9 @@ package AddressBusTransactionPkg is
 
   ------------------------------------------------------------
   procedure WriteAndReadAsync (
-  -- dispatch CPU Write Cycle
-  -- Only Read Addresss Sent.  Does not wait for Read Data
+  -- Dispatch Write Address and Data.  Do not wait for completion
+  -- Dispatch Read Address.  Do not wait for Read Data.  
+  -- Retrieve read data with ReadData or TryReadData
   ------------------------------------------------------------
     signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
@@ -1457,7 +1458,7 @@ package body AddressBusTransactionPkg is
 
   ------------------------------------------------------------
   procedure WriteAndRead (
-  -- do CPU Write Cycle
+  -- Write and Read Cycle that use same address and are dispatched together
   ------------------------------------------------------------
     signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
@@ -1481,8 +1482,9 @@ package body AddressBusTransactionPkg is
 
   ------------------------------------------------------------
   procedure WriteAndReadAsync (
-  -- dispatch CPU Write Cycle
-  -- Only Read Addresss Sent.  Does not wait for Read Data
+  -- Dispatch Write Address and Data.  Do not wait for completion
+  -- Dispatch Read Address.  Do not wait for Read Data.  
+  -- Retrieve read data with ReadData or TryReadData
   ------------------------------------------------------------
     signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
