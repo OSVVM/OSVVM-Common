@@ -53,14 +53,14 @@ library osvvm ;
 entity InterruptHandler is
 port (
   -- Interrupt Input
-  IntReq      : in   std_logic ;
+  IntReq          : in   std_logic ;
 
   -- From TestCtrl
-  TransRec    : inout AddressBusRecType ;
-  InterruptRec      : inout AddressBusRecType ;
+  TransRec        : inout AddressBusRecType ;
+  InterruptRec    : inout AddressBusRecType ;
   
   -- To Verification Component
-  VCRec       : inout AddressBusRecType
+  VCRec           : inout AddressBusRecType
 ) ;
 end entity InterruptHandler ;
 architecture Behavioral of InterruptHandler is
@@ -68,74 +68,82 @@ architecture Behavioral of InterruptHandler is
   signal   iIntReq  : std_logic := '0' ;
 begin
 
-  -- Generate Interrupts only when Interrupt Present and
-  -- there are interrupt transactions pending 
-  iIntReq <= '1' when IntReq = POLARITY and 
-                      InterruptRec.Rdy /= InterruptRec.Ack else '0' ;
+  -- Only handle interrupts when interrupt transactions pending 
+  iIntReq   <= TO_X01(IntReq) when TransactionPending(InterruptRec.Rdy, InterruptRec.Ack) 
+               else '0' ;
 
-  TransactionHandler : process 
+  TransactionSelection : process 
     variable IntState : boolean := FALSE ;
   begin
-    TransRec.Ack     <= Increment(TransRec.Ack) ;       -- due to differences in handling
-    InterruptRec.Ack <= Increment(InterruptRec.Ack) ;   -- due to differences in handling
-    wait for 0 ns ; 
+    FinishTransaction(TransRec.Ack) ;       -- due to differences in handling
+    FinishTransaction(InterruptRec.Ack) ;   -- due to differences in handling
     loop
       if not IntState then 
-        if not(TransRec.Ack /= TransRec.Rdy or iIntReq = '1') then 
-          wait until TransRec.Ack /= TransRec.Rdy or iIntReq = '1' ;
+        if not(TransactionPending(TransRec.Rdy, TransRec.Ack) or iIntReq = '1') then 
+          wait until TransactionPending(TransRec.Rdy, TransRec.Ack) or iIntReq = '1' ;
         end if ; 
         if iIntReq = '1' then 
           IntState := TRUE ; 
         else
-          -- Copy transaction info to VC
-          VCRec.Operation     <=  TransRec.Operation   ;
-          VCRec.Address       <=  TransRec.Address     ;
-          VCRec.AddrWidth     <=  TransRec.AddrWidth   ;
-          VCRec.DataToModel   <=  TransRec.DataToModel ;
-          VCRec.DataWidth     <=  TransRec.DataWidth   ;
-          VCRec.StatusMsgOn   <=  TransRec.StatusMsgOn ;
-          VCRec.IntToModel    <=  TransRec.IntToModel  ;
-          VCRec.BoolToModel   <=  TransRec.BoolToModel ;
-          VCRec.Options       <=  TransRec.Options     ;
+          -- Copy normal transaction info to VCRec
+          VCRec.Operation       <=  TransRec.Operation   ;
+          VCRec.Address         <=  TransRec.Address     ;
+          VCRec.AddrWidth       <=  TransRec.AddrWidth   ;
+          VCRec.DataToModel     <=  TransRec.DataToModel ;
+          VCRec.DataWidth       <=  TransRec.DataWidth   ;
+          VCRec.WriteBurstFifo  <=  TransRec.WriteBurstFifo ; 
+          VCRec.ReadBurstFifo   <=  TransRec.ReadBurstFifo ; 
+          VCRec.StatusMsgOn     <=  TransRec.StatusMsgOn ;
+          VCRec.IntToModel      <=  TransRec.IntToModel  ;
+          VCRec.BoolToModel     <=  TransRec.BoolToModel ;
+          VCRec.Options         <=  TransRec.Options     ;
+          
+          -- Forward transaction to VC
           RequestTransaction(Rdy => VCRec.Rdy, Ack => VCRec.Ack) ; 
 
-          -- Copy transaction results back
+          -- Copy transaction results back to TransRec
           TransRec.DataFromModel <= VCRec.DataFromModel ;
           TransRec.IntFromModel  <= VCRec.IntFromModel  ;
           TransRec.BoolFromModel <= VCRec.BoolFromModel ;
-          TransRec.Ack           <= Increment(TransRec.Ack) ; 
-          wait for 0 ns ; 
+          
+          -- Complete Transaction on TransRec side
+          FinishTransaction(TransRec.Ack) ; 
         end if ; 
       end if ; 
       
       if IntState then 
-        if not(InterruptRec.Ack /= InterruptRec.Rdy) then 
-          wait until InterruptRec.Ack /= InterruptRec.Rdy ;
+        if not(TransactionPending(InterruptRec.Rdy, InterruptRec.Ack)) then 
+          wait until TransactionPending(InterruptRec.Rdy, InterruptRec.Ack) ;
         end if ; 
         if InterruptRec.Operation = INTERRUPT_RETURN then 
           IntState := FALSE ; 
         else
-          -- Copy transaction info to VC
-          VCRec.Operation     <=  InterruptRec.Operation   ;
-          VCRec.Address       <=  InterruptRec.Address     ;
-          VCRec.AddrWidth     <=  InterruptRec.AddrWidth   ;
-          VCRec.DataToModel   <=  InterruptRec.DataToModel ;
-          VCRec.DataWidth     <=  InterruptRec.DataWidth   ;
-          VCRec.StatusMsgOn   <=  InterruptRec.StatusMsgOn ;
-          VCRec.IntToModel    <=  InterruptRec.IntToModel  ;
-          VCRec.BoolToModel   <=  InterruptRec.BoolToModel ;
-          VCRec.Options       <=  InterruptRec.Options     ;
-          RequestTransaction(Rdy => VCRec.Rdy, Ack => VCRec.Ack) ; 
+          -- Copy interrupt transaction info to VCRec
+          VCRec.Operation       <=  InterruptRec.Operation   ;
+          VCRec.Address         <=  InterruptRec.Address     ;
+          VCRec.AddrWidth       <=  InterruptRec.AddrWidth   ;
+          VCRec.DataToModel     <=  InterruptRec.DataToModel ;
+          VCRec.DataWidth       <=  InterruptRec.DataWidth   ;
+          VCRec.WriteBurstFifo  <=  InterruptRec.WriteBurstFifo ; 
+          VCRec.ReadBurstFifo   <=  InterruptRec.ReadBurstFifo ; 
+          VCRec.StatusMsgOn     <=  InterruptRec.StatusMsgOn ;
+          VCRec.IntToModel      <=  InterruptRec.IntToModel  ;
+          VCRec.BoolToModel     <=  InterruptRec.BoolToModel ;
+          VCRec.Options         <=  InterruptRec.Options     ;
           
-          -- Copy transaction results back
+          -- Forward transaction to VC
+          RequestTransaction(Rdy => VCRec.Rdy, Ack => VCRec.Ack) ; 
+
+          -- Copy transaction results back to InterruptRec
           InterruptRec.DataFromModel <= VCRec.DataFromModel ;
           InterruptRec.IntFromModel  <= VCRec.IntFromModel  ;
           InterruptRec.BoolFromModel <= VCRec.BoolFromModel ;
         end if ; 
-        InterruptRec.Ack <= Increment(InterruptRec.Ack) ;
-        wait for 0 ns ; 
+        
+        -- Complete Transaction on TransRec side
+        FinishTransaction(TransRec.Ack) ; 
       end if ; 
     end loop ; 
-  end process TransactionHandler ;  
+  end process TransactionSelection ;  
 
 end architecture Behavioral ; 
