@@ -54,6 +54,9 @@ package InterruptHandlerComponentPkg is
   ------------------------------------------------------------
   component InterruptHandler is
   ------------------------------------------------------------
+  generic (
+    MODEL_ID_NAME    : string := "" 
+  ) ;
   port (
     -- Interrupt Input
     IntReq       : in   std_logic ;

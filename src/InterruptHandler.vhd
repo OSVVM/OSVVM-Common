@@ -46,11 +46,15 @@ library ieee ;
 
 library osvvm ;
   context osvvm.OsvvmContext ;
+  use osvvm.ScoreboardPkg_slv.all ; 
 
   use work.AddressBusTransactionPkg.all; 
 
 
 entity InterruptHandler is
+generic (
+  MODEL_ID_NAME    : string := "" 
+) ;
 port (
   -- Interrupt Input
   IntReq          : in   std_logic ;
@@ -66,6 +70,10 @@ end entity InterruptHandler ;
 architecture Behavioral of InterruptHandler is
   constant POLARITY : std_logic := '1' ;
   signal   iIntReq  : std_logic := '0' ;
+  
+  constant MODEL_INSTANCE_NAME : string :=
+    -- use MODEL_ID_NAME Generic if set, otherwise use instance label (preferred if set as entityname_1)
+    IfElse(MODEL_ID_NAME /= "", MODEL_ID_NAME, to_lower(PathTail(InterruptHandler'PATH_NAME))) ;
 begin
 
   -- Only handle interrupts when interrupt transactions pending 
@@ -74,9 +82,19 @@ begin
 
   TransactionSelection : process 
     variable IntState : boolean := FALSE ;
+    variable ModelID : AlertLogIDType ;
   begin
+    ModelID := NewID(MODEL_INSTANCE_NAME) ;
     FinishTransaction(TransRec.Ack) ;       -- due to differences in handling
     FinishTransaction(InterruptRec.Ack) ;   -- due to differences in handling
+    wait for 0 ns ; wait for 0 ns ; 
+    -- Copy burst FIFOs from VC
+    TransRec.WriteBurstFifo <= VCRec.WriteBurstFifo ;
+    TransRec.ReadBurstFifo  <= VCRec.ReadBurstFifo ;
+    -- Create Burst FIFOs for InterruptRec
+    InterruptRec.WriteBurstFifo <= NewID("WriteBurstFifo", ModelID, Search => PRIVATE) ;
+    InterruptRec.ReadBurstFifo  <= NewID("ReadBurstFifo",  ModelID, Search => PRIVATE) ;
+
     loop
       if not IntState then 
         if not(TransactionPending(TransRec.Rdy, TransRec.Ack) or iIntReq = '1') then 
@@ -140,8 +158,8 @@ begin
           InterruptRec.BoolFromModel <= VCRec.BoolFromModel ;
         end if ; 
         
-        -- Complete Transaction on TransRec side
-        FinishTransaction(TransRec.Ack) ; 
+        -- Complete Transaction on InterruptRec side
+        FinishTransaction(InterruptRec.Ack) ; 
       end if ; 
     end loop ; 
   end process TransactionSelection ;  
