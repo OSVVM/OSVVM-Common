@@ -92,8 +92,8 @@ begin
     TransRec.WriteBurstFifo <= VCRec.WriteBurstFifo ;
     TransRec.ReadBurstFifo  <= VCRec.ReadBurstFifo ;
     -- Create Burst FIFOs for InterruptRec
-    InterruptRec.WriteBurstFifo <= NewID("WriteBurstFifo", ModelID, Search => PRIVATE) ;
-    InterruptRec.ReadBurstFifo  <= NewID("ReadBurstFifo",  ModelID, Search => PRIVATE) ;
+    InterruptRec.WriteBurstFifo <= NewID("WriteBurstFifo", ModelID, Search => PRIVATE_NAME) ;
+    InterruptRec.ReadBurstFifo  <= NewID("ReadBurstFifo",  ModelID, Search => PRIVATE_NAME) ;
 
     loop
       if not IntState then 
