@@ -21,6 +21,7 @@
 --
 --  Revision History:
 --    Date      Version     Description
+--    10/2022   2022.10     Updated PushBurstRandom and CheckBurstRandom for bugs in Questa Intel edition 2021.2 
 --    01/2022   2022.01     Added new burst patterns
 --    06/2021   2021.06     Updated to work with new FIFO/Scoreboard data structures
 --    10/2020   2020.10     Updating comments to serve as documentation
@@ -418,30 +419,33 @@ package body FifoFillPkg_slv is
     constant Count        : in    integer ;
     constant FifoWidth    : in    integer := 8
   ) is
-    variable RV : RandomPType ; 
     variable intFirstWord : integer ; 
-    variable slvFirstWord : std_logic_vector(FifoWidth-1 downto 0) ; 
+--    variable RV : RandomPType ; 
+--    variable SlvWord : std_logic_vector(FifoWidth-1 downto 0) ; 
   begin
     if FirstWord < 0 then 
       intFirstWord := -FirstWord ; 
     else
       intFirstWord := FirstWord ; 
     end if ; 
+
+    PushBurstRandom(Fifo, to_slv(intFirstWord, FifoWidth), Count) ; 
     
-    -- Initialize seed and toss first random value  
-    RV.InitSeed(intFirstWord mod 2**30 + Count, UseNewSeedMethods => TRUE) ;
-    
-    if FifoWidth < NUMBER_POSITIVE_INTEGER_BITS then 
-      Push(Fifo, to_slv(intFirstWord mod (2**FifoWidth), FifoWidth)) ;
-    else 
-      Push(Fifo, to_slv(intFirstWord, FifoWidth)) ;
-    end if ; 
-    
-    for i in 2 to Count loop 
-      -- Extra Var added for QuestaSim
-      slvFirstWord := RV.RandSlv(FifoWidth) ;
-      Push(Fifo, slvFirstWord) ;
-    end loop ;
+--    -- Initialize seed and toss first random value  
+--    RV.InitSeed(intFirstWord mod 2**30 + Count, UseNewSeedMethods => TRUE) ;
+--    
+--    if FifoWidth < NUMBER_POSITIVE_INTEGER_BITS then 
+--      SlvWord := to_slv(intFirstWord mod (2**FifoWidth), FifoWidth) ;
+--    else 
+--      SlvWord := to_slv(intFirstWord, FifoWidth) ;
+--    end if ; 
+--    Push(Fifo, SlvWord) ;
+--    
+--    for i in 2 to Count loop 
+--      -- Extra Var added for QuestaSim
+--      SlvWord := RV.RandSlv(FifoWidth) ;
+--      Push(Fifo, SlvWord) ;
+--    end loop ;
   end procedure PushBurstRandom ;
 
   ------------------------------------------------------------
@@ -582,30 +586,32 @@ package body FifoFillPkg_slv is
     constant Count        : in    integer ;
     constant FifoWidth    : in    integer := 8
   ) is
-    variable RV           : RandomPType ; 
     variable intFirstWord : integer ; 
-    variable slvFirstWord : std_logic_vector(FifoWidth-1 downto 0) ; 
+--    variable RV           : RandomPType ; 
+--    variable SlvWord : std_logic_vector(FifoWidth-1 downto 0) ; 
   begin
     if FirstWord < 0 then 
       intFirstWord := -FirstWord ; 
     else
       intFirstWord := FirstWord ; 
     end if ; 
+    CheckBurstRandom(Fifo, to_slv(intFirstWord, FifoWidth), Count) ; 
     
-    -- Initialize seed and toss first random value  
-    RV.InitSeed(intFirstWord mod 2**30 + Count, UseNewSeedMethods => TRUE) ;
-    
-    if FifoWidth < NUMBER_POSITIVE_INTEGER_BITS then 
-      CheckExpected(Fifo, to_slv(intFirstWord mod (2**FifoWidth), FifoWidth)) ;
-    else 
-      CheckExpected(Fifo, to_slv(intFirstWord, FifoWidth)) ;
-    end if ; 
-    
-    for i in 2 to Count loop 
-      -- Extra Var added for QuestaSim
-      slvFirstWord := RV.RandSlv(FifoWidth) ; 
-      CheckExpected(Fifo, slvFirstWord) ;
-    end loop ;
+--    -- Initialize seed and toss first random value  
+--    RV.InitSeed(intFirstWord mod 2**30 + Count, UseNewSeedMethods => TRUE) ;
+--    
+--    if FifoWidth < NUMBER_POSITIVE_INTEGER_BITS then 
+--      SlvWord := to_slv(intFirstWord mod (2**FifoWidth), FifoWidth) ;
+--    else 
+--      SlvWord := to_slv(intFirstWord, FifoWidth) ;
+--    end if ; 
+--    CheckExpected(Fifo, SlvWord) ;
+--    
+--    for i in 2 to Count loop 
+--      -- Extra Var added for QuestaSim
+--      SlvWord := RV.RandSlv(FifoWidth) ; 
+--      CheckExpected(Fifo, SlvWord) ;
+--    end loop ;
   end procedure CheckBurstRandom ;
   
   ------------------------------------------------------------
