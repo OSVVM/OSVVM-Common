@@ -1,6 +1,12 @@
 # OSVVM Common Library
-The OSVVM Common Library 
-defines OSVVM's Model Independent Transactions (MIT).
+The OSVVM Common library defines 
+   * OSVVM Model Independent Transactions (MIT)
+   * Support functions for filling burst transfer FIFOs (in MIT or not)
+   * Generic Interrupt handler for MIT
+   * Model Parameter Settings support
+
+
+## About OSVVM's Model Independent Transactions (MIT).
 MIT defines a common communication interface (record based)
 and transaction API for Address Bus and Streaming Interface.
 Using MIT makes verification component development as easy
@@ -46,27 +52,40 @@ You can find the project [Authors here](AUTHORS.md) and
 
 ### common/src
    * StreamTransactionPkg.vhd
-      * Stream Interface Model Independent Transaction Definitions
+      * Stream Interface Model Independent Transaction (MIT) Definitions
    * AddressBusTransactionPkg.vhd
-      * Address Bus Interface Model Independent Transaction Definitions
+      * Address Bus Interface Model Independent Transaction (MIT) Definitions
    * AddressBusResponderTransactionPkg.vhd
-      * Address Bus Responder Interface Model Independent Transaction Definitions
+      * Address Bus Responder Interface Model Independent Transaction (MIT) Definitions
    * AddressBusVersionCompatibilityPkg.vhd
       * Aliases to keep this version compatible with last version
    * ModelParametersPkg.vhd
       * Support for setting parameters in a verification component
    * FifoFillPkg_slv.vhd
       * Implements fill patterns for verification component burst buffers.
+   * InterruptHandler.vhd
+      * Generic Interrupt Handler for any VC that implements Address Bus Interface MIT
+   * InterruptHandlerComponentPkg.vhd
+      * Component declaration for the OSVVM Interrupt Handler
    * OsvvmCommonContext.vhd
       * Context declaration to include all above packages
       
 For current compile order see Common/common.pro.
 
-### common/testbench
-   * TbModelParameters.vhd
-      * Verify ModelParametersPkg.vhd
-     
-For current compile order see Common/testbench/testbench.pro.
+### Verification
+   * AddressBusTransactionPkg and AddressBusResponderTransactionPkg
+      * OsvvmLibraries/AXI4/Axi4/RunAllTests.pro
+   * StreamTransactionPkg
+      * OsvvmLibraries/AXI4/AxiStream/RunAllTests.pro
+   * FifoFillPkg_slv
+      * OsvvmLibraries/AXI4/Axi4/RunAllTests.pro
+   * InterruptHandler
+      * OsvvmLibraries/AXI4/Axi4/testbench_interrupt
+   * ModelParametersPkg
+      * common/testbench
+      * TbModelParameters.vhd to verify ModelParametersPkg.vhd
+      * Runs using testbench.pro
+
 
 ## More Information on OSVVM
 

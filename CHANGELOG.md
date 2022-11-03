@@ -1,13 +1,15 @@
 # OSVVM Common Library Change Log
 
-| Revision  | Revision Date |  Release Summary | 
-------------|---------------|----------- 
-| 2022.01   | January 2022  |  Added Burst Patterns to Address Bus and Stream
-| 2021.06   | June 2021     |  Updated FifoFillPkg_slv.vhd ...
-| 2020.12   | December 2020 |  Consistency updates to AddressBus and Stream MIT
-| 2020.10   | October 2020  |  Added Bursting to Stream Model Independent Transactions 
-| 2020.07   | July 2020     |  Updated for MIT and freed the slaves
-| 2020.02   | February 2020 |  Created by refactoring Axi4LiteMasterTransactionPkg
+| Revision  |  Release Summary | 
+------------|----------- 
+| 2022.10   |  Updated InterruptHandler for BurstFIFO updates.   
+|           |  Updated PushBurstRandom / CheckBurstRandom to work around Questa bugs
+| 2022.01   |  Added Burst Patterns to Address Bus and Stream
+| 2021.06   |  Updated FifoFillPkg_slv.vhd ...
+| 2020.12   |  Consistency updates to AddressBus and Stream MIT
+| 2020.10   |  Added Bursting to Stream Model Independent Transactions 
+| 2020.07   |  Updated for MIT and freed the slaves
+| 2020.02   |  Created by refactoring Axi4LiteMasterTransactionPkg
 
 
 ## 2022.01  January 2022
