@@ -9,9 +9,13 @@
 --
 --
 --  Description:
---    The Stream Model Independent Transaction package (StreamTransactionTransactionPkg.vhd) 
---    defines a record for communication and transaction initiation procedures 
---    that are suitable for Stream Interfaces.   
+--    Defines the OSVVM Stream Model Independent Transaction
+--    Interface (StreamRecType) and transaction initiation 
+--    procedures (Send, Get, ...), as well as supporting types,
+--    constants, and subprograms that are essential to both 
+--    to Verification Components and testbenches (test 
+--    harnesses and test sequencers) that use streaming type
+--    interfaces (such as UART, AxiStream, ...)
 --
 --
 --  Developed by:

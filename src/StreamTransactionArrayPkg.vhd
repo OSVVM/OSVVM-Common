@@ -9,7 +9,14 @@
 --
 --
 --  Description:
---    Works around issues with signal parameters required to be a static signal name
+--    Defines Stream transaction initiation procedures (Send, Get, ...)
+--    for arrays of Stream Interfaces (StreamRecArrayType).
+--    Companion to StreamTransactionPkg.vhd
+--    
+--    This works around a VHDL issue documented in 
+--    https://gitlab.com/IEEE-P1076/VHDL-Issues/-/issues/275
+--    When this issue is fixed and implemented, this package will
+--    no longer be needed
 --
 --
 --  Developed by:
@@ -987,6 +994,116 @@ package body StreamTransactionArrayPkg is
       when 17 =>  RequestTransaction(Rdy => TransactionRec(17).Rdy, Ack => TransactionRec(17).Ack) ; 
       when 18 =>  RequestTransaction(Rdy => TransactionRec(18).Rdy, Ack => TransactionRec(18).Ack) ; 
       when 19 =>  RequestTransaction(Rdy => TransactionRec(19).Rdy, Ack => TransactionRec(19).Ack) ; 
+      when 20 =>  RequestTransaction(Rdy => TransactionRec(20).Rdy, Ack => TransactionRec(20).Ack) ; 
+      when 21 =>  RequestTransaction(Rdy => TransactionRec(21).Rdy, Ack => TransactionRec(21).Ack) ; 
+      when 22 =>  RequestTransaction(Rdy => TransactionRec(22).Rdy, Ack => TransactionRec(22).Ack) ; 
+      when 23 =>  RequestTransaction(Rdy => TransactionRec(23).Rdy, Ack => TransactionRec(23).Ack) ; 
+      when 24 =>  RequestTransaction(Rdy => TransactionRec(24).Rdy, Ack => TransactionRec(24).Ack) ; 
+      when 25 =>  RequestTransaction(Rdy => TransactionRec(25).Rdy, Ack => TransactionRec(25).Ack) ; 
+      when 26 =>  RequestTransaction(Rdy => TransactionRec(26).Rdy, Ack => TransactionRec(26).Ack) ; 
+      when 27 =>  RequestTransaction(Rdy => TransactionRec(27).Rdy, Ack => TransactionRec(27).Ack) ; 
+      when 28 =>  RequestTransaction(Rdy => TransactionRec(28).Rdy, Ack => TransactionRec(28).Ack) ; 
+      when 29 =>  RequestTransaction(Rdy => TransactionRec(29).Rdy, Ack => TransactionRec(29).Ack) ; 
+      when 30 =>  RequestTransaction(Rdy => TransactionRec(30).Rdy, Ack => TransactionRec(30).Ack) ; 
+      when 31 =>  RequestTransaction(Rdy => TransactionRec(31).Rdy, Ack => TransactionRec(31).Ack) ; 
+      when 32 =>  RequestTransaction(Rdy => TransactionRec(32).Rdy, Ack => TransactionRec(32).Ack) ; 
+      when 33 =>  RequestTransaction(Rdy => TransactionRec(33).Rdy, Ack => TransactionRec(33).Ack) ; 
+      when 34 =>  RequestTransaction(Rdy => TransactionRec(34).Rdy, Ack => TransactionRec(34).Ack) ; 
+      when 35 =>  RequestTransaction(Rdy => TransactionRec(35).Rdy, Ack => TransactionRec(35).Ack) ; 
+      when 36 =>  RequestTransaction(Rdy => TransactionRec(36).Rdy, Ack => TransactionRec(36).Ack) ; 
+      when 37 =>  RequestTransaction(Rdy => TransactionRec(37).Rdy, Ack => TransactionRec(37).Ack) ; 
+      when 38 =>  RequestTransaction(Rdy => TransactionRec(38).Rdy, Ack => TransactionRec(38).Ack) ; 
+      when 39 =>  RequestTransaction(Rdy => TransactionRec(39).Rdy, Ack => TransactionRec(39).Ack) ; 
+      when 40 =>  RequestTransaction(Rdy => TransactionRec(40).Rdy, Ack => TransactionRec(40).Ack) ; 
+      when 41 =>  RequestTransaction(Rdy => TransactionRec(41).Rdy, Ack => TransactionRec(41).Ack) ; 
+      when 42 =>  RequestTransaction(Rdy => TransactionRec(42).Rdy, Ack => TransactionRec(42).Ack) ; 
+      when 43 =>  RequestTransaction(Rdy => TransactionRec(43).Rdy, Ack => TransactionRec(43).Ack) ; 
+      when 44 =>  RequestTransaction(Rdy => TransactionRec(44).Rdy, Ack => TransactionRec(44).Ack) ; 
+      when 45 =>  RequestTransaction(Rdy => TransactionRec(45).Rdy, Ack => TransactionRec(45).Ack) ; 
+      when 46 =>  RequestTransaction(Rdy => TransactionRec(46).Rdy, Ack => TransactionRec(46).Ack) ; 
+      when 47 =>  RequestTransaction(Rdy => TransactionRec(47).Rdy, Ack => TransactionRec(47).Ack) ; 
+      when 48 =>  RequestTransaction(Rdy => TransactionRec(48).Rdy, Ack => TransactionRec(48).Ack) ; 
+      when 49 =>  RequestTransaction(Rdy => TransactionRec(49).Rdy, Ack => TransactionRec(49).Ack) ; 
+      when 50 =>  RequestTransaction(Rdy => TransactionRec(50).Rdy, Ack => TransactionRec(50).Ack) ; 
+      when 51 =>  RequestTransaction(Rdy => TransactionRec(51).Rdy, Ack => TransactionRec(51).Ack) ; 
+      when 52 =>  RequestTransaction(Rdy => TransactionRec(52).Rdy, Ack => TransactionRec(52).Ack) ; 
+      when 53 =>  RequestTransaction(Rdy => TransactionRec(53).Rdy, Ack => TransactionRec(53).Ack) ; 
+      when 54 =>  RequestTransaction(Rdy => TransactionRec(54).Rdy, Ack => TransactionRec(54).Ack) ; 
+      when 55 =>  RequestTransaction(Rdy => TransactionRec(55).Rdy, Ack => TransactionRec(55).Ack) ; 
+      when 56 =>  RequestTransaction(Rdy => TransactionRec(56).Rdy, Ack => TransactionRec(56).Ack) ; 
+      when 57 =>  RequestTransaction(Rdy => TransactionRec(57).Rdy, Ack => TransactionRec(57).Ack) ; 
+      when 58 =>  RequestTransaction(Rdy => TransactionRec(58).Rdy, Ack => TransactionRec(58).Ack) ; 
+      when 59 =>  RequestTransaction(Rdy => TransactionRec(59).Rdy, Ack => TransactionRec(59).Ack) ; 
+      when 60 =>  RequestTransaction(Rdy => TransactionRec(60).Rdy, Ack => TransactionRec(60).Ack) ; 
+      when 61 =>  RequestTransaction(Rdy => TransactionRec(61).Rdy, Ack => TransactionRec(61).Ack) ; 
+      when 62 =>  RequestTransaction(Rdy => TransactionRec(62).Rdy, Ack => TransactionRec(62).Ack) ; 
+      when 63 =>  RequestTransaction(Rdy => TransactionRec(63).Rdy, Ack => TransactionRec(63).Ack) ; 
+      when 64 =>  RequestTransaction(Rdy => TransactionRec(64).Rdy, Ack => TransactionRec(64).Ack) ; 
+      when 65 =>  RequestTransaction(Rdy => TransactionRec(65).Rdy, Ack => TransactionRec(65).Ack) ; 
+      when 66 =>  RequestTransaction(Rdy => TransactionRec(66).Rdy, Ack => TransactionRec(66).Ack) ; 
+      when 67 =>  RequestTransaction(Rdy => TransactionRec(67).Rdy, Ack => TransactionRec(67).Ack) ; 
+      when 68 =>  RequestTransaction(Rdy => TransactionRec(68).Rdy, Ack => TransactionRec(68).Ack) ; 
+      when 69 =>  RequestTransaction(Rdy => TransactionRec(69).Rdy, Ack => TransactionRec(69).Ack) ; 
+      when 70 =>  RequestTransaction(Rdy => TransactionRec(70).Rdy, Ack => TransactionRec(70).Ack) ; 
+      when 71 =>  RequestTransaction(Rdy => TransactionRec(71).Rdy, Ack => TransactionRec(71).Ack) ; 
+      when 72 =>  RequestTransaction(Rdy => TransactionRec(72).Rdy, Ack => TransactionRec(72).Ack) ; 
+      when 73 =>  RequestTransaction(Rdy => TransactionRec(73).Rdy, Ack => TransactionRec(73).Ack) ; 
+      when 74 =>  RequestTransaction(Rdy => TransactionRec(74).Rdy, Ack => TransactionRec(74).Ack) ; 
+      when 75 =>  RequestTransaction(Rdy => TransactionRec(75).Rdy, Ack => TransactionRec(75).Ack) ; 
+      when 76 =>  RequestTransaction(Rdy => TransactionRec(76).Rdy, Ack => TransactionRec(76).Ack) ; 
+      when 77 =>  RequestTransaction(Rdy => TransactionRec(77).Rdy, Ack => TransactionRec(77).Ack) ; 
+      when 78 =>  RequestTransaction(Rdy => TransactionRec(78).Rdy, Ack => TransactionRec(78).Ack) ; 
+      when 79 =>  RequestTransaction(Rdy => TransactionRec(79).Rdy, Ack => TransactionRec(79).Ack) ; 
+      when 80 =>  RequestTransaction(Rdy => TransactionRec(80).Rdy, Ack => TransactionRec(80).Ack) ; 
+      when 81 =>  RequestTransaction(Rdy => TransactionRec(81).Rdy, Ack => TransactionRec(81).Ack) ; 
+      when 82 =>  RequestTransaction(Rdy => TransactionRec(82).Rdy, Ack => TransactionRec(82).Ack) ; 
+      when 83 =>  RequestTransaction(Rdy => TransactionRec(83).Rdy, Ack => TransactionRec(83).Ack) ; 
+      when 84 =>  RequestTransaction(Rdy => TransactionRec(84).Rdy, Ack => TransactionRec(84).Ack) ; 
+      when 85 =>  RequestTransaction(Rdy => TransactionRec(85).Rdy, Ack => TransactionRec(85).Ack) ; 
+      when 86 =>  RequestTransaction(Rdy => TransactionRec(86).Rdy, Ack => TransactionRec(86).Ack) ; 
+      when 87 =>  RequestTransaction(Rdy => TransactionRec(87).Rdy, Ack => TransactionRec(87).Ack) ; 
+      when 88 =>  RequestTransaction(Rdy => TransactionRec(88).Rdy, Ack => TransactionRec(88).Ack) ; 
+      when 89 =>  RequestTransaction(Rdy => TransactionRec(89).Rdy, Ack => TransactionRec(89).Ack) ; 
+      when 90 =>  RequestTransaction(Rdy => TransactionRec(90).Rdy, Ack => TransactionRec(90).Ack) ; 
+      when 91 =>  RequestTransaction(Rdy => TransactionRec(91).Rdy, Ack => TransactionRec(91).Ack) ; 
+      when 92 =>  RequestTransaction(Rdy => TransactionRec(92).Rdy, Ack => TransactionRec(92).Ack) ; 
+      when 93 =>  RequestTransaction(Rdy => TransactionRec(93).Rdy, Ack => TransactionRec(93).Ack) ; 
+      when 94 =>  RequestTransaction(Rdy => TransactionRec(94).Rdy, Ack => TransactionRec(94).Ack) ; 
+      when 95 =>  RequestTransaction(Rdy => TransactionRec(95).Rdy, Ack => TransactionRec(95).Ack) ; 
+      when 96 =>  RequestTransaction(Rdy => TransactionRec(96).Rdy, Ack => TransactionRec(96).Ack) ; 
+      when 97 =>  RequestTransaction(Rdy => TransactionRec(97).Rdy, Ack => TransactionRec(97).Ack) ; 
+      when 98 =>  RequestTransaction(Rdy => TransactionRec(98).Rdy, Ack => TransactionRec(98).Ack) ; 
+      when 99 =>  RequestTransaction(Rdy => TransactionRec(99).Rdy, Ack => TransactionRec(99).Ack) ; 
+      when 100 =>  RequestTransaction(Rdy => TransactionRec(100).Rdy, Ack => TransactionRec(100).Ack) ; 
+      when 101 =>  RequestTransaction(Rdy => TransactionRec(101).Rdy, Ack => TransactionRec(101).Ack) ; 
+      when 102 =>  RequestTransaction(Rdy => TransactionRec(102).Rdy, Ack => TransactionRec(102).Ack) ; 
+      when 103 =>  RequestTransaction(Rdy => TransactionRec(103).Rdy, Ack => TransactionRec(103).Ack) ; 
+      when 104 =>  RequestTransaction(Rdy => TransactionRec(104).Rdy, Ack => TransactionRec(104).Ack) ; 
+      when 105 =>  RequestTransaction(Rdy => TransactionRec(105).Rdy, Ack => TransactionRec(105).Ack) ; 
+      when 106 =>  RequestTransaction(Rdy => TransactionRec(106).Rdy, Ack => TransactionRec(106).Ack) ; 
+      when 107 =>  RequestTransaction(Rdy => TransactionRec(107).Rdy, Ack => TransactionRec(107).Ack) ; 
+      when 108 =>  RequestTransaction(Rdy => TransactionRec(108).Rdy, Ack => TransactionRec(108).Ack) ; 
+      when 109 =>  RequestTransaction(Rdy => TransactionRec(109).Rdy, Ack => TransactionRec(109).Ack) ; 
+      when 110 =>  RequestTransaction(Rdy => TransactionRec(110).Rdy, Ack => TransactionRec(110).Ack) ; 
+      when 111 =>  RequestTransaction(Rdy => TransactionRec(111).Rdy, Ack => TransactionRec(111).Ack) ; 
+      when 112 =>  RequestTransaction(Rdy => TransactionRec(112).Rdy, Ack => TransactionRec(112).Ack) ; 
+      when 113 =>  RequestTransaction(Rdy => TransactionRec(113).Rdy, Ack => TransactionRec(113).Ack) ; 
+      when 114 =>  RequestTransaction(Rdy => TransactionRec(114).Rdy, Ack => TransactionRec(114).Ack) ; 
+      when 115 =>  RequestTransaction(Rdy => TransactionRec(115).Rdy, Ack => TransactionRec(115).Ack) ; 
+      when 116 =>  RequestTransaction(Rdy => TransactionRec(116).Rdy, Ack => TransactionRec(116).Ack) ; 
+      when 117 =>  RequestTransaction(Rdy => TransactionRec(117).Rdy, Ack => TransactionRec(117).Ack) ; 
+      when 118 =>  RequestTransaction(Rdy => TransactionRec(118).Rdy, Ack => TransactionRec(118).Ack) ; 
+      when 119 =>  RequestTransaction(Rdy => TransactionRec(119).Rdy, Ack => TransactionRec(119).Ack) ; 
+      when 120 =>  RequestTransaction(Rdy => TransactionRec(120).Rdy, Ack => TransactionRec(120).Ack) ; 
+      when 121 =>  RequestTransaction(Rdy => TransactionRec(121).Rdy, Ack => TransactionRec(121).Ack) ; 
+      when 122 =>  RequestTransaction(Rdy => TransactionRec(122).Rdy, Ack => TransactionRec(122).Ack) ; 
+      when 123 =>  RequestTransaction(Rdy => TransactionRec(123).Rdy, Ack => TransactionRec(123).Ack) ; 
+      when 124 =>  RequestTransaction(Rdy => TransactionRec(124).Rdy, Ack => TransactionRec(124).Ack) ; 
+      when 125 =>  RequestTransaction(Rdy => TransactionRec(125).Rdy, Ack => TransactionRec(125).Ack) ; 
+      when 126 =>  RequestTransaction(Rdy => TransactionRec(126).Rdy, Ack => TransactionRec(126).Ack) ; 
+      when 127 =>  RequestTransaction(Rdy => TransactionRec(127).Rdy, Ack => TransactionRec(127).Ack) ; 
+      when 128 =>  RequestTransaction(Rdy => TransactionRec(128).Rdy, Ack => TransactionRec(128).Ack) ; 
+      when 129 =>  RequestTransaction(Rdy => TransactionRec(129).Rdy, Ack => TransactionRec(129).Ack) ; 
       when others => Alert("StreamTransactionArrayPkg: Please extend StreamArrayRequestTransaction to handle " & to_string(Index) & " indices") ; 
     end case ;  
   end procedure StreamArrayRequestTransaction ; 
@@ -1030,7 +1147,7 @@ package body StreamTransactionArrayPkg is
   ------------------------------------------------------------
     signal    TransactionRec   : inout StreamRecArrayType ;
     constant  Index            : in    integer ;
-    variable  TransactionCount  : out   integer 
+    variable  TransactionCount : out   integer 
   ) is
   begin
     TransactionRec(Index).Operation   <= GET_TRANSACTION_COUNT ;
