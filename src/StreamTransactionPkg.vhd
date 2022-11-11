@@ -136,15 +136,17 @@ package StreamTransactionPkg is
     -- BurstFifo
     BurstFifo       : ScoreboardIdType ; 
     -- Verification Component Options Parameters - used by SetModelOptions
-    IntToModel      : integer_max ;
-    IntFromModel    : integer_max ; 
+    IntToModel       : integer_max ;
+    IntFromModel     : integer_max ; 
     BoolToModel     : boolean_max ; 
     BoolFromModel   : boolean_max ;
     TimeToModel     : time_max ; 
     TimeFromModel   : time_max ; 
     -- Verification Component Options Type 
-    Options         : integer_max ; 
+    Options          : integer_max ; 
   end record StreamRecType ; 
+
+  type StreamRecArrayType  is array (integer range <>) of StreamRecType ;
 
 
   -- --------------------------------------------------------
@@ -206,7 +208,7 @@ package StreamTransactionPkg is
   procedure WaitForTransaction (
   --  Wait until pending (transmit) or next (receive) transaction(s) complete
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType 
+    signal    TransactionRec   : inout StreamRecType 
   ) ; 
 
   ------------------------------------------------------------
@@ -214,8 +216,8 @@ package StreamTransactionPkg is
   -- Wait for NumberOfClocks number of clocks 
   -- relative to the verification component clock
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  WaitCycles      : in    natural := 1
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  WaitCycles       : in    natural := 1
   ) ; 
   
  alias NoOp is WaitForClock [StreamRecType, natural] ;
@@ -232,8 +234,8 @@ package StreamTransactionPkg is
   procedure GetAlertLogID (
   -- Get the AlertLogID from the verification component.
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  AlertLogID      : out   AlertLogIDType 
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  AlertLogID       : out   AlertLogIDType 
   ) ; 
   
   ------------------------------------------------------------
@@ -241,8 +243,8 @@ package StreamTransactionPkg is
   -- Error reporting for testbenches that do not use OSVVM AlertLogPkg
   -- Returns error count.  If an error count /= 0, also print errors
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  ErrorCount      : out   natural
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  ErrorCount       : out   natural
   ) ; 
   
   -- ========================================================
@@ -287,15 +289,15 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SetBurstMode (
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut StreamRecType ;
-    constant OptVal          : In    StreamFifoBurstModeType
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  OptVal           : in    StreamFifoBurstModeType
   ) ;
 
   ------------------------------------------------------------
   procedure GetBurstMode (
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut StreamRecType ;
-    variable OptVal          : Out   StreamFifoBurstModeType
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  OptVal           : out   StreamFifoBurstModeType
   ) ;
 
   ------------------------------------------------------------
@@ -306,9 +308,9 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
   procedure GotBurst (
   ------------------------------------------------------------
-    signal   TransactionRec    : InOut StreamRecType ;
-    constant NumFifoWords      : In    integer ;
-    variable Available         : Out   boolean
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  NumFifoWords     : in    integer ;
+    variable  Available        : out   boolean
   ) ;
 
   -- ========================================================
@@ -321,79 +323,79 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut StreamRecType ;
-    constant Option          : In    integer ;
-    constant OptVal          : In    boolean
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Option           : in    integer ;
+    constant  OptVal           : in    boolean
   ) ;
 
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut StreamRecType ;
-    constant Option          : In    integer ;
-    constant OptVal          : In    integer
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Option           : in    integer ;
+    constant  OptVal           : in    integer
   ) ;
 
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut StreamRecType ;
-    constant Option          : In    integer ;
-    constant OptVal          : In    std_logic_vector
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Option           : in    integer ;
+    constant  OptVal           : in    std_logic_vector
   ) ;
   
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut StreamRecType ;
-    constant Option          : In    integer ;
-    constant OptVal          : In    time
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Option           : in    integer ;
+    constant  OptVal           : in    time
   ) ;
   
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut StreamRecType ;
-    constant Option          : In    integer 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Option           : in    integer 
   ) ;
   
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut StreamRecType ;
-    constant Option          : In    integer ;
-    variable OptVal          : Out   boolean
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Option           : in    integer ;
+    variable  OptVal           : out   boolean
   ) ;
 
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut StreamRecType ;
-    constant Option          : In    integer ;
-    variable OptVal          : Out   integer
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Option           : in    integer ;
+    variable  OptVal           : out   integer
   ) ;
 
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut StreamRecType ;
-    constant Option          : In    integer ;
-    variable OptVal          : Out   std_logic_vector
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Option           : in    integer ;
+    variable  OptVal           : out   std_logic_vector
   ) ;
   
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut StreamRecType ;
-    constant Option          : In    integer ;
-    variable OptVal          : Out   time
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Option           : in    integer ;
+    variable  OptVal           : out   time
   ) ;
   
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut StreamRecType ;
-    constant Option          : In    integer 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Option           : in    integer 
   ) ;
 
 
@@ -411,18 +413,18 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
   procedure Send (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  Param           : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Data             : in    std_logic_vector ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) ; 
 
   ------------------------------------------------------------
   procedure Send (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Data             : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) ; 
   
 
@@ -436,18 +438,18 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SendAsync (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  Param           : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Data             : in    std_logic_vector ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) ; 
 
   ------------------------------------------------------------
   procedure SendAsync (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Data             : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) ; 
 
 
@@ -461,35 +463,35 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SendBurst (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  NumFifoWords    : In    integer ;
-    constant  Param           : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) ; 
 
   ------------------------------------------------------------
   procedure SendBurst (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  NumFifoWords    : In    integer ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) ; 
   
   ------------------------------------------------------------
   procedure SendBurstVector (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant VectorOfWords  : In    slv_vector ;
-    constant Param          : In    std_logic_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  VectorOfWords    : in    slv_vector ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;
   
   ------------------------------------------------------------
   procedure SendBurstVector (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant VectorOfWords  : In    slv_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  VectorOfWords    : in    slv_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;
   
 --  alias SendBurst is SendBurstVector[StreamRecType, slv_vector, std_logic_vector, boolean] ; 
@@ -498,60 +500,60 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SendBurstIncrement (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant Param          : In    std_logic_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;
 
   ------------------------------------------------------------
   procedure SendBurstIncrement (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;
 
   ------------------------------------------------------------
   procedure SendBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant Param          : In    std_logic_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;
 
   ------------------------------------------------------------
   procedure SendBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;
 
   ------------------------------------------------------------
   procedure SendBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant CoverID        : In    CoverageIDType ;
-    constant NumFifoWords   : In    integer ;
-    constant FifoWidth      : In    integer ;
-    constant Param          : In    std_logic_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  CoverID          : in    CoverageIDType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  FifoWidth        : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;
 
   ------------------------------------------------------------
   procedure SendBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant CoverID        : In    CoverageIDType ;
-    constant NumFifoWords   : In    integer ;
-    constant FifoWidth      : In    integer ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  CoverID          : in    CoverageIDType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  FifoWidth        : in    integer ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;
 
   -- ========================================================
@@ -564,35 +566,35 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SendBurstAsync (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  NumFifoWords    : In    integer ;
-    constant  Param           : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) ; 
 
   ------------------------------------------------------------
   procedure SendBurstAsync (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  NumFifoWords    : In    integer ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) ; 
   
   ------------------------------------------------------------
   procedure SendBurstVectorAsync (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant VectorOfWords  : In    slv_vector ;
-    constant Param          : In    std_logic_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  VectorOfWords    : in    slv_vector ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;
   
   ------------------------------------------------------------
   procedure SendBurstVectorAsync (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant VectorOfWords  : In    slv_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  VectorOfWords    : in    slv_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;
   
 --  alias SendBurstAsync is SendBurstVectorAsync[StreamRecType, slv_vector, std_logic_vector, boolean] ; 
@@ -601,60 +603,60 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SendBurstIncrementAsync (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant Param          : In    std_logic_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;
 
   ------------------------------------------------------------
   procedure SendBurstIncrementAsync (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;
 
   ------------------------------------------------------------
   procedure SendBurstRandomAsync (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant Param          : In    std_logic_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;
 
   ------------------------------------------------------------
   procedure SendBurstRandomAsync (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;
   
   ------------------------------------------------------------
   procedure SendBurstRandomAsync (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant CoverID        : In    CoverageIDType ;
-    constant NumFifoWords   : In    integer ;
-    constant FifoWidth      : In    integer ;
-    constant Param          : In    std_logic_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  CoverID          : in    CoverageIDType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  FifoWidth        : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;
 
   ------------------------------------------------------------
   procedure SendBurstRandomAsync (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant CoverID        : In    CoverageIDType ;
-    constant NumFifoWords   : In    integer ;
-    constant FifoWidth      : In    integer ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  CoverID          : in    CoverageIDType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  FifoWidth        : in    integer ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;
 
   -- ========================================================
@@ -671,18 +673,18 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
   procedure Get (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  Data            : out   std_logic_vector ;
-    variable  Param           : out   std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  Data             : out   std_logic_vector ;
+    variable  Param            : out   std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) ; 
 
   ------------------------------------------------------------
   procedure Get (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  Data            : out   std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  Data             : out   std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) ; 
 
 
@@ -698,20 +700,20 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
   procedure TryGet (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  Data            : out   std_logic_vector ;
-    variable  Available       : out   boolean ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  Data             : out   std_logic_vector ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) ; 
   
   ------------------------------------------------------------
   procedure TryGet (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  Data            : out   std_logic_vector ;
-    variable  Param           : out   std_logic_vector ;
-    variable  Available       : out   boolean ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  Data             : out   std_logic_vector ;
+    variable  Param            : out   std_logic_vector ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) ;  
 
 
@@ -725,18 +727,18 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
   procedure GetBurst (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  NumFifoWords    : inout integer ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  NumFifoWords     : inout integer ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) ; 
   
   ------------------------------------------------------------
   procedure GetBurst (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  NumFifoWords    : inout integer ;
-    variable  Param           : out   std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  NumFifoWords     : inout integer ;
+    variable  Param            : out   std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) ;  
 
   -- ========================================================
@@ -751,20 +753,20 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
   procedure TryGetBurst (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  NumFifoWords    : inout integer ;
-    variable  Available       : out   boolean ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  NumFifoWords     : inout integer ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) ; 
   
   ------------------------------------------------------------
   procedure TryGetBurst (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  NumFifoWords    : inout integer ;
-    variable  Param           : out   std_logic_vector ;
-    variable  Available       : out   boolean ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  NumFifoWords     : inout integer ;
+    variable  Param            : out   std_logic_vector ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) ;  
 
 
@@ -779,18 +781,18 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
   procedure Check (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  Param           : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Data             : in    std_logic_vector ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) ; 
 
   ------------------------------------------------------------
   procedure Check (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Data             : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) ; 
 
 
@@ -806,20 +808,20 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
   procedure TryCheck (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  Param           : in    std_logic_vector ;
-    variable  Available       : out   boolean ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Data             : in    std_logic_vector ;
+    constant  Param            : in    std_logic_vector ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) ; 
 
   ------------------------------------------------------------
   procedure TryCheck (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    variable  Available       : out   boolean ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Data             : in    std_logic_vector ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) ; 
 
   -- ========================================================
@@ -831,35 +833,35 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
   procedure CheckBurst (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  NumFifoWords    : In    integer ;
-    constant  Param           : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) ; 
 
   ------------------------------------------------------------
   procedure CheckBurst (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  NumFifoWords    : In    integer ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) ; 
 
   ------------------------------------------------------------
   procedure CheckBurstVector (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant VectorOfWords  : In    slv_vector ;
-    constant Param          : In    std_logic_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  VectorOfWords    : in    slv_vector ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;
   
   ------------------------------------------------------------
   procedure CheckBurstVector (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant VectorOfWords  : In    slv_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  VectorOfWords    : in    slv_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;
   
 --  alias CheckBurst is CheckBurstVector[StreamRecType, slv_vector, std_logic_vector, boolean] ; 
@@ -868,60 +870,60 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
   procedure CheckBurstIncrement (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant Param          : In    std_logic_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;
 
   ------------------------------------------------------------
   procedure CheckBurstIncrement (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;
 
   ------------------------------------------------------------
   procedure CheckBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant Param          : In    std_logic_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;
 
   ------------------------------------------------------------
   procedure CheckBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;
 
   ------------------------------------------------------------
   procedure CheckBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant CoverID        : In    CoverageIDType ;
-    constant NumFifoWords   : In    integer ;
-    constant FifoWidth      : In    integer ;
-    constant Param          : In    std_logic_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  CoverID          : in    CoverageIDType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  FifoWidth        : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;  
 
   ------------------------------------------------------------
   procedure CheckBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant CoverID        : In    CoverageIDType ;
-    constant NumFifoWords   : In    integer ;
-    constant FifoWidth      : In    integer ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  CoverID          : in    CoverageIDType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  FifoWidth        : in    integer ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;  
 
   -- ========================================================
@@ -934,39 +936,39 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
   procedure TryCheckBurst (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  NumFifoWords    : In    integer ;
-    constant  Param           : in    std_logic_vector ;
-    variable  Available       : out   boolean ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) ; 
   
   ------------------------------------------------------------
   procedure TryCheckBurst (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  NumFifoWords    : In    integer ;
-    variable  Available       : out   boolean ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  NumFifoWords     : in    integer ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) ; 
   
   ------------------------------------------------------------
   procedure TryCheckBurstVector (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant VectorOfWords  : In    slv_vector ;
-    constant Param          : In    std_logic_vector ;
-    variable Available      : Out   boolean ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  VectorOfWords    : in    slv_vector ;
+    constant  Param            : in    std_logic_vector ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false
   )  ;
   
   ------------------------------------------------------------
   procedure TryCheckBurstVector (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant VectorOfWords  : In    slv_vector ;
-    variable Available      : Out   boolean ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  VectorOfWords    : in    slv_vector ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;
 
 --  alias TryCheckBurst is TryCheckBurstVector[StreamRecType, slv_vector, std_logic_vector, boolean, boolean] ; 
@@ -975,66 +977,66 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
   procedure TryCheckBurstIncrement (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant Param          : In    std_logic_vector ;
-    variable Available      : Out   boolean ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;
 
   ------------------------------------------------------------
   procedure TryCheckBurstIncrement (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    variable Available      : Out   boolean ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;
 
   ------------------------------------------------------------
   procedure TryCheckBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant Param          : In    std_logic_vector ;
-    variable Available      : Out   boolean ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;
 
   ------------------------------------------------------------
   procedure TryCheckBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    variable Available      : Out   boolean ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;
 
   ------------------------------------------------------------
   procedure TryCheckBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant CoverID        : In    CoverageIDType ;
-    constant NumFifoWords   : In    integer ;
-    constant FifoWidth      : In    integer ;
-    constant Param          : In    std_logic_vector ;
-    variable Available      : Out   boolean ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  CoverID          : in    CoverageIDType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  FifoWidth        : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;  
 
   ------------------------------------------------------------
   procedure TryCheckBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant CoverID        : In    CoverageIDType ;
-    constant NumFifoWords   : In    integer ;
-    constant FifoWidth      : In    integer ;
-    variable Available      : Out   boolean ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  CoverID          : in    CoverageIDType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  FifoWidth        : in    integer ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false
   ) ;  
 
 
@@ -1046,14 +1048,14 @@ package StreamTransactionPkg is
   procedure ReleaseTransactionRecord (
   --  Must run on same delta cycle as AcquireTransactionRecord
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType 
+    signal    TransactionRec   : inout StreamRecType 
   ) ; 
   
   ------------------------------------------------------------
   procedure AcquireTransactionRecord (
   --  Must run on same delta cycle as ReleaseTransactionRecord
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType 
+    signal    TransactionRec   : inout StreamRecType 
   ) ; 
 
   -- ========================================================
@@ -1064,21 +1066,21 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
   function IsBlocking (
   -----------------------------------------------------------
-    constant Operation     : in StreamOperationType
+    constant  Operation        : in StreamOperationType
   ) return boolean ;
   
   ------------------------------------------------------------
   function IsTry (
   -- True when this transaction is an asynchronous or try transaction.
   -----------------------------------------------------------
-    constant Operation     : in StreamOperationType
+    constant  Operation        : in StreamOperationType
   ) return boolean ;
 
   ------------------------------------------------------------
   function IsCheck (
   -- True when this transaction is a check transaction.
   -----------------------------------------------------------
-    constant Operation     : in StreamOperationType
+    constant  Operation        : in StreamOperationType
   ) return boolean ;
 
 end StreamTransactionPkg ;
@@ -1122,7 +1124,7 @@ package body StreamTransactionPkg is
   procedure WaitForTransaction (
   --  Wait until pending (transmit) or next (receive) transaction(s) complete
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType 
+    signal    TransactionRec   : inout StreamRecType 
   ) is
   begin
     TransactionRec.Operation   <= WAIT_FOR_TRANSACTION ;
@@ -1134,8 +1136,8 @@ package body StreamTransactionPkg is
   -- Wait for NumberOfClocks number of clocks 
   -- relative to the verification component clock
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  WaitCycles      : in    natural := 1
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  WaitCycles       : in    natural := 1
   ) is
   begin
     TransactionRec.Operation   <= WAIT_FOR_CLOCK ;
@@ -1148,7 +1150,7 @@ package body StreamTransactionPkg is
   -- Get the number of transactions handled by the model.  
   ------------------------------------------------------------
     signal    TransactionRec   : inout StreamRecType ;
-    variable  TransactionCount : out   integer 
+    variable  TransactionCount  : out   integer 
   ) is
   begin
     TransactionRec.Operation   <= GET_TRANSACTION_COUNT ;
@@ -1160,8 +1162,8 @@ package body StreamTransactionPkg is
   procedure GetAlertLogID (
   -- Get the AlertLogID from the verification component.
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  AlertLogID      : out   AlertLogIDType 
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  AlertLogID       : out   AlertLogIDType 
   ) is
   begin
     TransactionRec.Operation   <= GET_ALERTLOG_ID ;
@@ -1174,8 +1176,8 @@ package body StreamTransactionPkg is
   -- Error reporting for testbenches that do not use OSVVM AlertLogPkg
   -- Returns error count.  If an error count /= 0, also print errors
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  ErrorCount      : out   natural
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  ErrorCount       : out   natural
   ) is
     variable  AlertLogID : AlertLogIDType ;
   begin
@@ -1192,8 +1194,8 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SetBurstMode (
   ------------------------------------------------------------
-    signal   TransactionRec    : InOut StreamRecType ;
-    constant OptVal            : In    StreamFifoBurstModeType
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  OptVal           : in    StreamFifoBurstModeType
   ) is
   begin
     TransactionRec.Operation     <= SET_BURST_MODE ;
@@ -1204,8 +1206,8 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure GetBurstMode (
   ------------------------------------------------------------
-    signal   TransactionRec    : InOut StreamRecType ;
-    variable OptVal            : Out   StreamFifoBurstModeType
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  OptVal           : out   StreamFifoBurstModeType
   ) is
   begin
     TransactionRec.Operation     <= GET_BURST_MODE ;
@@ -1220,9 +1222,9 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure GotBurst (
   ------------------------------------------------------------
-    signal   TransactionRec    : InOut StreamRecType ;
-    constant NumFifoWords      : In    integer ;
-    variable Available         : Out   boolean
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  NumFifoWords     : in    integer ;
+    variable  Available        : out   boolean
   ) is
   begin
     TransactionRec.Operation   <= GOT_BURST ;
@@ -1242,9 +1244,9 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut StreamRecType ;
-    constant Option          : In    integer ;
-    constant OptVal          : In    boolean
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Option           : in    integer ;
+    constant  OptVal           : in    boolean
   ) is
   begin
     TransactionRec.Operation     <= SET_MODEL_OPTIONS ;
@@ -1256,9 +1258,9 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut StreamRecType ;
-    constant Option          : In    integer ;
-    constant OptVal          : In    integer
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Option           : in    integer ;
+    constant  OptVal           : in    integer
   ) is
   begin
     TransactionRec.Operation     <= SET_MODEL_OPTIONS ;
@@ -1270,9 +1272,9 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut StreamRecType ;
-    constant Option          : In    integer ;
-    constant OptVal          : In    std_logic_vector
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Option           : in    integer ;
+    constant  OptVal           : in    std_logic_vector
   ) is
   begin
     TransactionRec.Operation     <= SET_MODEL_OPTIONS ;
@@ -1284,9 +1286,9 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut StreamRecType ;
-    constant Option          : In    integer ;
-    constant OptVal          : In    time
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Option           : in    integer ;
+    constant  OptVal           : in    time
   ) is
   begin
     TransactionRec.Operation     <= SET_MODEL_OPTIONS ;
@@ -1298,8 +1300,8 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut StreamRecType ;
-    constant Option          : In    integer 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Option           : in    integer 
   ) is
   begin
     TransactionRec.Operation     <= SET_MODEL_OPTIONS ;
@@ -1312,9 +1314,9 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut StreamRecType ;
-    constant Option          : In    integer ;
-    variable OptVal          : Out   boolean
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Option           : in    integer ;
+    variable  OptVal           : out   boolean
   ) is
   begin
     TransactionRec.Operation     <= GET_MODEL_OPTIONS ;
@@ -1326,9 +1328,9 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut StreamRecType ;
-    constant Option          : In    integer ;
-    variable OptVal          : Out   integer
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Option           : in    integer ;
+    variable  OptVal           : out   integer
   ) is
   begin
     TransactionRec.Operation     <= GET_MODEL_OPTIONS ;
@@ -1340,9 +1342,9 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut StreamRecType ;
-    constant Option          : In    integer ;
-    variable OptVal          : Out   std_logic_vector
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Option           : in    integer ;
+    variable  OptVal           : out   std_logic_vector
   ) is
   begin
     TransactionRec.Operation     <= GET_MODEL_OPTIONS ;
@@ -1354,9 +1356,9 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut StreamRecType ;
-    constant Option          : In    integer ;
-    variable OptVal          : Out   time
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Option           : in    integer ;
+    variable  OptVal           : out   time
   ) is
   begin
     TransactionRec.Operation     <= GET_MODEL_OPTIONS ;
@@ -1368,8 +1370,8 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut StreamRecType ;
-    constant Option          : In    integer 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Option           : in    integer 
   ) is
   begin
     TransactionRec.Operation     <= GET_MODEL_OPTIONS ;
@@ -1394,11 +1396,11 @@ package body StreamTransactionPkg is
   procedure LocalSend (
   -- Package Local - simplifies the other calls to Send
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Operation       : in    StreamOperationType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  Param           : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Operation        : in    StreamOperationType ;
+    constant  Data             : in    std_logic_vector ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
     variable LocalParam : std_logic_vector(TransactionRec.ParamToModel'length -1 downto 0) := (others => '-') ;
   begin
@@ -1414,10 +1416,10 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure Send (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  Param           : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Data             : in    std_logic_vector ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
   begin
     LocalSend(TransactionRec, SEND, Data, Param, StatusMsgOn) ;
@@ -1426,9 +1428,9 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure Send (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Data             : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
   begin
     LocalSend(TransactionRec, SEND, Data, "", StatusMsgOn);
@@ -1444,10 +1446,10 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SendAsync (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  Param           : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Data             : in    std_logic_vector ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
   begin
     LocalSend(TransactionRec, SEND_ASYNC, Data, Param, StatusMsgOn) ;
@@ -1456,9 +1458,9 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SendAsync (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Data             : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
   begin
     LocalSend(TransactionRec, SEND_ASYNC, Data, "", StatusMsgOn);
@@ -1475,11 +1477,11 @@ package body StreamTransactionPkg is
   procedure LocalSendBurst (
   -- Package Local - simplifies the other calls to Send
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Operation       : in    StreamOperationType ;
-    constant  NumFifoWords    : In    integer ;
-    constant  Param           : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Operation        : in    StreamOperationType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
     variable LocalParam : std_logic_vector(TransactionRec.ParamToModel'length -1 downto 0) := (others => '-') ;
   begin
@@ -1494,10 +1496,10 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SendBurst (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  NumFifoWords    : In    integer ;
-    constant  Param           : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
   begin
     LocalSendBurst(TransactionRec, SEND_BURST, NumFifoWords, Param, StatusMsgOn) ;
@@ -1506,9 +1508,9 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SendBurst (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  NumFifoWords    : In    integer ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
   begin
     LocalSendBurst(TransactionRec, SEND_BURST, NumFifoWords, "", StatusMsgOn) ;
@@ -1517,10 +1519,10 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SendBurstVector (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant VectorOfWords  : In    slv_vector ;
-    constant Param          : In    std_logic_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  VectorOfWords    : in    slv_vector ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     PushBurstVector(TransactionRec.BurstFifo, VectorOfWords) ;
@@ -1530,9 +1532,9 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SendBurstVector (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant VectorOfWords  : In    slv_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  VectorOfWords    : in    slv_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     SendBurstVector(TransactionRec, VectorOfWords, "", StatusMsgOn) ; 
@@ -1541,11 +1543,11 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SendBurstIncrement (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant Param          : In    std_logic_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     PushBurstIncrement(TransactionRec.BurstFifo, FirstWord, NumFifoWords) ;
@@ -1555,10 +1557,10 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SendBurstIncrement (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     SendBurstIncrement(TransactionRec, FirstWord, NumFifoWords, "", StatusMsgOn) ; 
@@ -1567,11 +1569,11 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SendBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant Param          : In    std_logic_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     PushBurstRandom(TransactionRec.BurstFifo, FirstWord, NumFifoWords) ;
@@ -1581,10 +1583,10 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SendBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     SendBurstRandom(TransactionRec, FirstWord, NumFifoWords, "", StatusMsgOn) ; 
@@ -1593,12 +1595,12 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SendBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant CoverID        : In    CoverageIDType ;
-    constant NumFifoWords   : In    integer ;
-    constant FifoWidth      : In    integer ;
-    constant Param          : In    std_logic_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  CoverID          : in    CoverageIDType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  FifoWidth        : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     PushBurstRandom(TransactionRec.BurstFifo, CoverID, NumFifoWords, FifoWidth) ;
@@ -1608,11 +1610,11 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SendBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant CoverID        : In    CoverageIDType ;
-    constant NumFifoWords   : In    integer ;
-    constant FifoWidth      : In    integer ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  CoverID          : in    CoverageIDType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  FifoWidth        : in    integer ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     SendBurstRandom(TransactionRec, CoverID, NumFifoWords, FifoWidth, "", StatusMsgOn) ; 
@@ -1629,10 +1631,10 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SendBurstAsync (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  NumFifoWords    : In    integer ;
-    constant  Param           : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
   begin
     LocalSendBurst(TransactionRec, SEND_BURST_ASYNC, NumFifoWords, Param, StatusMsgOn) ;
@@ -1641,9 +1643,9 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SendBurstAsync (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  NumFifoWords    : In    integer ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
   begin
     LocalSendBurst(TransactionRec, SEND_BURST_ASYNC, NumFifoWords, "", StatusMsgOn) ;
@@ -1652,10 +1654,10 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SendBurstVectorAsync (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant VectorOfWords  : In    slv_vector ;
-    constant Param          : In    std_logic_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  VectorOfWords    : in    slv_vector ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     PushBurstVector(TransactionRec.BurstFifo, VectorOfWords) ;
@@ -1665,9 +1667,9 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SendBurstVectorAsync (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant VectorOfWords  : In    slv_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  VectorOfWords    : in    slv_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     SendBurstVectorAsync(TransactionRec, VectorOfWords, "", StatusMsgOn) ; 
@@ -1676,11 +1678,11 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SendBurstIncrementAsync (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant Param          : In    std_logic_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     PushBurstIncrement(TransactionRec.BurstFifo, FirstWord, NumFifoWords) ;
@@ -1690,10 +1692,10 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SendBurstIncrementAsync (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     SendBurstIncrementAsync(TransactionRec, FirstWord, NumFifoWords, "", StatusMsgOn) ; 
@@ -1702,11 +1704,11 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SendBurstRandomAsync (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant Param          : In    std_logic_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     PushBurstRandom(TransactionRec.BurstFifo, FirstWord, NumFifoWords) ;
@@ -1716,10 +1718,10 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SendBurstRandomAsync (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
     variable RV : RandomPType ; 
   begin
@@ -1729,12 +1731,12 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SendBurstRandomAsync (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant CoverID        : In    CoverageIDType ;
-    constant NumFifoWords   : In    integer ;
-    constant FifoWidth      : In    integer ;
-    constant Param          : In    std_logic_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  CoverID          : in    CoverageIDType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  FifoWidth        : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     PushBurstRandom(TransactionRec.BurstFifo, CoverID, NumFifoWords, FifoWidth) ;
@@ -1744,11 +1746,11 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure SendBurstRandomAsync (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant CoverID        : In    CoverageIDType ;
-    constant NumFifoWords   : In    integer ;
-    constant FifoWidth      : In    integer ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  CoverID          : in    CoverageIDType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  FifoWidth        : in    integer ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     SendBurstRandomAsync(TransactionRec, CoverID, NumFifoWords, FifoWidth, "", StatusMsgOn) ; 
@@ -1769,9 +1771,9 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure Get (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  Data            : out   std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  Data             : out   std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
   begin
     TransactionRec.Operation   <= GET ;
@@ -1784,10 +1786,10 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure Get (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  Data            : out   std_logic_vector ;
-    variable  Param           : out   std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  Data             : out   std_logic_vector ;
+    variable  Param            : out   std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
   begin
     Get(TransactionRec, Data, StatusMsgOn) ;
@@ -1806,10 +1808,10 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure TryGet (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  Data            : out   std_logic_vector ;
-    variable  Available       : out   boolean ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  Data             : out   std_logic_vector ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
   begin
     TransactionRec.Operation   <= TRY_GET ;
@@ -1823,11 +1825,11 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure TryGet (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  Data            : out   std_logic_vector ;
-    variable  Param           : out   std_logic_vector ;
-    variable  Available       : out   boolean ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  Data             : out   std_logic_vector ;
+    variable  Param            : out   std_logic_vector ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
   begin
     TryGet(TransactionRec, Data, Available, StatusMsgOn) ;
@@ -1845,9 +1847,9 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure LocalGetBurst (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  NumFifoWords    : in    integer ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
   begin
     TransactionRec.Operation   <= GET_BURST ;
@@ -1859,9 +1861,9 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure GetBurst (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  NumFifoWords    : inout integer ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  NumFifoWords     : inout integer ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
   begin
     LocalGetBurst(TransactionRec, NumFifoWords, StatusMsgOn) ; 
@@ -1871,10 +1873,10 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure GetBurst (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  NumFifoWords    : inout integer ;
-    variable  Param           : out   std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  NumFifoWords     : inout integer ;
+    variable  Param            : out   std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
   begin
     LocalGetBurst(TransactionRec, NumFifoWords, StatusMsgOn) ; 
@@ -1894,10 +1896,10 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure LocalTryGetBurst (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  NumFifoWords    : in    integer ;
-    variable  Available       : out   boolean ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  NumFifoWords     : in    integer ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
   begin
     TransactionRec.Operation   <= TRY_GET_BURST ;
@@ -1910,10 +1912,10 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure TryGetBurst (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  NumFifoWords    : inout integer ;
-    variable  Available       : out   boolean ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  NumFifoWords     : inout integer ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
   begin
     LocalTryGetBurst(TransactionRec, NumFifoWords, Available, StatusMsgOn) ;
@@ -1923,11 +1925,11 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure TryGetBurst (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    variable  NumFifoWords    : inout integer ;
-    variable  Param           : out   std_logic_vector ;
-    variable  Available       : out   boolean ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  NumFifoWords     : inout integer ;
+    variable  Param            : out   std_logic_vector ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
   begin
     LocalTryGetBurst(TransactionRec, NumFifoWords, Available, StatusMsgOn) ;
@@ -1947,10 +1949,10 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure Check (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  Param           : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Data             : in    std_logic_vector ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
     variable LocalParam : std_logic_vector(TransactionRec.ParamToModel'length -1 downto 0) := (others => '-') ;
   begin
@@ -1966,9 +1968,9 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure Check (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Data             : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
   begin
     Check(TransactionRec, Data, "", StatusMsgOn) ;
@@ -1987,11 +1989,11 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure TryCheck (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    constant  Param           : in    std_logic_vector ;
-    variable  Available       : out   boolean ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Data             : in    std_logic_vector ;
+    constant  Param            : in    std_logic_vector ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
     variable LocalParam : std_logic_vector(TransactionRec.ParamToModel'length -1 downto 0) := (others => '-') ;
   begin
@@ -2008,10 +2010,10 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure TryCheck (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Data            : in    std_logic_vector ;
-    variable  Available       : out   boolean ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Data             : in    std_logic_vector ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
   begin
     TryCheck(TransactionRec, Data, "", Available, StatusMsgOn) ;
@@ -2028,11 +2030,11 @@ package body StreamTransactionPkg is
   procedure LocalCheckBurst (
   -- Package Local - simplifies the other calls to Check
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  Operation       : in    StreamOperationType ;
-    constant  NumFifoWords    : In    integer ;
-    constant  Param           : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  Operation        : in    StreamOperationType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
     variable LocalParam : std_logic_vector(TransactionRec.ParamToModel'length -1 downto 0) := (others => '-') ;
   begin
@@ -2047,10 +2049,10 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure CheckBurst (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  NumFifoWords    : In    integer ;
-    constant  Param           : in    std_logic_vector ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
   begin
     LocalCheckBurst(TransactionRec, CHECK_BURST, NumFifoWords, Param, StatusMsgOn) ;
@@ -2059,9 +2061,9 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure CheckBurst (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  NumFifoWords    : In    integer ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
   begin
     LocalCheckBurst(TransactionRec, CHECK_BURST, NumFifoWords, "", StatusMsgOn) ;
@@ -2070,10 +2072,10 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure CheckBurstVector (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant VectorOfWords  : In    slv_vector ;
-    constant Param          : In    std_logic_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  VectorOfWords    : in    slv_vector ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     PushBurstVector(TransactionRec.BurstFifo, VectorOfWords) ;
@@ -2083,9 +2085,9 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure CheckBurstVector (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant VectorOfWords  : In    slv_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  VectorOfWords    : in    slv_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     CheckBurstVector(TransactionRec, VectorOfWords, "", StatusMsgOn) ; 
@@ -2094,11 +2096,11 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure CheckBurstIncrement (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant Param          : In    std_logic_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     PushBurstIncrement(TransactionRec.BurstFifo, FirstWord, NumFifoWords) ;
@@ -2108,10 +2110,10 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure CheckBurstIncrement (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     CheckBurstIncrement(TransactionRec, FirstWord, NumFifoWords, "", StatusMsgOn) ; 
@@ -2120,11 +2122,11 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure CheckBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant Param          : In    std_logic_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     PushBurstRandom(TransactionRec.BurstFifo, FirstWord, NumFifoWords) ;
@@ -2134,10 +2136,10 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure CheckBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     CheckBurstRandom(TransactionRec, FirstWord, NumFifoWords, "", StatusMsgOn) ; 
@@ -2146,12 +2148,12 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure CheckBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant CoverID        : In    CoverageIDType ;
-    constant NumFifoWords   : In    integer ;
-    constant FifoWidth      : In    integer ;
-    constant Param          : In    std_logic_vector ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  CoverID          : in    CoverageIDType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  FifoWidth        : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     PushBurstRandom(TransactionRec.BurstFifo, CoverID, NumFifoWords, FifoWidth) ;
@@ -2161,11 +2163,11 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure CheckBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant CoverID        : In    CoverageIDType ;
-    constant NumFifoWords   : In    integer ;
-    constant FifoWidth      : In    integer ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  CoverID          : in    CoverageIDType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  FifoWidth        : in    integer ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     CheckBurstRandom(TransactionRec, CoverID, NumFifoWords, FifoWidth, "", StatusMsgOn) ;
@@ -2180,11 +2182,11 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure TryCheckBurst (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  NumFifoWords    : In    integer ;
-    constant  Param           : in    std_logic_vector ;
-    variable  Available       : out   boolean ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
   begin
     LocalCheckBurst(TransactionRec, TRY_CHECK_BURST, NumFifoWords, Param, StatusMsgOn) ;
@@ -2194,10 +2196,10 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure TryCheckBurst (
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType ;
-    constant  NumFifoWords    : In    integer ;
-    variable  Available       : out   boolean ;
-    constant  StatusMsgOn     : in    boolean := FALSE 
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  NumFifoWords     : in    integer ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false 
   ) is 
   begin
     LocalCheckBurst(TransactionRec, TRY_CHECK_BURST, NumFifoWords, "", StatusMsgOn) ;
@@ -2207,11 +2209,11 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure TryCheckBurstVector (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant VectorOfWords  : In    slv_vector ;
-    constant Param          : In    std_logic_vector ;
-    variable Available      : Out   boolean ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  VectorOfWords    : in    slv_vector ;
+    constant  Param            : in    std_logic_vector ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     GotBurst(TransactionRec, VectorOfWords'length, Available) ; 
@@ -2224,10 +2226,10 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure TryCheckBurstVector (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant VectorOfWords  : In    slv_vector ;
-    variable Available      : Out   boolean ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  VectorOfWords    : in    slv_vector ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     TryCheckBurstVector(TransactionRec, VectorOfWords, "", Available, StatusMsgOn) ;
@@ -2236,12 +2238,12 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure TryCheckBurstIncrement (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant Param          : In    std_logic_vector ;
-    variable Available      : Out   boolean ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     GotBurst(TransactionRec, NumFifoWords, Available) ; 
@@ -2254,11 +2256,11 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure TryCheckBurstIncrement (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    variable Available      : Out   boolean ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     TryCheckBurstIncrement(TransactionRec, FirstWord, NumFifoWords, "", Available, StatusMsgOn) ; 
@@ -2267,12 +2269,12 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure TryCheckBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    constant Param          : In    std_logic_vector ;
-    variable Available      : Out   boolean ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     GotBurst(TransactionRec, NumFifoWords, Available) ; 
@@ -2285,11 +2287,11 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure TryCheckBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant FirstWord      : In    std_logic_vector ;
-    constant NumFifoWords   : In    integer ;
-    variable Available      : Out   boolean ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  FirstWord        : in    std_logic_vector ;
+    constant  NumFifoWords     : in    integer ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     TryCheckBurstRandom(TransactionRec, FirstWord, NumFifoWords, "", Available, StatusMsgOn) ; 
@@ -2298,13 +2300,13 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure TryCheckBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant CoverID        : In    CoverageIDType ;
-    constant NumFifoWords   : In    integer ;
-    constant FifoWidth      : In    integer ;
-    constant Param          : In    std_logic_vector ;
-    variable Available      : Out   boolean ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  CoverID          : in    CoverageIDType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  FifoWidth        : in    integer ;
+    constant  Param            : in    std_logic_vector ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     GotBurst(TransactionRec, NumFifoWords, Available) ; 
@@ -2317,12 +2319,12 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   procedure TryCheckBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : InOut StreamRecType ;
-    constant CoverID        : In    CoverageIDType ;
-    constant NumFifoWords   : In    integer ;
-    constant FifoWidth      : In    integer ;
-    variable Available      : Out   boolean ;
-    constant StatusMsgOn    : In    boolean := false
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  CoverID          : in    CoverageIDType ;
+    constant  NumFifoWords     : in    integer ;
+    constant  FifoWidth        : in    integer ;
+    variable  Available        : out   boolean ;
+    constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
     TryCheckBurstRandom(TransactionRec, CoverID, NumFifoWords, FifoWidth, "", Available, StatusMsgOn) ;
@@ -2336,7 +2338,7 @@ package body StreamTransactionPkg is
   procedure ReleaseTransactionRecord (
   --  Must run on same delta cycle as AcquireTransactionRecord
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType 
+    signal    TransactionRec   : inout StreamRecType 
   ) is
   begin
     -- Set everything driven by TestCtrl to type'left (except Rdy)
@@ -2354,7 +2356,7 @@ package body StreamTransactionPkg is
   procedure AcquireTransactionRecord (
   --  Must run on same delta cycle as ReleaseTransactionRecord
   ------------------------------------------------------------
-    signal    TransactionRec  : inout StreamRecType 
+    signal    TransactionRec   : inout StreamRecType 
   ) is
   begin
     -- Start Driving Rdy on next delta cycle with the current value.  
@@ -2370,7 +2372,7 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   function IsBlocking (
   -----------------------------------------------------------
-    constant Operation     : in StreamOperationType
+    constant  Operation        : in StreamOperationType
   ) return boolean is
   begin
     return (Operation = SEND) or (Operation = GET) or (Operation = CHECK) or 
@@ -2380,7 +2382,7 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   function IsTry (
   -----------------------------------------------------------
-    constant Operation     : in StreamOperationType
+    constant  Operation        : in StreamOperationType
   ) return boolean is
   begin
     return (Operation = TRY_GET) or (Operation = TRY_CHECK) or (Operation = TRY_GET_BURST) or (Operation = TRY_CHECK_BURST) ;
@@ -2389,7 +2391,7 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
   function IsCheck (
   -----------------------------------------------------------
-    constant Operation     : in StreamOperationType
+    constant  Operation        : in StreamOperationType
   ) return boolean is
   begin
     return (Operation = CHECK) or (Operation = TRY_CHECK) or (Operation = CHECK_BURST) or (Operation = TRY_CHECK_BURST) ;

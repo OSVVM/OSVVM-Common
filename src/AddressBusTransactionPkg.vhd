@@ -181,6 +181,8 @@ package AddressBusTransactionPkg is
     Options            : integer_max ;  
   end record AddressBusRecType ;
   
+  type AddressBusRecArrayType  is array (integer range <>) of AddressBusRecType ;
+
   -- --------------------------------------------------------
   -- Usage of the Transaction Interface (AddressBusRecType)
   -- The Address and Data fields of AddressBusRecType are unconstrained.
