@@ -38,13 +38,15 @@
 #  limitations under the License.
 #
 library OSVVM_Common
-analyze ./src/ModelParametersPkg.vhd
-analyze ./src/FifoFillPkg_slv.vhd
-analyze ./src/StreamTransactionPkg.vhd
-analyze ./src/StreamTransactionArrayPkg.vhd
-analyze ./src/AddressBusTransactionPkg.vhd
-analyze ./src/AddressBusResponderTransactionPkg.vhd
-analyze ./src/AddressBusVersionCompatibilityPkg.vhd
-analyze ./src/InterruptHandler.vhd
-analyze ./src/InterruptHandlerComponentPkg.vhd
-analyze ./src/OsvvmCommonContext.vhd
+ChangeWorkingDirectory ./src
+analyze ModelParametersPkg.vhd
+analyze FifoFillPkg_slv.vhd
+analyze StreamTransactionPkg.vhd
+analyze StreamTransactionArrayPkg.vhd
+analyze AddressBusTransactionPkg.vhd
+analyze AddressBusTransactionArrayPkg.vhd
+analyze AddressBusResponderTransactionPkg.vhd
+analyze AddressBusVersionCompatibilityPkg.vhd
+analyze InterruptHandler.vhd
+analyze InterruptHandlerComponentPkg.vhd
+analyze OsvvmCommonContext.vhd
