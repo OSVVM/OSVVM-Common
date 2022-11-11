@@ -10,8 +10,13 @@
 --
 --
 --  Description:
---      Defines types, constants, and subprograms used by
---      OSVVM Address Bus Transaction Based Models (aka: TBM, TLM, VVC)
+--    Defines the OSVVM Address Bus Model Independent Transaction
+--    Interface (StreamRecType) and transaction initiation 
+--    procedures (Read, Write, ...), as well as supporting types,
+--    constants, and subprograms that are essential to both 
+--    to Verification Components and testbenches (test 
+--    harnesses and test sequencers) that use address bus type
+--    interfaces (such as Axi4 Full, Avalon, Wishbone, ...)
 --
 --
 --  Developed by:
@@ -21,6 +26,7 @@
 --
 --  Revision History:
 --    Date      Version    Description
+--    11/2022   2022.11    Added AddressBusRecArrayType
 --    01/2022   2022.01    Burst patterns - Burst, BurstInc, BurstRandom
 --    06/2021   2021.06    Updated bursting 
 --    12/2020   2020.12    Added SetBurstMode, updated parameter names for consistency
@@ -32,7 +38,7 @@
 --
 --  This file is part of OSVVM.
 --  
---  Copyright (c) 2017 - 2021 by SynthWorks Design Inc.  
+--  Copyright (c) 2017 - 2022 by SynthWorks Design Inc.  
 --  
 --  Licensed under the Apache License, Version 2.0 (the "License");
 --  you may not use this file except in compliance with the License.
@@ -234,21 +240,21 @@ package AddressBusTransactionPkg is
   procedure WaitForTransaction (
   --  Wait until pending transaction completes
   ------------------------------------------------------------
-    signal    TransactionRec  : inout AddressBusRecType 
+    signal   TransactionRec : InOut AddressBusRecType 
   ) ; 
 
   ------------------------------------------------------------
   procedure WaitForWriteTransaction (
   --  Wait until pending transaction completes
   ------------------------------------------------------------
-    signal    TransactionRec  : inout AddressBusRecType 
+    signal   TransactionRec : InOut AddressBusRecType 
   ) ; 
 
   ------------------------------------------------------------
   procedure WaitForReadTransaction (
   --  Wait until pending transaction completes
   ------------------------------------------------------------
-    signal    TransactionRec  : inout AddressBusRecType 
+    signal   TransactionRec : InOut AddressBusRecType 
   ) ;
   
   ------------------------------------------------------------
@@ -256,8 +262,8 @@ package AddressBusTransactionPkg is
   -- Wait for NumberOfClocks number of clocks 
   -- relative to the verification component clock
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut AddressBusRecType ;
-             NumberOfClocks  : In    natural := 1
+    signal   TransactionRec : InOut AddressBusRecType ;
+    constant NumberOfClocks : In    natural := 1
   ) ;
 
   alias NoOp is WaitForClock [AddressBusRecType, natural] ;
@@ -337,21 +343,21 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure SetBurstMode (
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut AddressBusRecType ;
-    constant OptVal          : In    AddressBusFifoBurstModeType
+    signal   TransactionRec : InOut AddressBusRecType ;
+    constant OptVal         : In    AddressBusFifoBurstModeType
   ) ;
 
   ------------------------------------------------------------
   procedure GetBurstMode (
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut AddressBusRecType ;
-    variable OptVal          : Out   AddressBusFifoBurstModeType
+    signal   TransactionRec : InOut AddressBusRecType ;
+    variable OptVal         : Out   AddressBusFifoBurstModeType
   ) ;
 
   ------------------------------------------------------------
   function IsAddressBusBurstMode (
   -----------------------------------------------------------
-    constant AddressBusFifoBurstMode : in AddressBusFifoBurstModeType
+    constant AddressBusFifoBurstMode : In AddressBusFifoBurstModeType
   ) return boolean ;
 
 
@@ -783,14 +789,14 @@ package AddressBusTransactionPkg is
   procedure ReleaseTransactionRecord (
   --  Must run on same delta cycle as AcquireTransactionRecord
   ------------------------------------------------------------
-    signal    TransactionRec  : inout AddressBusRecType 
+    signal   TransactionRec : InOut AddressBusRecType 
   ) ; 
   
   ------------------------------------------------------------
   procedure AcquireTransactionRecord (
   --  Must run on same delta cycle as ReleaseTransactionRecord
   ------------------------------------------------------------
-    signal    TransactionRec  : inout AddressBusRecType 
+    signal   TransactionRec : InOut AddressBusRecType 
   ) ; 
 
   -- ========================================================
@@ -802,91 +808,91 @@ package AddressBusTransactionPkg is
   function IsWriteAddress (
   -- TRUE for a transaction includes write address
   -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
+    constant Operation      : In AddressBusOperationType
   ) return boolean ;
 
   ------------------------------------------------------------
   function IsBlockOnWriteAddress (
   -- TRUE for blocking transactions that include write address
   -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
+    constant Operation      : In AddressBusOperationType
   ) return boolean ;
 
   ------------------------------------------------------------
   function IsTryWriteAddress (
   -- TRUE for asynchronous or try transactions that include write address
   -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
+    constant Operation      : In AddressBusOperationType
   ) return boolean ;
 
   ------------------------------------------------------------
   function IsWriteData (
   -- TRUE for a transaction includes write data
   -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
+    constant Operation      : In AddressBusOperationType
   ) return boolean ;
 
   ------------------------------------------------------------
   function IsBlockOnWriteData (
   -- TRUE for a blocking transactions that include write data
   -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
+    constant Operation      : In AddressBusOperationType
   ) return boolean ;
 
   ------------------------------------------------------------
   function IsTryWriteData (
   -- TRUE for asynchronous or try transactions that include write data
   -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
+    constant Operation      : In AddressBusOperationType
   ) return boolean ;
 
   ------------------------------------------------------------
   function IsReadAddress (
   -- TRUE for a transaction includes read address
   -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
+    constant Operation      : In AddressBusOperationType
   ) return boolean ;
 
   ------------------------------------------------------------
   function IsTryReadAddress (
   -- TRUE for an asynchronous or try transactions that include read address
   -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
+    constant Operation      : In AddressBusOperationType
   ) return boolean ;
 
   ------------------------------------------------------------
   function IsReadData (
   -- TRUE for a transaction includes read data
   -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
+    constant Operation      : In AddressBusOperationType
   ) return boolean ;
 
   ------------------------------------------------------------
   function IsBlockOnReadData (
   -- TRUE for a blocking transactions that include read data
   -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
+    constant Operation      : In AddressBusOperationType
   ) return boolean ;
 
   ------------------------------------------------------------
   function IsTryReadData (
   -- TRUE for asynchronous or try transactions that include read data
   -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
+    constant Operation      : In AddressBusOperationType
   ) return boolean ;
 
   ------------------------------------------------------------
   function IsReadCheck (
   -- TRUE for a transaction includes check information for read data 
   -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
+    constant Operation      : In AddressBusOperationType
   ) return boolean ;
 
   ------------------------------------------------------------
   function IsBurst (
   -- TRUE for a transaction includes read or write burst information
   -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
+    constant Operation      : In AddressBusOperationType
   ) return boolean ;
 
   
@@ -923,7 +929,7 @@ package body AddressBusTransactionPkg is
   procedure WaitForTransaction (
   --  Wait until pending transaction completes
   ------------------------------------------------------------
-    signal    TransactionRec  : inout AddressBusRecType 
+    signal   TransactionRec : InOut AddressBusRecType 
   ) is
   begin
     TransactionRec.Operation     <= WAIT_FOR_TRANSACTION ;
@@ -934,7 +940,7 @@ package body AddressBusTransactionPkg is
   procedure WaitForWriteTransaction (
   --  Wait until pending transaction completes
   ------------------------------------------------------------
-    signal    TransactionRec  : inout AddressBusRecType 
+    signal   TransactionRec : InOut AddressBusRecType 
   ) is
   begin
     TransactionRec.Operation     <= WAIT_FOR_WRITE_TRANSACTION ;
@@ -945,7 +951,7 @@ package body AddressBusTransactionPkg is
   procedure WaitForReadTransaction (
   --  Wait until pending transaction completes
   ------------------------------------------------------------
-    signal    TransactionRec  : inout AddressBusRecType 
+    signal   TransactionRec : InOut AddressBusRecType 
   ) is
   begin
     TransactionRec.Operation     <= WAIT_FOR_READ_TRANSACTION ;
@@ -956,8 +962,8 @@ package body AddressBusTransactionPkg is
   procedure WaitForClock (
   -- Directive:  Wait for NumberOfClocks number of clocks in the model
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut AddressBusRecType ;
-             NumberOfClocks  : In    natural := 1
+    signal   TransactionRec : InOut AddressBusRecType ;
+    constant NumberOfClocks : In    natural := 1
   ) is
   begin
     TransactionRec.Operation     <= WAIT_FOR_CLOCK ;
@@ -1044,8 +1050,8 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure SetBurstMode (
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut AddressBusRecType ;
-    constant OptVal          : In    AddressBusFifoBurstModeType
+    signal   TransactionRec : InOut AddressBusRecType ;
+    constant OptVal         : In    AddressBusFifoBurstModeType
   ) is
   begin
     TransactionRec.Operation     <= SET_BURST_MODE ;
@@ -1056,8 +1062,8 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure GetBurstMode (
   ------------------------------------------------------------
-    signal   TransactionRec  : InOut AddressBusRecType ;
-    variable OptVal          : Out   AddressBusFifoBurstModeType
+    signal   TransactionRec : InOut AddressBusRecType ;
+    variable OptVal         : Out   AddressBusFifoBurstModeType
   ) is
   begin
     TransactionRec.Operation     <= GET_BURST_MODE ;
@@ -1068,7 +1074,7 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   function IsAddressBusBurstMode (
   -----------------------------------------------------------
-    constant AddressBusFifoBurstMode : in AddressBusFifoBurstModeType
+    constant AddressBusFifoBurstMode : In AddressBusFifoBurstModeType
   ) return boolean is
   begin
     return
@@ -1750,7 +1756,7 @@ package body AddressBusTransactionPkg is
   procedure ReleaseTransactionRecord (
   --  Must run on same delta cycle as AcquireTransactionRecord
   ------------------------------------------------------------
-    signal    TransactionRec  : inout AddressBusRecType 
+    signal   TransactionRec : InOut AddressBusRecType 
   ) is
   begin
     -- Set everything driven by TestCtrl to type'left (except Rdy)
@@ -1770,17 +1776,21 @@ package body AddressBusTransactionPkg is
   procedure AcquireTransactionRecord (
   --  Must run on same delta cycle as ReleaseTransactionRecord
   ------------------------------------------------------------
-    signal    TransactionRec  : inout AddressBusRecType 
+    signal   TransactionRec : InOut AddressBusRecType 
   ) is
   begin
     -- Start Driving Rdy on next delta cycle with the current value.  
     TransactionRec.Rdy           <= TransactionRec.Rdy ; 
   end procedure AcquireTransactionRecord ; 
     
+
+  -- ========================================================
+  --  Verification Component Support
+  -- ========================================================
   ------------------------------------------------------------
   function IsWriteAddress (
   -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
+    constant Operation      : In AddressBusOperationType
   ) return boolean is
   begin
     return
@@ -1797,7 +1807,7 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   function IsBlockOnWriteAddress (
   -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
+    constant Operation      : In AddressBusOperationType
   ) return boolean is
   begin
     return
@@ -1810,7 +1820,7 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   function IsTryWriteAddress (
   -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
+    constant Operation      : In AddressBusOperationType
   ) return boolean is
   begin
     return
@@ -1823,7 +1833,7 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   function IsWriteData (
   -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
+    constant Operation      : In AddressBusOperationType
   ) return boolean is
   begin
     return
@@ -1840,7 +1850,7 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   function IsBlockOnWriteData (
   -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
+    constant Operation      : In AddressBusOperationType
   ) return boolean is
   begin
     return 
@@ -1853,7 +1863,7 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   function IsTryWriteData (
   -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
+    constant Operation      : In AddressBusOperationType
   ) return boolean is
   begin
     return
@@ -1866,7 +1876,7 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   function IsReadAddress (
   -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
+    constant Operation      : In AddressBusOperationType
   ) return boolean is
   begin
     return
@@ -1883,7 +1893,7 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   function IsTryReadAddress (
   -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
+    constant Operation      : In AddressBusOperationType
   ) return boolean is
   begin
     return
@@ -1896,7 +1906,7 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   function IsReadData (
   -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
+    constant Operation      : In AddressBusOperationType
   ) return boolean is
   begin
     return
@@ -1916,7 +1926,7 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   function IsBlockOnReadData (
   -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
+    constant Operation      : In AddressBusOperationType
   ) return boolean is
   begin
     return
@@ -1931,7 +1941,7 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   function IsTryReadData (
   -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
+    constant Operation      : In AddressBusOperationType
   ) return boolean is
   begin
     return 
@@ -1945,7 +1955,7 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   function IsReadCheck (
   -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
+    constant Operation      : In AddressBusOperationType
   ) return boolean is
   begin
     return
@@ -1957,7 +1967,7 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   function IsBurst (
   -----------------------------------------------------------
-    constant Operation     : in AddressBusOperationType
+    constant Operation      : In AddressBusOperationType
   ) return boolean is
   begin
     return
