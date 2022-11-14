@@ -45,6 +45,7 @@ context OsvvmCommonContext is
     use osvvm_common.StreamTransactionPkg.all ; 
     use osvvm_common.StreamTransactionArrayPkg.all ; 
     use OSVVM_Common.AddressBusTransactionPkg.all ; 
+    use OSVVM_Common.AddressBusTransactionArrayPkg.all ; 
     use OSVVM_Common.AddressBusResponderTransactionPkg.all ;
     use OSVVM_Common.AddressBusVersionCompatibilityPkg.all ;     
     use OSVVM_Common.InterruptHandlerComponentPkg.all ;
