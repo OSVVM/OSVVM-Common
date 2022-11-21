@@ -329,7 +329,6 @@ package AddressBusTransactionPkg is
   -- 16, ... bytes)
   constant ADDRESS_BUS_BURST_WORD_MODE       : AddressBusFifoBurstModeType  := 0 ;
   
-  -- Byte mode is experimental and may be removed in a future revision.
   -- Byte mode indicates that the burst FIFO contains bytes.  
   -- The verification component assembles interface words from the bytes.
   -- This allows transfers to be conceptualized in an interface independent 

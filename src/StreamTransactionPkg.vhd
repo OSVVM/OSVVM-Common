@@ -25,6 +25,7 @@
 --
 --  Revision History:
 --    Date      Version    Description
+--    11/2022   2022.11    Added StreamRecArrayType
 --    01/2022   2022.01    Burst patterns - Burst, BurstInc, BurstRandom
 --    06/2021   2021.06    Updated bursting 
 --    10/2020   2020.10    Added bursting to stream transactions
@@ -278,7 +279,6 @@ package StreamTransactionPkg is
   -- different applications.
   constant STREAM_BURST_WORD_PARAM_MODE : StreamFifoBurstModeType  := 1 ;
   
-  -- Byte mode is experimental and may be removed in a future revision.
   -- Byte mode indicates that the burst FIFO contains bytes.  
   -- The verification component assembles interface words from the bytes.
   -- This allows transfers to be conceptualized in an interface independent 
