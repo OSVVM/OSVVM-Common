@@ -17,8 +17,9 @@
 #
 #  Revision History:
 #    Date      Version    Description
-#     1/2019   2019.01    Compile Script for OSVVM Common library
+#    11/2022   2022.11    Added AddressBusTransactionArrayPkg and AddressBusResponderTransactionArrayPkg
 #     1/2020   2020.01    Updated Licenses to Apache
+#     1/2019   2019.01    Compile Script for OSVVM Common library
 #
 #
 #  This file is part of OSVVM.
@@ -46,6 +47,7 @@ analyze StreamTransactionArrayPkg.vhd
 analyze AddressBusTransactionPkg.vhd
 analyze AddressBusTransactionArrayPkg.vhd
 analyze AddressBusResponderTransactionPkg.vhd
+analyze AddressBusResponderTransactionArrayPkg.vhd
 analyze AddressBusVersionCompatibilityPkg.vhd
 analyze InterruptHandler.vhd
 analyze InterruptHandlerComponentPkg.vhd
