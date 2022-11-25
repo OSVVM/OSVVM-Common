@@ -26,7 +26,7 @@
 --
 --  Revision History:
 --    Date      Version    Description
---    11/2022   2022.11    Initial
+--    11/2022   2022.11    Initial.   Derived from AddressBusTransactionPkg
 --
 --  This file is part of OSVVM.
 --  
@@ -643,6 +643,17 @@ package AddressBusTransactionArrayPkg is
     signal   TransactionRec : InOut AddressBusRecArrayType ;
     constant Index          : In    integer  
   ) ; 
+  
+  -- ========================================================
+  --  Supports AddressBusResponderTransactionArrayPkg
+  -- ========================================================
+  ------------------------------------------------------------
+  procedure AddressBusArrayRequestTransaction (
+  --  Package Local
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout AddressBusRecArrayType ;
+    constant  Index            : in    integer 
+  ) ;
 
 end package AddressBusTransactionArrayPkg ;
 
