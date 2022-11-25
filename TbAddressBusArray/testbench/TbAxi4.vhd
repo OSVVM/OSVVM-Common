@@ -109,11 +109,14 @@ architecture TestHarness of TbAxi4 is
   component TestCtrl is
     port (
       -- Global Signal Interface
-      nReset         : In    std_logic ;
+      nReset           : In    std_logic ;
+
+      -- Drive IntReq
+      IntReq           : Out   std_logic := '0' ;
 
       -- Transaction Interfaces
-      ManagerRec      : inout AddressBusRecArrayType ;
-      InterruptRec   : inout AddressBusRecArrayType ;
+      ManagerRec       : inout AddressBusRecArrayType ;
+      InterruptRec     : inout AddressBusRecArrayType ;
       SubordinateRec   : inout AddressBusRecArrayType
     ) ;
   end component TestCtrl ;
@@ -207,7 +210,10 @@ begin
   ------------------------------------------------------------
   port map (
     -- Global Signal Interface
-    nReset        => nReset,
+    nReset          => nReset,
+
+    -- Drive IntReq
+    IntReq          => IntReq, 
 
     -- Transaction Interfaces
     ManagerRec      => ManagerRec,
