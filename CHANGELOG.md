@@ -2,6 +2,7 @@
 
 | Revision  |  Release Summary | 
 ------------|----------- 
+| 2022.11   |  Relocated tests cases for XxxTransactionPkg and InterruptHandler to here   
 | 2022.10   |  Updated InterruptHandler for BurstFIFO updates.   
 |           |  Updated PushBurstRandom / CheckBurstRandom to work around Questa bugs
 | 2022.01   |  Added Burst Patterns to Address Bus and Stream
@@ -11,6 +12,15 @@
 | 2020.07   |  Updated for MIT and freed the slaves
 | 2020.02   |  Created by refactoring Axi4LiteMasterTransactionPkg
 
+
+## 2022.11  November 2022
+- Added array types AddressBusRecArrayType and StreamRecArrayType
+- Created Array packages AddressBusTransactionArrayPkg and StreamTransactionArrayPkg
+  These packages support iterating across AddressBusRecArrayType and StreamRecArrayType 
+- Refactored test cases for AddressBusTransactionPkg and StreamTransactionPkg from AXI 
+  to support a set of MitTestCases
+- Created test cases for Array based packages
+- Relocated Interrupt Handler TestCases to TbInterrupt
 
 ## 2022.01  January 2022
 - Updated AddressBusTransactionPkg and StreamTransactionPkg for Burst Patterns
