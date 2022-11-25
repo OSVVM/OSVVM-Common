@@ -47,6 +47,9 @@ include ./TbStreamArray
 include ./TbAddressBus
 include ./TbAddressBusArray
 
+## =============================================
+## Test InterruptHandler 
+include ./TbInterrupt   
 
 ## =============================================
 ## Test Params Pkg  - not currently self checking, so not run in regression 
