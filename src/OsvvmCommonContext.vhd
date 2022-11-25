@@ -16,8 +16,9 @@
 --
 --  Revision History:      
 --    Date      Version    Description
---    06/2019   2019.06    Initial Revision
+--    11/2022   2022.11    Added AddressBusTransactionArrayPkg and AddressBusResponderTransactionArrayPkg
 --    01/2020   2020.01    Updated license notice
+--    06/2019   2019.06    Initial Revision
 --
 --
 --  This file is part of OSVVM.
@@ -43,8 +44,11 @@ context OsvvmCommonContext is
     use OSVVM_Common.ModelParametersPkg.all ; 
     use OSVVM_Common.FifoFillPkg_slv.all ; 
     use osvvm_common.StreamTransactionPkg.all ; 
+    use osvvm_common.StreamTransactionArrayPkg.all ; 
     use OSVVM_Common.AddressBusTransactionPkg.all ; 
+    use OSVVM_Common.AddressBusTransactionArrayPkg.all ; 
     use OSVVM_Common.AddressBusResponderTransactionPkg.all ;
+    use OSVVM_Common.AddressBusResponderTransactionArrayPkg.all ;
     use OSVVM_Common.AddressBusVersionCompatibilityPkg.all ;     
     use OSVVM_Common.InterruptHandlerComponentPkg.all ;
 end context OsvvmCommonContext ; 
