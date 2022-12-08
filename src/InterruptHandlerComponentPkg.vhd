@@ -51,6 +51,8 @@ library osvvm ;
 
 package InterruptHandlerComponentPkg is
 
+  signal gIntReq : boolean := false ;
+
   ------------------------------------------------------------
   component InterruptHandler is
   ------------------------------------------------------------
