@@ -49,8 +49,10 @@ library   InterruptHandler
 
 analyze TbAxi4_InterruptCosim1.vhd
 analyze TbAxi4_InterruptCosim2.vhd
+analyze TbAxi4_InterruptCosim3.vhd
 
 #simulate TbAxi4_InterruptCosim1 [ mk_vproc $::osvvm::CurrentWorkingDirectory/../../../CoSim tests/interrupt ]analyze TbAxi4_InterruptCosim1.vhd
-simulate TbAxi4_InterruptCosim2 [ mk_vproc $::osvvm::CurrentWorkingDirectory/../../../CoSim tests/interruptCB ]
+#simulate TbAxi4_InterruptCosim2 [ mk_vproc $::osvvm::CurrentWorkingDirectory/../../../CoSim tests/interruptCB ]
+simulate TbAxi4_InterruptCosim3 [ mk_vproc $::osvvm::CurrentWorkingDirectory/../../../CoSim tests/interruptIss rv32 ]
 
 
