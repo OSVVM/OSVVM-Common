@@ -58,7 +58,7 @@ begin
   begin
 
     -- Initialization of test
-    SetTestName("TbAxi4_Interruptcosim1") ;
+    SetTestName("TbAxi4_InterruptCosim1") ;
     SetLogEnable(PASSED, TRUE) ;    -- Enable PASSED logs
     SetLogEnable(INFO, TRUE) ;    -- Enable INFO logs
     SetLogEnable(GetAlertLogID("Memory_1"), INFO, FALSE) ;
