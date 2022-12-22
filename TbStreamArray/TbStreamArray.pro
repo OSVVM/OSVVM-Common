@@ -38,6 +38,7 @@
 #  
 
 library osvvm_TbStreamTransactionArrayPkg
+TestSuite StreamTransactionArrayPkg
 
 include testbench
 include StreamTransactionArrayPkg
