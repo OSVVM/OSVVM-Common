@@ -49,6 +49,9 @@ library osvvm ;
   use osvvm.ScoreboardPkg_slv.all ; 
 
   use work.AddressBusTransactionPkg.all; 
+  
+library osvvm_common ;
+  use work.InterruptHandlerComponentPkg.all ;
 
 
 entity InterruptHandler is
@@ -75,6 +78,9 @@ architecture Behavioral of InterruptHandler is
     -- use MODEL_ID_NAME Generic if set, otherwise use instance label (preferred if set as entityname_1)
     IfElse(MODEL_ID_NAME /= "", MODEL_ID_NAME, to_lower(PathTail(InterruptHandler'PATH_NAME))) ;
 begin
+
+  -- Export interrupt
+  gIntReq <= true when IntReq = '1' else false ;
 
   -- Only handle interrupts when interrupt transactions pending 
   iIntReq   <= TO_X01(IntReq) when TransactionPending(InterruptRec.Rdy, InterruptRec.Ack) 

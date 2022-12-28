@@ -1,5 +1,5 @@
-#  File Name:         common.pro
-#  Revision:          OSVVM MODELS STANDARD VERSION
+#  File Name:         TbInterrupt.pro
+#  Revision:          STANDARD VERSION
 #
 #  Maintainer:        Jim Lewis      email:  jim@synthworks.com
 #  Contributor(s):
@@ -7,7 +7,7 @@
 #
 #
 #  Description:
-#        Top level script to compile the OSVVM common packages   
+#        Script to run one Axi4 test  
 #
 #  Developed for:
 #        SynthWorks Design Inc.
@@ -17,14 +17,13 @@
 #
 #  Revision History:
 #    Date      Version    Description
-#    11/2022   2022.11    Added AddressBusTransactionArrayPkg and AddressBusResponderTransactionArrayPkg
-#     1/2020   2020.01    Updated Licenses to Apache
-#     1/2019   2019.01    Compile Script for OSVVM Common library
+#    11/2022   2022.11    Updated and moved to Common library
+#    10/2022   2022.10    Initial
 #
 #
 #  This file is part of OSVVM.
 #  
-#  Copyright (c) 2019 - 2020 by SynthWorks Design Inc.  
+#  Copyright (c) 2022 by SynthWorks Design Inc.  
 #  
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -37,18 +36,10 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#
-library OSVVM_Common
-ChangeWorkingDirectory ./src
-analyze ModelParametersPkg.vhd
-analyze FifoFillPkg_slv.vhd
-analyze StreamTransactionPkg.vhd
-analyze StreamTransactionArrayPkg.vhd
-analyze AddressBusTransactionPkg.vhd
-analyze AddressBusTransactionArrayPkg.vhd
-analyze AddressBusResponderTransactionPkg.vhd
-analyze AddressBusResponderTransactionArrayPkg.vhd
-analyze AddressBusVersionCompatibilityPkg.vhd
-analyze InterruptHandlerComponentPkg.vhd
-analyze InterruptHandler.vhd
-analyze OsvvmCommonContext.vhd
+#  
+TestSuite InterruptHandler
+library   InterruptHandler
+
+include testbench
+include ./TestCases/TestCasesCosim.pro
+
