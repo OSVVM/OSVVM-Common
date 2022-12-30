@@ -1,12 +1,12 @@
 --
---  File Name:         InterruptHandlerComponentPkg.vhd
---  Design Unit Name:  InterruptHandlerComponentPkg
+--  File Name:         InterruptGlobalSignalPkg.vhd
+--  Design Unit Name:  InterruptGlobalSignalPkg
 --  Revision:          OSVVM MODELS STANDARD VERSION
 --
 --  Maintainer:        Jim Lewis      email:  jim@synthworks.com
 --  Contributor(s):
---     Jim Lewis      jim@synthworks.com
---
+--     Jim Lewis          jim@synthworks.com
+--     Simon Southwell    simon.southwell@gmail.com
 --
 --  Description:
 --      InterruptHandler Component Declaration
@@ -19,12 +19,12 @@
 --
 --  Revision History:
 --    Date      Version    Description
---    04/2021   2021.04    Initial revision
+--    12/2022              Initial revision
 --
 --
 --  This file is part of OSVVM.
 --
---  Copyright (c) 2017 - 2021 by SynthWorks Design Inc.
+--  Copyright (c) 2022 by SynthWorks Design Inc.
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
 --  you may not use this file except in compliance with the License.
@@ -40,34 +40,12 @@
 --
 library ieee ;
   use ieee.std_logic_1164.all ;
-  use ieee.numeric_std.all ;
-  use ieee.numeric_std_unsigned.all ;
-  use ieee.math_real.all ;
 
-library osvvm ;
-  context osvvm.OsvvmContext ;
+package InterruptGlobalSignalPkg is
 
-  use work.AddressBusTransactionPkg.all; 
+  signal gIntReq : boolean := false ;
 
-package InterruptHandlerComponentPkg is
+  constant NUMBER_INTERRUPT_SIGNALS : integer := 32 ; 
+--  signal gIntReq : std_logic_vector(NUMBER_INTERRUPT_SIGNALS-1 downto 0) ; 
 
-  ------------------------------------------------------------
-  component InterruptHandler is
-  ------------------------------------------------------------
-  generic (
-    MODEL_ID_NAME    : string := "" 
-  ) ;
-  port (
-    -- Interrupt Input
-    IntReq       : in   std_logic ;
-
-    -- From TestCtrl
-    TransRec     : inout AddressBusRecType ;
-    InterruptRec : inout AddressBusRecType ;
-    
-    -- To Verification Component
-    VCRec        : inout AddressBusRecType
-  ) ;
-  end component InterruptHandler ;
-  
-end package InterruptHandlerComponentPkg ;
+end package InterruptGlobalSignalPkg ;

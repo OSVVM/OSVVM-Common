@@ -49,6 +49,7 @@ analyze AddressBusTransactionArrayPkg.vhd
 analyze AddressBusResponderTransactionPkg.vhd
 analyze AddressBusResponderTransactionArrayPkg.vhd
 analyze AddressBusVersionCompatibilityPkg.vhd
-analyze InterruptHandlerComponentPkg.vhd
+analyze InterruptGlobalSignalPkg.vhd
 analyze InterruptHandler.vhd
+analyze InterruptHandlerComponentPkg.vhd
 analyze OsvvmCommonContext.vhd

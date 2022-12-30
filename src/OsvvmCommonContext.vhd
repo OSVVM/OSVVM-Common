@@ -51,5 +51,6 @@ context OsvvmCommonContext is
     use OSVVM_Common.AddressBusResponderTransactionArrayPkg.all ;
     use OSVVM_Common.AddressBusVersionCompatibilityPkg.all ;     
     use OSVVM_Common.InterruptHandlerComponentPkg.all ;
+    use OSVVM_Common.InterruptGlobalSignalPkg.all ;
 end context OsvvmCommonContext ; 
 

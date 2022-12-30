@@ -51,7 +51,7 @@ library osvvm ;
   use work.AddressBusTransactionPkg.all; 
   
 library osvvm_common ;
-  use work.InterruptHandlerComponentPkg.all ;
+  use work.InterruptGlobalSignalPkg.all ;
 
 
 entity InterruptHandler is
