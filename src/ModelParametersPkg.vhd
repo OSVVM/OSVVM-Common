@@ -259,7 +259,7 @@ package body ModelParametersPkg is
       case ParmPtrVar(Index).ParmType is 
         when NONE =>
           alert(AlertLogIDVar, "ModelParametersPType.Get[natural, return std_logic_vector] No value set");
-          return (31 downto 0 => 'U');
+          return 32SB"U";
         
         when eINT =>
           return std_logic_vector(to_signed(ParmPtrVar(Index).IParm, 32));
@@ -272,11 +272,12 @@ package body ModelParametersPkg is
     ------------------------------------------------------------
 		impure function Get(Index: natural; len: positive) return std_logic_vector is
     ------------------------------------------------------------
+      constant AllU : std_logic_vector(len-1 downto 0) := (others => 'U') ; 
 		begin
       case ParmPtrVar(Index).ParmType is 
         when NONE =>
           alert(AlertLogIDVar, "ModelParametersPType.Get[natural, positive return std_logic_vector] No value set");
-          return (len-1 downto 0 => 'U');
+          return AllU;
         
         when eINT =>
           return std_logic_vector(to_signed(ParmPtrVar(Index).IParm, len));
