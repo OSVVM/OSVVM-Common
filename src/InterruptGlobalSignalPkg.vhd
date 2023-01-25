@@ -19,12 +19,13 @@
 --
 --  Revision History:
 --    Date      Version    Description
+--    01/2023   2023.01    Updated to gIntReq use std_logic_vector
 --    12/2022              Initial revision
 --
 --
 --  This file is part of OSVVM.
 --
---  Copyright (c) 2022 by SynthWorks Design Inc.
+--  Copyright (c) 2022-2023 by SynthWorks Design Inc.
 --
 --  Licensed under the Apache License, Version 2.0 (the "License");
 --  you may not use this file except in compliance with the License.
@@ -43,9 +44,17 @@ library ieee ;
 
 package InterruptGlobalSignalPkg is
 
-  signal gIntReq : boolean := false ;
-
   constant NUMBER_INTERRUPT_SIGNALS : integer := 32 ; 
---  signal gIntReq : std_logic_vector(NUMBER_INTERRUPT_SIGNALS-1 downto 0) ; 
+  signal gIntReq : std_logic_vector(NUMBER_INTERRUPT_SIGNALS-1 downto 0) := (others => '0') ; 
+--  signal gIntReq : boolean := false ;
+  signal gVProcReadInterrupts : bit := '0' ; 
+  constant INTERRUPT_ON_LEVEL : std_logic := '0' ;
+  constant INTERRUPT_ON_EDGE  : std_logic := '1' ;
 
 end package InterruptGlobalSignalPkg ;
+
+package body InterruptGlobalSignalPkg is
+
+--  constant NUMBER_INTERRUPT_SIGNALS : integer ; 
+
+end package body InterruptGlobalSignalPkg ;

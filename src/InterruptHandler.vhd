@@ -80,7 +80,7 @@ architecture Behavioral of InterruptHandler is
 begin
 
   -- Export interrupt
-  gIntReq <= true when IntReq = '1' else false ;
+  gIntReq(0) <= IntReq ;
 
   -- Only handle interrupts when interrupt transactions pending 
   iIntReq   <= TO_X01(IntReq) when TransactionPending(InterruptRec.Rdy, InterruptRec.Ack) 
