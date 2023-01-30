@@ -1,6 +1,6 @@
 --
---  File Name:         InterruptGeneratorBit.vhd
---  Design Unit Name:  InterruptGeneratorBit
+--  File Name:         InterruptGeneratorBitVti.vhd
+--  Design Unit Name:  InterruptGeneratorBitVti
 --  Revision:          OSVVM MODELS STANDARD VERSION
 --
 --  Maintainer:        Jim Lewis      email:  jim@synthworks.com
@@ -9,7 +9,7 @@
 --
 --
 --  Description:
---      InterruptGeneratorBit
+--      InterruptGeneratorBitVti
 --
 --
 --  Developed by:
@@ -52,7 +52,7 @@ library osvvm ;
   use work.InterruptGlobalSignalPkg.all ;
 
 
-entity InterruptGeneratorBit is
+entity InterruptGeneratorBitVti is
 generic (
   MODEL_ID_NAME    : string := "" ;
   POLARITY         : std_logic := '1' 
@@ -65,11 +65,11 @@ port (
   -- Connects to sequencer (TestCtrl)
   signal TransRec : StreamRecType(DataToModel(0 downto 0), DataFromModel(0 downto 0), ParamToModel(1 to 0), ParamFromModel(1 to 0)) ; 
 
-end entity InterruptGeneratorBit ;
-architecture Behavioral of InterruptGeneratorBit is
+end entity InterruptGeneratorBitVti ;
+architecture Behavioral of InterruptGeneratorBitVti is
   constant MODEL_INSTANCE_NAME : string :=
     -- use MODEL_ID_NAME Generic if set, otherwise use instance label (preferred if set as entityname_1)
-    IfElse(MODEL_ID_NAME /= "", MODEL_ID_NAME, to_lower(PathTail(InterruptGeneratorBit'PATH_NAME))) ;
+    IfElse(MODEL_ID_NAME /= "", MODEL_ID_NAME, to_lower(PathTail(InterruptGeneratorBitVti'PATH_NAME))) ;
 
   signal ModelID : AlertLogIDType ;
 
