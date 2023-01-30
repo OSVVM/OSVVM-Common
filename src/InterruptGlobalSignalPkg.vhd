@@ -41,20 +41,28 @@
 --
 library ieee ;
   use ieee.std_logic_1164.all ;
+  
+library osvvm ; 
+  context osvvm.OsvvmContext ; 
+  
+  use work.StreamTransactionPkg.all ; 
 
 package InterruptGlobalSignalPkg is
 
+  -- This could be a generic
   constant NUMBER_INTERRUPT_SIGNALS : integer := 32 ; 
+  
+  -- Used by CoSim interface
   signal gIntReq : std_logic_vector(NUMBER_INTERRUPT_SIGNALS-1 downto 0) := (others => '0') ; 
---  signal gIntReq : boolean := false ;
-  signal gVProcReadInterrupts : bit := '0' ; 
+  signal gVProcReadInterrupts : bit := '0' ;
+  
   constant INTERRUPT_ON_LEVEL : std_logic := '0' ;
   constant INTERRUPT_ON_EDGE  : std_logic := '1' ;
+  
+  subtype InterruptGeneratorBitRecType is StreamRecType(DataToModel(0 downto 0),    DataFromModel(0 downto 0),    ParamToModel(NULL_RANGE_TYPE), ParamFromModel(NULL_RANGE_TYPE)) ;
+  subtype InterruptGeneratorRecArrayType  is StreamRecArrayType(gIntReq'range)(DataToModel(0 downto 0), DataFromModel(0 downto 0), ParamToModel(NULL_RANGE_TYPE), ParamFromModel(NULL_RANGE_TYPE)) ;
+
+  subtype InterruptGeneratorRecType    is StreamRecType(DataToModel(gIntReq'range), DataFromModel(gIntReq'range), ParamToModel(NULL_RANGE_TYPE), ParamFromModel(NULL_RANGE_TYPE)) ; 
 
 end package InterruptGlobalSignalPkg ;
 
-package body InterruptGlobalSignalPkg is
-
---  constant NUMBER_INTERRUPT_SIGNALS : integer ; 
-
-end package body InterruptGlobalSignalPkg ;
