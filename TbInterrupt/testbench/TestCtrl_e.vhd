@@ -19,6 +19,7 @@
 --
 --  Revision History:
 --    Date      Version    Description
+--    12/2022   2023.01    Added CoSim Context
 --    12/2020   2020.12    Updated port names
 --    01/2020   2020.01    Updated license notice
 --    05/2019   2019.05    Added context reference
@@ -27,7 +28,7 @@
 --
 --  This file is part of OSVVM.
 --  
---  Copyright (c) 2017 - 2020 by SynthWorks Design Inc.  
+--  Copyright (c) 2017 - 2023 by SynthWorks Design Inc.  
 --  
 --  Licensed under the Apache License, Version 2.0 (the "License");
 --  you may not use this file except in compliance with the License.
@@ -55,26 +56,25 @@ library OSVVM_AXI4 ;
   context OSVVM_AXI4.Axi4Context ; 
   use osvvm.ScoreboardPkg_slv.all ;
 
-use work.OsvvmTestCommonPkg.all ;
+library OSVVM_Common ;
+  context OSVVM_Common.OsvvmCommonContext ;
 
 entity TestCtrl is
   port (
     -- Global Signal Interface
-    nReset           : In    std_logic ;
+    nReset            : In    std_logic ;
     
-    -- Drive IntReq
-    IntReq           : Out   std_logic := '0' ;
-
     -- Transaction Interfaces
-    ManagerRec       : inout AddressBusRecType ;
-    InterruptRec     : inout AddressBusRecType ;
-    SubordinateRec   : inout AddressBusRecType 
+    ManagerRec        : inout AddressBusRecType ;
+    InterruptRec      : inout AddressBusRecType ;
+    SubordinateRec    : inout AddressBusRecType ;
+      
+    InterruptRecArray : inout StreamRecArrayType 
   ) ;
   
   -- Derive AXI interface properties from the ManagerRec
   constant AXI_ADDR_WIDTH : integer := ManagerRec.Address'length ; 
   constant AXI_DATA_WIDTH : integer := ManagerRec.DataToModel'length ;  
   constant AXI_DATA_BYTE_WIDTH : integer := AXI_DATA_WIDTH / 8 ;
-  constant AXI_BYTE_ADDR_WIDTH : integer := integer(ceil(log2(real(AXI_DATA_BYTE_WIDTH)))) ;
-    
+  constant AXI_BYTE_ADDR_WIDTH : integer := integer(ceil(log2(real(AXI_DATA_BYTE_WIDTH)))) ;    
 end entity TestCtrl ;
