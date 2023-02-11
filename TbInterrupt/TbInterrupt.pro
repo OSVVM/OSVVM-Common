@@ -37,9 +37,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #  
-TestSuite InterruptHandler
-library   InterruptHandler
-
 include testbench
 include TestCases
 
