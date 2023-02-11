@@ -38,11 +38,11 @@
 #  limitations under the License.
 #  
 
-RunTest TbAxi4_Interrupt1.vhd
-RunTest TbAxi4_Interrupt2.vhd
-RunTest TbAxi4_InterruptBurst1.vhd
-RunTest TbAxi4_InterruptBurst2.vhd
+RunTest TbAb_Interrupt1.vhd
+RunTest TbAb_Interrupt2.vhd
+RunTest TbAb_InterruptBurst1.vhd
+RunTest TbAb_InterruptBurst2.vhd
 
-RunTest TbAxi4_InterruptNoHandler1.vhd
-#RunTest TbAxi4_InterruptNoHandler2.vhd
+RunTest TbAb_InterruptNoHandler1.vhd
+# RunTest TbAb_InterruptNoHandler2.vhd
 

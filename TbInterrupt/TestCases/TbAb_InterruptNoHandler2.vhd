@@ -1,5 +1,5 @@
 --
---  File Name:         TbAxi4_InterruptNoHandler1.vhd
+--  File Name:         TbAb_InterruptNoHandler2.vhd
 --  Design Unit Name:  Architecture of TestCtrl
 --  Revision:          OSVVM MODELS STANDARD VERSION
 --
@@ -40,9 +40,9 @@
 --  limitations under the License.
 --  
 
-architecture InterruptNoHandler1 of TestCtrl is
+architecture InterruptNoHandler2 of TestCtrl is
 
-  signal ManagerSync1, MemorySync1, TestDone : integer_barrier := 1 ;
+  signal ManagerSync1, MemorySync1, TestDone, GenerateIntSync : integer_barrier := 1 ;
  
 begin
 
@@ -53,14 +53,14 @@ begin
   ControlProc : process
   begin
     -- Initialization of test
-    SetTestName("TbAxi4_InterruptNoHandler1") ;
+    SetTestName("TbAb_InterruptNoHandler2") ;
     SetLogEnable(PASSED, TRUE) ;    -- Enable PASSED logs
     SetLogEnable(INFO, TRUE) ;    -- Enable INFO logs
     SetLogEnable(GetAlertLogID("Memory_1"), INFO, FALSE) ;   
 
     -- Wait for testbench initialization 
     wait for 0 ns ;  wait for 0 ns ;
-    TranscriptOpen(OSVVM_RESULTS_DIR & "TbAxi4_InterruptNoHandler1.txt") ;
+    TranscriptOpen(OSVVM_OUTPUT_DIRECTORY & "TbAb_InterruptNoHandler2.txt") ;
     SetTranscriptMirror(TRUE) ; 
 
     -- Wait for Design Reset
@@ -75,7 +75,7 @@ begin
     
     TranscriptClose ; 
     -- Printing differs in different simulators due to differences in process order execution
-    -- AlertIfDiff("./results/TbAxi4_InterruptNoHandler1.txt", "../AXI4/Axi4/testbench/validated_results/TbAxi4_InterruptNoHandler1.txt", "") ; 
+    -- AlertIfDiff("./results/TbAb_InterruptNoHandler2.txt", "../AXI4/Axi4/testbench/validated_results/TbAb_InterruptNoHandler2.txt", "") ; 
 
     EndOfTestReports ; 
     std.env.stop ; 
@@ -92,7 +92,7 @@ begin
     wait until nReset = '1' ;  
     WaitForClock(ManagerRec, 2) ; 
     
-    for i in 0 to 3 loop 
+    for i in 0 to 7 loop 
       blankline(2) ; 
       log("Main Starting Writes.  Loop #" & to_string(i)) ;
       Write(ManagerRec, X"1000_0000", Data ) ;
@@ -109,18 +109,19 @@ begin
       Write(ManagerRec, X"A000_2004", Data + 1 ) ;
       Write(ManagerRec, X"A000_2008", Data + 2 ) ;
       Write(ManagerRec, X"A000_200C", Data + 3 ) ;
-      
+
       -- Do WaitForClock Cycles mixed with Interrupt Handling
-      IntReq <= '1' after i * 10 ns + 5 ns, '0' after i * 10 ns + 50 ns ;  
+--      IntReq <= '1' after i * 10 ns + 5 ns, '0' after i * 10 ns + 50 ns ;  
+      WaitForBarrier(GenerateIntSync) ; 
       wait for 9 ns ; 
+      Write(ManagerRec, X"1000_0010", Data + 4 ) ;
+      ReadCheck(ManagerRec, X"1000_0010", Data + 4 ) ;
+      Write(ManagerRec, X"1000_0014", Data + 5 ) ;
+      ReadCheck(ManagerRec, X"1000_0014", Data + 5 ) ;
       WaitForClock(ManagerRec, 1) ; 
       log("WaitForClock #1 finished") ;
       WaitForClock(ManagerRec, 1) ; 
       log("WaitForClock #2 finished") ;
-      WaitForClock(ManagerRec, 1) ; 
-      log("WaitForClock #3 finished") ;
-      WaitForClock(ManagerRec, 1) ; 
-      log("WaitForClock #4 finished") ;
 
       blankline(2) ; 
       log("Main Starting Reads.  Loop #" & to_string(i)) ;
@@ -148,7 +149,6 @@ begin
     variable Data : std_logic_vector(AXI_DATA_WIDTH-1 downto 0) := (others => '0') ;    
   begin
     wait ; 
-    
 --    WaitForClock(InterruptRec, 1) ; 
 --    blankline(2) ; 
 --    log("Interrupt Handler Started") ; 
@@ -171,6 +171,23 @@ begin
   end process InterruptProc ;
 
   ------------------------------------------------------------
+  -- InterruptGeneratorProc
+  --   Generate transactions for AxiSubordinate
+  ------------------------------------------------------------
+  GenInterruptProc : process
+    variable IterationCount : integer := 0 ; 
+  begin
+    WaitForBarrier(GenerateIntSync) ; 
+    -- IntReq <= '1' after IterationCount * 10 ns + 5 ns, '0' after IterationCount * 10 ns + 50 ns ;
+    wait for IterationCount * 10 ns + 5 ns ;
+    Send(InterruptRecArray(0), "1") ; 
+    wait for 45 ns ;
+    Send(InterruptRecArray(0), "0") ; 
+    
+    IterationCount := IterationCount + 1 ; 
+  end process GenInterruptProc ;
+
+  ------------------------------------------------------------
   -- SubordinateProc
   --   Generate transactions for AxiSubordinate
   ------------------------------------------------------------
@@ -186,15 +203,15 @@ begin
   end process SubordinateProc ;
 
 
-end InterruptNoHandler1 ;
+end InterruptNoHandler2 ;
 
-Configuration TbAxi4_InterruptNoHandler1 of TbAxi4Memory is
+Configuration TbAb_InterruptNoHandler2 of TbAddressBusMemory is
   for TestHarness
     for TestCtrl_1 : TestCtrl
-      use entity work.TestCtrl(InterruptNoHandler1) ; 
+      use entity work.TestCtrl(InterruptNoHandler2) ; 
     end for ; 
 --!!    for Subordinate_1 : Axi4Subordinate 
 --!!      use entity OSVVM_AXI4.Axi4Memory ; 
 --!!    end for ; 
   end for ; 
-end TbAxi4_InterruptNoHandler1 ; 
+end TbAb_InterruptNoHandler2 ; 
