@@ -54,6 +54,11 @@ library OSVVM_Common ;
   context OSVVM_Common.OsvvmCommonContext ;
 
 entity TbAddressBusMemory is
+generic (
+  NUM_INTERRUPTS       : integer := 1 ;
+  INT_EDGE_LEVEL       : std_logic := INTERRUPT_ON_LEVEL ;
+  INT_POLARITY         : std_logic := '1' 
+) ;
 end entity TbAddressBusMemory ;
 architecture TestHarness of TbAddressBusMemory is
   constant AXI_ADDR_WIDTH : integer := 32 ;
@@ -132,7 +137,7 @@ architecture TestHarness of TbAddressBusMemory is
 
   signal IntReq            : std_logic_vector(gIntReq'range) := (others => '0');
 --  signal InterruptRecArray : InterruptGeneratorRecArrayType(0 downto 0) ; -- GHDL does not like partially constrained arrays
-  signal InterruptRecArray : StreamRecArrayType(0 downto 0)(
+  signal InterruptRecArray : StreamRecArrayType(NUM_INTERRUPTS-1 downto 0)(
     DataToModel(0 downto 0), DataFromModel(0 downto 0), ParamToModel(NULL_RANGE_TYPE), ParamFromModel(NULL_RANGE_TYPE)) ;
   
 begin
@@ -322,7 +327,7 @@ begin
   ------------------------------------------------------------
   port map (
     -- Interrupt Input
-    IntReq       => IntReq(0),
+    IntReq       => IntReq,
 
     -- From TestCtrl
     TransRec     => ManagerRec,
@@ -348,20 +353,7 @@ begin
       TransRec        => InterruptRecArray(i)
     ) ;
   end generate InterruptGen ;
-  
---    InterruptGeneratorBit_0 : InterruptGeneratorBit 
---    generic map (
---      MODEL_ID_NAME    => "InterruptGeneratorBit_" & to_string(0),
---      POLARITY         => '1'
---    ) 
---    port map (
---      -- Interrupt Input
---      IntReq          => IntReq(0), 
---      
---      -- Transaction port
---      TransRec        => InterruptRecArray(0)
---    ) ;
-    
+
   ------------------------------------------------------------
   Monitor : process(IntReq)
   ------------------------------------------------------------

@@ -48,6 +48,7 @@ library osvvm ;
   context osvvm.OsvvmContext ;
 
   use work.AddressBusTransactionPkg.all; 
+  use work.InterruptGlobalSignalPkg.all ;
 
 package InterruptHandlerComponentPkg is
 
@@ -59,7 +60,7 @@ package InterruptHandlerComponentPkg is
   ) ;
   port (
     -- Interrupt Input
-    IntReq       : in   std_logic ;
+    IntReq       : in   std_logic_vector(gIntReq'range) ;
 
     -- From TestCtrl
     TransRec     : inout AddressBusRecType ;

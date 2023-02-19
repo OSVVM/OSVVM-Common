@@ -1,4 +1,4 @@
-#  File Name:         testbench.pro
+#  File Name:         TbInterrupt.pro
 #  Revision:          STANDARD VERSION
 #
 #  Maintainer:        Jim Lewis      email:  jim@synthworks.com
@@ -37,13 +37,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #  
-
-RunTest TbAb_Interrupt1.vhd
-RunTest TbAb_Interrupt2.vhd
-RunTest TbAb_Interrupt3.vhd [generic NUM_INTERRUPTS 2]
-RunTest TbAb_InterruptBurst1.vhd
-RunTest TbAb_InterruptBurst2.vhd
-
-RunTest TbAb_InterruptNoHandler1.vhd
-# RunTest TbAb_InterruptNoHandler2.vhd
+include testbench
+RunTest TestCases/TbAb_Interrupt3.vhd [generic NUM_INTERRUPTS 2]
 

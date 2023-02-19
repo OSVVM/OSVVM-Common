@@ -19,6 +19,7 @@
 --
 --  Revision History:
 --    Date      Version    Description
+--    02/2021   2023.02    Changed IntReq to an array port
 --    04/2021   2021.04    Initial revision
 --
 --
@@ -60,7 +61,7 @@ generic (
 ) ;
 port (
   -- Interrupt Input
-  IntReq          : in   std_logic ;
+  IntReq          : in   std_logic_vector(gIntReq'range) ;
 
   -- From TestCtrl
   TransRec        : inout AddressBusRecType ;
@@ -80,10 +81,10 @@ architecture Behavioral of InterruptHandler is
 begin
 
   -- Export interrupt
-  gIntReq(0) <= IntReq ;
+  gIntReq <= IntReq ;
 
   -- Only handle interrupts when interrupt transactions pending 
-  iIntReq   <= TO_X01(IntReq) when TransactionPending(InterruptRec.Rdy, InterruptRec.Ack) 
+  iIntReq   <= TO_X01(or IntReq) when TransactionPending(InterruptRec.Rdy, InterruptRec.Ack) 
                else '0' ;
 
   TransactionSelection : process 
