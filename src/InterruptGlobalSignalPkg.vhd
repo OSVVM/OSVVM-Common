@@ -9,7 +9,7 @@
 --     Simon Southwell    simon.southwell@gmail.com
 --
 --  Description:
---      InterruptHandler Component Declaration
+--      Interrupt Global Signals Package
 --
 --
 --  Developed by:

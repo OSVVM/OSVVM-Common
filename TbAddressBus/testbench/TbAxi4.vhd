@@ -129,7 +129,7 @@ architecture TestHarness of TbAxi4 is
     ) ;
   end component TestCtrl ;
 
-  signal IntReq : std_logic ; 
+  signal IntReq : std_logic_vector(gIntReq'range) := (others => '0') ; 
   
 begin
 
@@ -221,7 +221,7 @@ begin
     nReset          => nReset,
 
     -- Drive IntReq
-    IntReq          => IntReq, 
+    IntReq          => IntReq(0), 
 
     -- Transaction Interfaces
     ManagerRec      => ManagerRec,

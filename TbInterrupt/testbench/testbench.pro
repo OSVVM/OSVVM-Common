@@ -42,4 +42,8 @@ TestSuite InterruptHandler_Gen
 library   InterruptHandler_Gen
 
 analyze    TestCtrl_e.vhd
-analyze    TbAddressBusMemory.vhd
+if {$::osvvm::ToolName ne "GHDL"} { 
+  analyze    TbAddressBusMemory.vhd
+} else {
+  analyze    TbAddressBusMemory_GHDL.vhd
+}

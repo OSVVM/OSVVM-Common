@@ -137,7 +137,8 @@ architecture TestHarness of TbAddressBusMemory is
 
   signal IntReq            : std_logic_vector(gIntReq'range) := (others => '0');
 --  signal InterruptRecArray : InterruptGeneratorRecArrayType(0 downto 0) ; -- GHDL does not like partially constrained arrays
-  signal InterruptRecArray : StreamRecArrayType(NUM_INTERRUPTS-1 downto 0)(
+--  signal InterruptRecArray : StreamRecArrayType(NUM_INTERRUPTS-1 downto 0)(
+  signal InterruptRecArray : StreamRecArrayType(gIntReq'range)(
     DataToModel(0 downto 0), DataFromModel(0 downto 0), ParamToModel(NULL_RANGE_TYPE), ParamFromModel(NULL_RANGE_TYPE)) ;
   
 begin
@@ -338,7 +339,7 @@ begin
   ) ;
 
   ------------------------------------------------------------
-  InterruptGen : for i in NUM_INTERRUPTS-1 downto 0 generate
+  InterruptGen : for i in InterruptRecArray'range generate
   ------------------------------------------------------------
     InterruptGeneratorBit_1 : InterruptGeneratorBit 
     generic map (

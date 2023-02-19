@@ -9,7 +9,7 @@
 --
 --
 --  Description:
---      InterruptHandler Component Declaration
+--      InterruptGenerator Component Declaration
 --
 --
 --  Developed by:

@@ -41,7 +41,7 @@ TestSuite AddressBusTransactionArrayPkg
 
 include testbench
 include AddressBusMitTestCases
-include Interrupt
+if {$::osvvm::ToolName ne "GHDL"} { include Interrupt }
 include Axi
 
 
