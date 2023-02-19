@@ -19,7 +19,7 @@
 --
 --  Revision History:
 --    Date      Version    Description
---    02/2021   2023.02    Changed IntReq to an array port
+--    02/2023   2023.02    Changed IntReq to an array port
 --    04/2021   2021.04    Initial revision
 --
 --
