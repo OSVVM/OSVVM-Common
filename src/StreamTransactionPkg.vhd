@@ -80,6 +80,9 @@ package StreamTransactionPkg is
     WAIT_FOR_TRANSACTION,
     GET_TRANSACTION_COUNT,
     GET_ALERTLOG_ID,
+    -- Delay Coverage ID
+    SET_DELAYCOV_ID,
+    GET_DELAYCOV_ID,
     -- Burst FIFO Configuration
     SET_BURST_MODE,
     GET_BURST_MODE,
@@ -141,14 +144,14 @@ package StreamTransactionPkg is
     -- BurstFifo
     BurstFifo       : ScoreboardIdType ; 
     -- Verification Component Options Parameters - used by SetModelOptions
-    IntToModel       : integer_max ;
-    IntFromModel     : integer_max ; 
+    IntToModel      : integer_max ;
+    IntFromModel    : integer_max ; 
     BoolToModel     : boolean_max ; 
     BoolFromModel   : boolean_max ;
     TimeToModel     : time_max ; 
     TimeFromModel   : time_max ; 
     -- Verification Component Options Type 
-    Options          : integer_max ; 
+    Options         : integer_max ; 
   end record StreamRecType ; 
 
   type StreamRecArrayType  is array (integer range <>) of StreamRecType ;
@@ -251,7 +254,27 @@ package StreamTransactionPkg is
     signal    TransactionRec   : inout StreamRecType ;
     variable  ErrorCount       : out   natural
   ) ; 
-  
+
+  -- ========================================================
+  --  Delay Coverage Transactions   
+  --  Get Delay Coverage ID to change delay coverage parameters.
+  -- ========================================================
+  ------------------------------------------------------------
+  procedure SetDelayCoverageID (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  DelayCov         : in    DelayCoverageIdType 
+--    constant  Index            : in    integer := 0 
+  ) ;
+
+  ------------------------------------------------------------
+  procedure GetDelayCoverageID (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  DelayCov         : out   DelayCoverageIdType 
+--    constant  Index            : in    integer := 0 
+  ) ;
+
   -- ========================================================
   -- BurstFIFOs and Burst Mode Controls
   -- The burst FIFOs hold bursts of data that is to be sent to 
@@ -1189,8 +1212,39 @@ package body StreamTransactionPkg is
 --    ReportNonZeroAlerts(AlertLogID => AlertLogID) ;
     ErrorCount := GetAlertCount(AlertLogID => AlertLogID) ;
   end procedure GetErrorCount ; 
-  
-  
+
+  -- ========================================================
+  --  Delay Coverage Transactions   
+  --  Get Delay Coverage ID to change delay coverage parameters.
+  -- ========================================================
+  ------------------------------------------------------------
+  procedure SetDelayCoverageID (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  DelayCov         : in    DelayCoverageIdType 
+--    constant  Index            : in    integer := 0 
+  ) is
+  begin
+    TransactionRec.Operation     <= SET_DELAYCOV_ID ;
+    TransactionRec.IntToModel    <= DelayCov.ID ;
+--    TransactionRec.Options       <= Index ; 
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+  end procedure SetDelayCoverageID ;
+
+  ------------------------------------------------------------
+  procedure GetDelayCoverageID (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  DelayCov         : out   DelayCoverageIdType 
+--    constant  Index            : in    integer := 0 
+  ) is
+  begin
+    TransactionRec.Operation     <= GET_DELAYCOV_ID ;
+--    TransactionRec.Options       <= Index ; 
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+    DelayCov := GetDelayCoverage(TransactionRec.IntFromModel) ; 
+  end procedure GetDelayCoverageID ;
+
   -- ========================================================
   --  Set and Get Burst Mode   
   --  Set Burst Mode for models that do bursting.
