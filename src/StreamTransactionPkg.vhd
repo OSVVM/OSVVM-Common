@@ -25,6 +25,7 @@
 --
 --  Revision History:
 --    Date      Version    Description
+--    05/2023   2023.05    Added SetDelayCoverageID and GetDelayCoverageID
 --    11/2022   2022.11    Added StreamRecArrayType
 --    01/2022   2022.01    Burst patterns - Burst, BurstInc, BurstRandom
 --    06/2021   2021.06    Updated bursting 
@@ -264,7 +265,7 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
     signal    TransactionRec   : inout StreamRecType ;
     constant  DelayCov         : in    DelayCoverageIdType 
---    constant  Index            : in    integer := 0 
+--    constant  Index            : in    integer := 1 
   ) ;
 
   ------------------------------------------------------------
@@ -272,7 +273,7 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
     signal    TransactionRec   : inout StreamRecType ;
     variable  DelayCov         : out   DelayCoverageIdType 
---    constant  Index            : in    integer := 0 
+--    constant  Index            : in    integer := 1 
   ) ;
 
   -- ========================================================

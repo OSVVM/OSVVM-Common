@@ -11,7 +11,7 @@
 --
 --  Description:
 --    Defines the OSVVM Address Bus Model Independent Transaction
---    Interface (StreamRecType) and transaction initiation 
+--    Interface (AddressBusRecType) and transaction initiation 
 --    procedures (Read, Write, ...), as well as supporting types,
 --    constants, and subprograms that are essential to both 
 --    to Verification Components and testbenches (test 
@@ -26,6 +26,7 @@
 --
 --  Revision History:
 --    Date      Version    Description
+--    05/2023   2023.05    Added SetDelayCoverageID and GetDelayCoverageID
 --    11/2022   2022.11    Added AddressBusRecArrayType
 --    01/2022   2022.01    Burst patterns - Burst, BurstInc, BurstRandom
 --    06/2021   2021.06    Updated bursting 
@@ -38,7 +39,7 @@
 --
 --  This file is part of OSVVM.
 --  
---  Copyright (c) 2017 - 2022 by SynthWorks Design Inc.  
+--  Copyright (c) 2017 - 2023 by SynthWorks Design Inc.  
 --  
 --  Licensed under the Apache License, Version 2.0 (the "License");
 --  you may not use this file except in compliance with the License.
@@ -83,6 +84,9 @@ package AddressBusTransactionPkg is
     GET_TRANSACTION_COUNT, 
     GET_WRITE_TRANSACTION_COUNT, GET_READ_TRANSACTION_COUNT,
     GET_ALERTLOG_ID, 
+    -- Delay Coverage ID
+    SET_DELAYCOV_ID,
+    GET_DELAYCOV_ID,
     -- Burst FIFO Configuration
     SET_BURST_MODE,
     GET_BURST_MODE,
@@ -310,6 +314,39 @@ package AddressBusTransactionPkg is
 
   alias GetErrors is GetErrorCount [AddressBusRecType, natural] ;
 
+  -- ========================================================
+  --  Delay Coverage Transactions   
+  --  Get Delay Coverage ID to change delay coverage parameters.
+  -- ========================================================
+  ------------------------------------------------------------
+  procedure SetDelayCoverageID (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout AddressBusRecType ;
+    constant  DelayCov         : in    DelayCoverageIdType ;
+    constant  Index            : in    integer := 1 
+  ) ;
+
+  ------------------------------------------------------------
+  procedure GetDelayCoverageID (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout AddressBusRecType ;
+    variable  DelayCov         : out   DelayCoverageIdType ;
+    constant  Index            : in    integer := 1 
+  ) ;
+
+  ------------------------------------------------------------
+  procedure SetDelayCoverageID (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout AddressBusRecType ;
+    constant  DelayCov         : in    DelayCoverageIdArrayType 
+  ) ;
+
+  ------------------------------------------------------------
+  procedure GetDelayCoverageID (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout AddressBusRecType ;
+    variable  DelayCov         : out   DelayCoverageIdArrayType 
+  ) ;
 
   -- ========================================================
   -- BurstFIFOs and Burst Mode Controls
@@ -1041,6 +1078,62 @@ package body AddressBusTransactionPkg is
 --    ReportNonZeroAlerts(AlertLogID => ModelID) ;
     ErrorCount := GetAlertCount(AlertLogID => ModelID) ;
   end procedure GetErrorCount ;
+
+  -- ========================================================
+  --  Delay Coverage Transactions   
+  --  Get Delay Coverage ID to change delay coverage parameters.
+  -- ========================================================
+  ------------------------------------------------------------
+  procedure SetDelayCoverageID (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout AddressBusRecType ;
+    constant  DelayCov         : in    DelayCoverageIdType ;
+    constant  Index            : in    integer := 1 
+  ) is
+  begin
+    TransactionRec.Operation     <= SET_DELAYCOV_ID ;
+    TransactionRec.IntToModel    <= DelayCov.ID ;
+    TransactionRec.Options       <= Index ; 
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+  end procedure SetDelayCoverageID ;
+
+  ------------------------------------------------------------
+  procedure GetDelayCoverageID (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout AddressBusRecType ;
+    variable  DelayCov         : out   DelayCoverageIdType ;
+    constant  Index            : in    integer := 1 
+  ) is
+  begin
+    TransactionRec.Operation     <= GET_DELAYCOV_ID ;
+    TransactionRec.Options       <= Index ; 
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+    DelayCov := GetDelayCoverage(TransactionRec.IntFromModel) ; 
+  end procedure GetDelayCoverageID ;
+
+  ------------------------------------------------------------
+  procedure SetDelayCoverageID (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout AddressBusRecType ;
+    constant  DelayCov         : in    DelayCoverageIdArrayType 
+  ) is
+  begin
+    for i in DelayCov'range loop
+      SetDelayCoverageID(TransactionRec, DelayCov(i), i) ; 
+    end loop ; 
+  end procedure SetDelayCoverageID ;
+
+  ------------------------------------------------------------
+  procedure GetDelayCoverageID (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout AddressBusRecType ;
+    variable  DelayCov         : out   DelayCoverageIdArrayType 
+  ) is
+  begin
+    for i in DelayCov'range loop
+      GetDelayCoverageID(TransactionRec, DelayCov(i), i) ; 
+    end loop ; 
+  end procedure GetDelayCoverageID ;
 
   -- ========================================================
   --  Set and Get Burst Mode   
