@@ -82,6 +82,8 @@ package StreamTransactionPkg is
     GET_TRANSACTION_COUNT,
     GET_ALERTLOG_ID,
     -- Delay Coverage ID
+    SET_USE_DELAYCOV,
+    GET_USE_DELAYCOV,
     SET_DELAYCOV_ID,
     GET_DELAYCOV_ID,
     -- Burst FIFO Configuration
@@ -261,6 +263,20 @@ package StreamTransactionPkg is
   --  Get Delay Coverage ID to change delay coverage parameters.
   -- ========================================================
   ------------------------------------------------------------
+  procedure SetUseDelayCoverage (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut StreamRecType ;
+    constant OptVal         : In    boolean := TRUE
+  ) ;
+  
+  ------------------------------------------------------------
+  procedure GetUseDelayCoverage (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut StreamRecType ;
+    variable OptVal         : Out   boolean
+  ) ;
+
+  ------------------------------------------------------------
   procedure SetDelayCoverageID (
   ------------------------------------------------------------
     signal    TransactionRec   : inout StreamRecType ;
@@ -331,10 +347,10 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
   --  GotBurst   
   --  Check to see if Read Burst is available
-  --  Primarily used internally
   ------------------------------------------------------------
   ------------------------------------------------------------
   procedure GotBurst (
+  --  Do not refactor. Required by Co-Sim interface 
   ------------------------------------------------------------
     signal    TransactionRec   : inout StreamRecType ;
     constant  NumFifoWords     : in    integer ;
@@ -1219,6 +1235,30 @@ package body StreamTransactionPkg is
   --  Get Delay Coverage ID to change delay coverage parameters.
   -- ========================================================
   ------------------------------------------------------------
+  procedure SetUseDelayCoverage (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut StreamRecType ;
+    constant OptVal         : In    boolean := TRUE
+  ) is
+  begin
+    TransactionRec.Operation     <= SET_USE_DELAYCOV ;
+    TransactionRec.BoolToModel   <= OptVal ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+  end procedure SetUseDelayCoverage ;
+
+  ------------------------------------------------------------
+  procedure GetUseDelayCoverage (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut StreamRecType ;
+    variable OptVal         : Out   boolean
+  ) is
+  begin
+    TransactionRec.Operation     <= GET_USE_DELAYCOV ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+    OptVal := TransactionRec.BoolFromModel    ;
+  end procedure GetUseDelayCoverage ;
+
+  ------------------------------------------------------------
   procedure SetDelayCoverageID (
   ------------------------------------------------------------
     signal    TransactionRec   : inout StreamRecType ;
@@ -1276,10 +1316,11 @@ package body StreamTransactionPkg is
 
   ------------------------------------------------------------
   --  GotBurst   
-  -- Check to see if Read Burst is available
+  --  Check to see if a Burst is available
   ------------------------------------------------------------
   ------------------------------------------------------------
   procedure GotBurst (
+  --  Do not refactor. Required by Co-Sim interface 
   ------------------------------------------------------------
     signal    TransactionRec   : inout StreamRecType ;
     constant  NumFifoWords     : in    integer ;
