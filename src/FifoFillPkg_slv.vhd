@@ -159,6 +159,16 @@ package FifoFillPkg_slv is
   ) ;
 
   ------------------------------------------------------------
+  procedure CheckBurstFifo (
+  -- Check received values from the FIFO against 
+  -- expected values in the scoreboard
+  ------------------------------------------------------------
+    constant Scoreboard     : in    ScoreboardIdType ;
+    constant Fifo           : in    ScoreboardIdType ;
+    constant Count          : in    integer 
+  ) ;
+
+  ------------------------------------------------------------
   procedure CheckBurstVector (
   -- Check values from the FIFO against the values 
   -- in the VectorOfWords parameter.   
@@ -489,6 +499,19 @@ package body FifoFillPkg_slv is
       VectorOfWords(i) := to_integer(Pop(Fifo)) ; 
     end loop ;
   end procedure PopBurstVector ;
+
+  ------------------------------------------------------------
+  procedure CheckBurstFifo (
+  ------------------------------------------------------------
+    constant Scoreboard     : in    ScoreboardIdType ;
+    constant Fifo           : in    ScoreboardIdType ;
+    constant Count          : in    integer 
+  ) is
+  begin
+    for i in 1 to Count loop
+      Check(Scoreboard, Pop(Fifo)) ; 
+    end loop ; 
+  end procedure CheckBurstFifo ;
 
   ------------------------------------------------------------
   procedure CheckBurstVector (

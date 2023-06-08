@@ -57,6 +57,10 @@ RunTest  TbAxi_SendGetAllParamAsync1.vhd
 
 RunTest  TbStream_GotBurst1.vhd
 
+# 2023.05 Additions
+RunTest   TbStream_SendCheckBurstVector1.vhd
+RunTest   TbStream_SendCheckBurstVectorAsync1.vhd
+
 
 ## =============================================
 ## MIT Record Checks Burst Transfer Tests - only test once for all 

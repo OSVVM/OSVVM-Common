@@ -85,8 +85,8 @@ package AddressBusTransactionPkg is
     GET_WRITE_TRANSACTION_COUNT, GET_READ_TRANSACTION_COUNT,
     GET_ALERTLOG_ID, 
     -- Delay Coverage ID
-    SET_USE_DELAYCOV,
-    GET_USE_DELAYCOV,
+    SET_USE_RANDOM_DELAYS,
+    GET_USE_RANDOM_DELAYS,
     SET_DELAYCOV_ID,
     GET_DELAYCOV_ID,
     -- Burst FIFO Configuration
@@ -321,14 +321,14 @@ package AddressBusTransactionPkg is
   --  Get Delay Coverage ID to change delay coverage parameters.
   -- ========================================================
   ------------------------------------------------------------
-  procedure SetUseDelayCoverage (
+  procedure SetUseRandomDelays (
   ------------------------------------------------------------
     signal   TransactionRec : InOut AddressBusRecType ;
     constant OptVal         : In    boolean := TRUE
   ) ;
   
   ------------------------------------------------------------
-  procedure GetUseDelayCoverage (
+  procedure GetUseRandomDelays (
   ------------------------------------------------------------
     signal   TransactionRec : InOut AddressBusRecType ;
     variable OptVal         : Out   boolean
@@ -1100,28 +1100,28 @@ package body AddressBusTransactionPkg is
   --  Get Delay Coverage ID to change delay coverage parameters.
   -- ========================================================
   ------------------------------------------------------------
-  procedure SetUseDelayCoverage (
+  procedure SetUseRandomDelays (
   ------------------------------------------------------------
     signal   TransactionRec : InOut AddressBusRecType ;
     constant OptVal         : In    boolean := TRUE
   ) is
   begin
-    TransactionRec.Operation     <= SET_USE_DELAYCOV ;
+    TransactionRec.Operation     <= SET_USE_RANDOM_DELAYS ;
     TransactionRec.BoolToModel   <= OptVal ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
-  end procedure SetUseDelayCoverage ;
+  end procedure SetUseRandomDelays ;
 
   ------------------------------------------------------------
-  procedure GetUseDelayCoverage (
+  procedure GetUseRandomDelays (
   ------------------------------------------------------------
     signal   TransactionRec : InOut AddressBusRecType ;
     variable OptVal         : Out   boolean
   ) is
   begin
-    TransactionRec.Operation     <= GET_USE_DELAYCOV ;
+    TransactionRec.Operation     <= GET_USE_RANDOM_DELAYS ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     OptVal := TransactionRec.BoolFromModel    ;
-  end procedure GetUseDelayCoverage ;
+  end procedure GetUseRandomDelays ;
   
   ------------------------------------------------------------
   procedure SetDelayCoverageID (
