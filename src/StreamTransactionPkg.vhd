@@ -551,7 +551,7 @@ package StreamTransactionPkg is
     signal    TransactionRec   : inout StreamRecType ;
     constant  VectorOfWords    : in    integer_vector ;
     constant  Param            : in    std_logic_vector ;
-    constant  FifoWidth        : in    integer := 8 ; 
+    constant  FifoWidth        : in    integer ; 
     constant  StatusMsgOn      : in    boolean := false
   ) ;
   
@@ -560,7 +560,7 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
     signal    TransactionRec   : inout StreamRecType ;
     constant  VectorOfWords    : in    integer_vector ;
-    constant  FifoWidth        : in    integer := 8 ; 
+    constant  FifoWidth        : in    integer ; 
     constant  StatusMsgOn      : in    boolean := false
   ) ;
   
@@ -673,7 +673,7 @@ package StreamTransactionPkg is
     signal    TransactionRec   : inout StreamRecType ;
     constant  VectorOfWords    : in    integer_vector ;
     constant  Param            : in    std_logic_vector ;
-    constant  FifoWidth        : in    integer := 8 ; 
+    constant  FifoWidth        : in    integer ; 
     constant  StatusMsgOn      : in    boolean := false
   ) ;
   
@@ -682,7 +682,7 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
     signal    TransactionRec   : inout StreamRecType ;
     constant  VectorOfWords    : in    integer_vector ;
-    constant  FifoWidth        : in    integer := 8 ; 
+    constant  FifoWidth        : in    integer ; 
     constant  StatusMsgOn      : in    boolean := false
   ) ;
   
@@ -959,7 +959,7 @@ package StreamTransactionPkg is
     signal    TransactionRec   : inout StreamRecType ;
     constant  VectorOfWords    : in    integer_vector ;
     constant  Param            : in    std_logic_vector ;
-    constant  FifoWidth        : in    integer := 8 ; 
+    constant  FifoWidth        : in    integer ; 
     constant  StatusMsgOn      : in    boolean := false
   ) ;
   
@@ -968,7 +968,7 @@ package StreamTransactionPkg is
   ------------------------------------------------------------
     signal    TransactionRec   : inout StreamRecType ;
     constant  VectorOfWords    : in    integer_vector ;
-    constant  FifoWidth        : in    integer := 8 ; 
+    constant  FifoWidth        : in    integer ; 
     constant  StatusMsgOn      : in    boolean := false
   ) ;
   
@@ -1086,7 +1086,7 @@ package StreamTransactionPkg is
     constant  VectorOfWords    : in    integer_vector ;
     constant  Param            : in    std_logic_vector ;
     variable  Available        : out   boolean ;
-    constant  FifoWidth        : in    integer := 8 ; 
+    constant  FifoWidth        : in    integer ; 
     constant  StatusMsgOn      : in    boolean := false
   ) ;
     
@@ -1096,7 +1096,7 @@ package StreamTransactionPkg is
     signal    TransactionRec   : inout StreamRecType ;
     constant  VectorOfWords    : in    integer_vector ;
     variable  Available        : out   boolean ;
-    constant  FifoWidth        : in    integer := 8 ; 
+    constant  FifoWidth        : in    integer ; 
     constant  StatusMsgOn      : in    boolean := false
   ) ;
   
@@ -1728,7 +1728,7 @@ package body StreamTransactionPkg is
     signal    TransactionRec   : inout StreamRecType ;
     constant  VectorOfWords    : in    integer_vector ;
     constant  Param            : in    std_logic_vector ;
-    constant  FifoWidth        : in    integer := 8 ; 
+    constant  FifoWidth        : in    integer ; 
     constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
@@ -1741,7 +1741,7 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
     signal    TransactionRec   : inout StreamRecType ;
     constant  VectorOfWords    : in    integer_vector ;
-    constant  FifoWidth        : in    integer := 8 ; 
+    constant  FifoWidth        : in    integer ; 
     constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
@@ -1889,7 +1889,7 @@ package body StreamTransactionPkg is
     signal    TransactionRec   : inout StreamRecType ;
     constant  VectorOfWords    : in    integer_vector ;
     constant  Param            : in    std_logic_vector ;
-    constant  FifoWidth        : in    integer := 8 ; 
+    constant  FifoWidth        : in    integer ; 
     constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
@@ -1902,7 +1902,7 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
     signal    TransactionRec   : inout StreamRecType ;
     constant  VectorOfWords    : in    integer_vector ;
-    constant  FifoWidth        : in    integer := 8 ; 
+    constant  FifoWidth        : in    integer ; 
     constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
@@ -2333,7 +2333,7 @@ package body StreamTransactionPkg is
     signal    TransactionRec   : inout StreamRecType ;
     constant  VectorOfWords    : in    integer_vector ;
     constant  Param            : in    std_logic_vector ;
-    constant  FifoWidth        : in    integer := 8 ; 
+    constant  FifoWidth        : in    integer ; 
     constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
@@ -2346,7 +2346,7 @@ package body StreamTransactionPkg is
   ------------------------------------------------------------
     signal    TransactionRec   : inout StreamRecType ;
     constant  VectorOfWords    : in    integer_vector ;
-    constant  FifoWidth        : in    integer := 8 ; 
+    constant  FifoWidth        : in    integer ; 
     constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
@@ -2502,7 +2502,7 @@ package body StreamTransactionPkg is
     constant  VectorOfWords    : in    integer_vector ;
     constant  Param            : in    std_logic_vector ;
     variable  Available        : out   boolean ;
-    constant  FifoWidth        : in    integer := 8 ; 
+    constant  FifoWidth        : in    integer ; 
     constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
@@ -2519,7 +2519,7 @@ package body StreamTransactionPkg is
     signal    TransactionRec   : inout StreamRecType ;
     constant  VectorOfWords    : in    integer_vector ;
     variable  Available        : out   boolean ;
-    constant  FifoWidth        : in    integer := 8 ; 
+    constant  FifoWidth        : in    integer ; 
     constant  StatusMsgOn      : in    boolean := false
   ) is
   begin
