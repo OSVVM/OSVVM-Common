@@ -2,6 +2,7 @@
 
 | Revision  |  Release Summary | 
 ------------|----------- 
+| 2023.05   |  Updated API for Randomizing delays in VC   
 | 2022.11   |  Relocated tests cases for XxxTransactionPkg and InterruptHandler to here   
 | 2022.10   |  Updated InterruptHandler for BurstFIFO updates.   
 |           |  Updated PushBurstRandom / CheckBurstRandom to work around Questa bugs
@@ -12,6 +13,13 @@
 | 2020.07   |  Updated for MIT and freed the slaves
 | 2020.02   |  Created by refactoring Axi4LiteMasterTransactionPkg
 
+
+
+## 2023.05  May 2023
+- In XxxTransactionPkg, 
+   - Added transactions to SetUseRandomDelays, SetDelayCoverageID, GetDelayCoverageID
+   - Added overloading for SendBurstVector[Async] and [Try]CheckBurstVector to use integer_vector
+- In FifoFillPkg_slv:  Added CheckBurstFifo
 
 ## 2022.11  November 2022
 - Added array types AddressBusRecArrayType and StreamRecArrayType
