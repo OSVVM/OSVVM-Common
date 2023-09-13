@@ -25,6 +25,7 @@
 --
 --  Revision History:
 --    Date      Version    Description
+--    09/2023   2023.09    Added SetDelayCoverageID and GetDelayCoverageID
 --    05/2023   2023.05    Added SetDelayCoverageID and GetDelayCoverageID
 --    11/2022   2022.11    Added StreamRecArrayType
 --    01/2022   2022.01    Burst patterns - Burst, BurstInc, BurstRandom
@@ -95,11 +96,13 @@ package StreamTransactionPkg is
     SET_MODEL_OPTIONS,
     GET_MODEL_OPTIONS,
     --  Transmitter
+    START_OF_TX_OPS,
     SEND, 
     SEND_ASYNC,
     SEND_BURST,
     SEND_BURST_ASYNC,
     -- Receiver
+    START_OF_RX_OPS,
     GET,             
     TRY_GET,
     GET_BURST,
@@ -1208,6 +1211,39 @@ package StreamTransactionPkg is
   -----------------------------------------------------------
     constant  Operation        : in StreamOperationType
   ) return boolean ;
+
+  ------------------------------------------------------------
+  function IsTransmitterOperation (
+  -----------------------------------------------------------
+    constant  Operation        : in StreamOperationType
+  ) return boolean  ;
+
+  ------------------------------------------------------------
+  function IsReceiverOperation (
+  -----------------------------------------------------------
+    constant  Operation        : in StreamOperationType
+  ) return boolean ;
+
+  ------------------------------------------------------------
+  function ClassifyUnimplementedOperation (
+  -----------------------------------------------------------
+    constant  Operation        : in StreamOperationType;
+    constant  TransactionCount : in natural
+  ) return string ;
+
+  ------------------------------------------------------------
+  function ClassifyUnimplementedTransmitterOperation (
+  -----------------------------------------------------------
+    constant  Operation        : in StreamOperationType;
+    constant  TransactionCount : in natural
+  ) return string ;
+  
+  ------------------------------------------------------------
+  function ClassifyUnimplementedReceiverOperation (
+  -----------------------------------------------------------
+    constant  Operation        : in StreamOperationType ;
+    constant  TransactionCount : in natural
+  ) return string ;
 
 end StreamTransactionPkg ;
 
@@ -2687,5 +2723,77 @@ package body StreamTransactionPkg is
   begin
     return (Operation = CHECK) or (Operation = TRY_CHECK) or (Operation = CHECK_BURST) or (Operation = TRY_CHECK_BURST) ;
   end function IsCheck ;
+  
+  ------------------------------------------------------------
+  function IsTransmitterOperation (
+  -----------------------------------------------------------
+    constant  Operation        : in StreamOperationType
+  ) return boolean is
+  begin
+    return (Operation < START_OF_RX_OPS) ;
+  end function IsTransmitterOperation ;
+
+  ------------------------------------------------------------
+  function IsReceiverOperation (
+  -----------------------------------------------------------
+    constant  Operation        : in StreamOperationType
+  ) return boolean is
+  begin
+    return (Operation < START_OF_TX_OPS) or (Operation > START_OF_RX_OPS) ;
+  end function IsReceiverOperation ;
+
+  ------------------------------------------------------------
+  function ClassifyUnimplementedOperation (
+  -----------------------------------------------------------
+    constant  Operation        : in StreamOperationType;
+    constant  TransactionCount : in natural
+  ) return string is
+  begin
+    if Operation = MULTIPLE_DRIVER_DETECT then
+      return "Multiple Drivers on Transaction Record." & 
+             "  Transaction # " & to_string(TransactionCount) ;
+    else
+      return "Unimplemented Transaction: " & to_string(Operation) & 
+             "  Transaction # " & to_string(TransactionCount) ;
+    end if ; 
+  end function ClassifyUnimplementedOperation ;
+
+  ------------------------------------------------------------
+  function ClassifyUnimplementedTransmitterOperation (
+  -----------------------------------------------------------
+    constant  Operation        : in StreamOperationType;
+    constant  TransactionCount : in natural
+  ) return string is
+  begin
+    if Operation = MULTIPLE_DRIVER_DETECT then
+      return "Multiple Drivers on Transaction Record." & 
+             "  Transaction # " & to_string(TransactionCount) ;
+    elsif IsReceiverOperation(Operation) then
+      return "Not a Transmitter Transaction: " & to_string(Operation) & 
+             "  Transaction # " & to_string(TransactionCount) ;
+    else
+      return "Unimplemented Transaction: " & to_string(Operation) & 
+             "  Transaction # " & to_string(TransactionCount) ;
+    end if ; 
+  end function ClassifyUnimplementedTransmitterOperation ;
+  
+  ------------------------------------------------------------
+  function ClassifyUnimplementedReceiverOperation (
+  -----------------------------------------------------------
+    constant  Operation        : in StreamOperationType ;
+    constant  TransactionCount : in natural
+  ) return string is
+  begin
+    if Operation = MULTIPLE_DRIVER_DETECT then
+      return "Multiple Drivers on Transaction Record." & 
+             "  Transaction # " & to_string(TransactionCount) ;
+    elsif IsTransmitterOperation(Operation) then
+      return "Not a Receiver Transaction: " & to_string(Operation) & 
+             "  Transaction # " & to_string(TransactionCount) ;
+    else
+      return "Unimplemented Transaction: " & to_string(Operation) & 
+             "  Transaction # " & to_string(TransactionCount) ;
+    end if ; 
+  end function ClassifyUnimplementedReceiverOperation ;
 
 end StreamTransactionPkg ;

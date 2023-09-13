@@ -947,6 +947,12 @@ package AddressBusTransactionPkg is
     constant Operation      : In AddressBusOperationType
   ) return boolean ;
 
+  ------------------------------------------------------------
+  function ClassifyUnimplementedOperation (
+  -----------------------------------------------------------
+    constant Operation        : In AddressBusOperationType ;
+    constant TransactionCount : in natural
+  ) return string ;
   
 end package AddressBusTransactionPkg ;
 
@@ -970,8 +976,6 @@ package body AddressBusTransactionPkg is
     return result ; 
 --    return maximum(s) ;
   end function resolved_max ;
-
-
 
   -- ========================================================
   --  Directive Transactions
@@ -2115,5 +2119,22 @@ package body AddressBusTransactionPkg is
 --      or (Operation = ASYNC_READ_BURST_ADDRESS)
 --      or (Operation = ASYNC_READ_BURST_DATA) ;
   end function IsBurst ;
+  
+  ------------------------------------------------------------
+  function ClassifyUnimplementedOperation (
+  -----------------------------------------------------------
+    constant Operation        : In AddressBusOperationType ;
+    constant TransactionCount : in natural
+  ) return string is
+  begin
+    if Operation = MULTIPLE_DRIVER_DETECT then
+      return "Multiple Drivers on Transaction Record." & 
+             "  Transaction # " & to_string(TransactionCount) ;
+    else
+      return "Unimplemented Transaction: " & to_string(Operation) & 
+             "  Transaction # " & to_string(TransactionCount) ;
+    end if ; 
+  end function ClassifyUnimplementedOperation ;
+
 
 end package body AddressBusTransactionPkg ;

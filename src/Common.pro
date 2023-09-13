@@ -39,7 +39,8 @@
 #  limitations under the License.
 #
 library OSVVM_Common
-analyze ModelParametersPkg.vhd
+analyze ModelParametersPtPkg.vhd
+analyze ModelParametersSingletonPkg.vhd
 analyze FifoFillPkg_slv.vhd
 
 # MIT

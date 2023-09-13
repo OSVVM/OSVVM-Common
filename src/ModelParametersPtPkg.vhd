@@ -272,7 +272,8 @@ package body ModelParametersPkg is
     ------------------------------------------------------------
 		impure function Get(Index: natural; len: positive) return std_logic_vector is
     ------------------------------------------------------------
-      constant AllU : std_logic_vector(len-1 downto 0) := (others => 'U') ; 
+      constant AllU   : std_logic_vector(len-1 downto 0) := (others => 'U') ; 
+      variable Result : signed(31 downto 0) ;
 		begin
       case ParmPtrVar(Index).ParmType is 
         when NONE =>
@@ -280,7 +281,8 @@ package body ModelParametersPkg is
           return AllU;
         
         when eINT =>
-          return std_logic_vector(to_signed(ParmPtrVar(Index).IParm, len));
+          Result := to_signed(ParmPtrVar(Index).IParm, 32) ;
+          return std_logic_vector(Result(len-1 downto 0));
 
         when eSLV =>
           return resize(ParmPtrVar(Index).SParm.all, len);
@@ -308,7 +310,6 @@ package body ModelParametersPkg is
       return AlertLogIDVar ; 
     end function GetAlertLogID ;
     
-				
 	end protected body ModelParametersPType;
 	
 end package body ModelParametersPkg;
