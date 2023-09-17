@@ -25,7 +25,9 @@
 --
 --  Revision History:
 --    Date      Version    Description
---    09/2023   2023.09    Added SetDelayCoverageID and GetDelayCoverageID
+--    09/2023   2023.09    Added ModelParametersIDType to Record, 
+--                         Added SendAndGet and SendAndGetBurst,
+--                         Added OperationType ENUMs:  EXTEND_DIRECTIVE_OP, EXTEND_OP, EXTEND_TX_OP, EXTEND_RX_OP
 --    05/2023   2023.05    Added SetDelayCoverageID and GetDelayCoverageID
 --    11/2022   2022.11    Added StreamRecArrayType
 --    01/2022   2022.01    Burst patterns - Burst, BurstInc, BurstRandom
@@ -65,6 +67,7 @@ library osvvm ;
   context osvvm.OsvvmContext ;  
   use osvvm.ScoreboardPkg_slv.all ; 
   
+  use work.ModelParametersSingletonPkg.all ; 
   use work.FifoFillPkg_slv.all ; 
 
 package StreamTransactionPkg is 
@@ -75,7 +78,7 @@ package StreamTransactionPkg is
   --  to the model via the transaction interface
   -- ========================================================
   type StreamUnresolvedOperationType is (
-    -- Default. Used for Multiple Driver Detection
+    -- Default. Used by resolution function for Multiple Driver Detection
     NOT_DRIVEN,  
     -- Directives
     WAIT_FOR_CLOCK, 
@@ -95,12 +98,17 @@ package StreamTransactionPkg is
     -- Model Options
     SET_MODEL_OPTIONS,
     GET_MODEL_OPTIONS,
+    -- VC Customization of Directives and Functional Operations
+    EXTEND_DIRECTIVE_OP,
+    EXTEND_OP,
     --  Transmitter
     START_OF_TX_OPS,
     SEND, 
     SEND_ASYNC,
     SEND_BURST,
     SEND_BURST_ASYNC,
+    -- VC Customization of TX Operations
+    EXTEND_TX_OP,
     -- Receiver
     START_OF_RX_OPS,
     GET,             
@@ -111,7 +119,14 @@ package StreamTransactionPkg is
     TRY_CHECK,
     CHECK_BURST,
     TRY_CHECK_BURST,
-    MULTIPLE_DRIVER_DETECT  -- value used when multiple drivers are present
+    -- VC Customization of RX Operations
+    EXTEND_RX_OP,
+    -- Send and Get
+    SEND_AND_GET, 
+    SEND_AND_GET_BURST, 
+
+    -- Resolution function detected Multiple drivers
+    MULTIPLE_DRIVER_DETECT 
   ) ;
   type StreamUnresolvedOperationVectorType is array (natural range <>) of StreamUnresolvedOperationType ;
   -- Maximum is implicitly defined for any array type in VHDL-2008.   
@@ -149,6 +164,10 @@ package StreamTransactionPkg is
     ParamFromModel  : std_logic_vector_max_c ; 
     -- BurstFifo
     BurstFifo       : ScoreboardIdType ; 
+    UseCheckFifo    : boolean_max ; 
+    CheckFifo       : ScoreboardIdType ; 
+    -- Parameters - internal settings for the VC in a singleton data structure   
+    Params          : ModelParametersIDType ;  
     -- Verification Component Options Parameters - used by SetModelOptions
     IntToModel      : integer_max ;
     IntFromModel    : integer_max ; 
@@ -1168,6 +1187,49 @@ package StreamTransactionPkg is
     constant  StatusMsgOn      : in    boolean := false
   ) ;  
 
+  -- ========================================================
+  --  Send And Get Transactions
+  -- 
+  -- ========================================================
+  ------------------------------------------------------------
+  procedure SendAndGet (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  iData            : in    std_logic_vector ;
+    constant  iParam           : in    std_logic_vector ;
+    variable  oData            : out   std_logic_vector ;
+    variable  oParam           : out   std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
+  ) ;  
+
+  ------------------------------------------------------------
+  procedure SendAndGet (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  iData            : in    std_logic_vector ;
+    variable  oData            : out   std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
+  ) ;  
+
+  ------------------------------------------------------------
+  procedure SendAndGetBurst (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  iNumFifoWords    : in    integer ;
+    constant  iParam           : in    std_logic_vector ;
+    variable  oNumFifoWords    : out   integer ;
+    variable  oParam           : out   std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
+  ) ; 
+
+  ------------------------------------------------------------
+  procedure SendAndGetBurst (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  iNumFifoWords    : in    integer ;
+    variable  oNumFifoWords    : out   integer ;
+    constant  StatusMsgOn      : in    boolean := false 
+  ) ; 
 
   -- ========================================================
   --  Pseudo Transactions
@@ -2656,6 +2718,70 @@ package body StreamTransactionPkg is
   begin
     TryCheckBurstRandom(TransactionRec, CoverID, NumFifoWords, FifoWidth, "", Available, StatusMsgOn) ;
   end procedure TryCheckBurstRandom ;  
+
+
+  -- ========================================================
+  --  Send And Get Transactions
+  -- 
+  -- ========================================================
+  ------------------------------------------------------------
+  procedure SendAndGet (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  iData            : in    std_logic_vector ;
+    constant  iParam           : in    std_logic_vector ;
+    variable  oData            : out   std_logic_vector ;
+    variable  oParam           : out   std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
+  ) is 
+  begin
+    LocalSend(TransactionRec, SEND_AND_GET, iData, iParam, StatusMsgOn) ;
+    oData  := SafeResize(TransactionRec.DataFromModel,  oData'length) ; 
+    oParam := SafeResize(TransactionRec.ParamFromModel, oParam'length) ; 
+  end procedure SendAndGet ;  
+
+  ------------------------------------------------------------
+  procedure SendAndGet (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  iData            : in    std_logic_vector ;
+    variable  oData            : out   std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
+  ) is 
+  begin
+    LocalSend(TransactionRec, SEND_AND_GET, iData, "", StatusMsgOn) ;
+    oData  := SafeResize(TransactionRec.DataFromModel, oData'length) ; 
+  end procedure SendAndGet ;  
+
+  ------------------------------------------------------------
+  procedure SendAndGetBurst (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  iNumFifoWords    : in    integer ;
+    constant  iParam           : in    std_logic_vector ;
+    variable  oNumFifoWords    : out   integer ;
+    variable  oParam           : out   std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
+  ) is 
+  begin
+    LocalSendBurst(TransactionRec, SEND_AND_GET_BURST, iNumFifoWords, iParam, StatusMsgOn) ;
+    oNumFifoWords := TransactionRec.IntFromModel ;
+    oParam        := SafeResize(TransactionRec.ParamFromModel, oParam'length) ; 
+  end procedure SendAndGetBurst ; 
+
+  ------------------------------------------------------------
+  procedure SendAndGetBurst (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecType ;
+    constant  iNumFifoWords    : in    integer ;
+    variable  oNumFifoWords    : out   integer ;
+    constant  StatusMsgOn      : in    boolean := false 
+  ) is 
+  begin
+    LocalSendBurst(TransactionRec, SEND_AND_GET_BURST, iNumFifoWords, "", StatusMsgOn) ;
+    oNumFifoWords := TransactionRec.IntFromModel ;
+  end procedure SendAndGetBurst ; 
+
 
   -- ========================================================
   --  Pseudo Transactions
