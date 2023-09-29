@@ -28,6 +28,7 @@
 --    09/2023   2023.09    Added ModelParametersIDType to Record, 
 --                         Added SendAndGet and SendAndGetBurst,
 --                         Added OperationType ENUMs:  EXTEND_DIRECTIVE_OP, EXTEND_OP, EXTEND_TX_OP, EXTEND_RX_OP
+--                         Added ClassifyUnimplementedOperation, ClassifyUnimplementedTransmitterOperation, ClassifyUnimplementedReceiverOperation
 --    05/2023   2023.05    Added SetDelayCoverageID and GetDelayCoverageID
 --    11/2022   2022.11    Added StreamRecArrayType
 --    01/2022   2022.01    Burst patterns - Burst, BurstInc, BurstRandom
@@ -164,8 +165,8 @@ package StreamTransactionPkg is
     ParamFromModel  : std_logic_vector_max_c ; 
     -- BurstFifo
     BurstFifo       : ScoreboardIdType ; 
-    UseCheckFifo    : boolean_max ; 
-    CheckFifo       : ScoreboardIdType ; 
+--    UseCheckFifo    : boolean_max ; 
+--    CheckFifo       : ScoreboardIdType ; 
     -- Parameters - internal settings for the VC in a singleton data structure   
     Params          : ModelParametersIDType ;  
     -- Verification Component Options Parameters - used by SetModelOptions

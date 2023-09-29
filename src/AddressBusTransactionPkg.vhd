@@ -191,8 +191,8 @@ package AddressBusTransactionPkg is
     -- Burst FIFOs
     WriteBurstFifo     : ScoreboardIdType ; 
     ReadBurstFifo      : ScoreboardIdType ; 
-    UseCheckFifo       : boolean_max ; 
-    CheckFifo          : ScoreboardIdType ; 
+--    UseCheckFifo       : boolean_max ; 
+--    CheckFifo          : ScoreboardIdType ; 
     -- Parameters - internal settings for the VC in a singleton data structure   
     Params             : ModelParametersIDType ;  
     -- StatusMsgOn provides transaction messaging override.

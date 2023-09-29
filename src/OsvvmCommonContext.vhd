@@ -42,6 +42,7 @@
 context OsvvmCommonContext is
     library osvvm_common ;  
     use OSVVM_Common.ModelParametersPkg.all ; 
+    use OSVVM_Common.ModelParametersSingletonPkg.all ; 
     use OSVVM_Common.FifoFillPkg_slv.all ;  
     
     -- MIT
