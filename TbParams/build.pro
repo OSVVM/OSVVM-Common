@@ -35,6 +35,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #  
-library tb_osvvm_common
-analyze TbModelParameters.vhd
-simulate TbModelParameters
+library  tb_ModelParams_Singleton
+RunTest  TbModelParameters1.vhd
+RunTest  TbModelParameters2.vhd

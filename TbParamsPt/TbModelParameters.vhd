@@ -59,8 +59,10 @@ begin
   initial : process
     variable ID : AlertLogIDType ; 
   begin
+    SetTestName("TbModelParameters") ;
     ID := GetAlertLogID("TB") ;
     TbID <= ID ; 
+    SetLogEnable(PASSED, TRUE) ; 
     Params.SetAlertLogID(ID) ;
     
     Params.Init(10) ;
@@ -78,88 +80,79 @@ begin
   end process initial ; 
   
   TestProc : process
+    variable CheckValue : integer ; 
   begin
     wait for 1 ns ; 
     
-    Print("Return integer values as an integer") ;
-    Print("Params.Get(0) = (10): " & to_string(integer'(Params.Get(0)))) ;
-    Print("Params.Get(1) = (11): " & to_string(integer'(Params.Get(1)))) ;
-    Print("Params.Get(2) = (0): "  & to_string(integer'(Params.Get(2)))) ;
-    Print("Params.Get(3) = (1): "  & to_string(integer'(Params.Get(3)))) ;
-    Print("Params.Get(4) = (14): " & to_string(integer'(Params.Get(4)))) ;
+    log("Return integer values as an integer") ;
+    AffirmIfEqual(TbID, Params.Get(0), 10,  "Params.Get(0) = 10") ;    
+    AffirmIfEqual(TbID, Params.Get(1), 11,  "Params.Get(1) = 11") ;
+    AffirmIfEqual(TbID, Params.Get(2),  0,  "Params.Get(2) =  0") ;
+    AffirmIfEqual(TbID, Params.Get(3),  1,  "Params.Get(3) =  1") ;
+    AffirmIfEqual(TbID, Params.Get(4), 14,  "Params.Get(4) = 14") ;
     
     blankline(2) ; 
-    Print("Return std_logic_vector values as an integer") ;
-    Print("Params.Get(5) = (17): " & to_string(integer'(Params.Get(5)))) ;
-    Print("Params.Get(6) = (18): " & to_string(integer'(Params.Get(6)))) ;
-    Print("Params.Get(7) = (19): " & to_string(integer'(Params.Get(7)))) ;
-    Print("Params.Get(8) = (20): " & to_string(integer'(Params.Get(8)))) ;
-    Print("Params.Get(9) = (21): " & to_string(integer'(Params.Get(9)))) ;
+    log("Return std_logic_vector values as an std_logic_vector") ;
+    AffirmIfEqual(TbID, Params.Get(5), 5X"11",   "Params.Get(5) = 5X""11""") ; 
+    AffirmIfEqual(TbID, Params.Get(6), 6X"12",   "Params.Get(6) = 6X""12""") ; 
+    AffirmIfEqual(TbID, Params.Get(7), 7X"13",   "Params.Get(7) = 7X""13""") ; 
+    AffirmIfEqual(TbID, Params.Get(8), 8X"14",   "Params.Get(8) = 8X""14""") ; 
+    AffirmIfEqual(TbID, Params.Get(9), 9X"15",   "Params.Get(9) = 9X""15""") ; 
+    
+    blankline(2) ; 
+
+    log("Return integer values as an std_logic_vector or boolean") ;
+    AffirmIfEqual(TbID, Params.Get(0),   32X"0A",    "Params.Get(0) =  32D""010""") ;
+    AffirmIfEqual(TbID, Params.Get(1,4),  4D"11",    "Params.Get(1) = (1,4) = 4D""11""") ;
+    AffirmIfEqual(TbID, Params.Get(2),     FALSE,    "Params.Get(2) = (2)   = FALSE") ;
+    AffirmIfEqual(TbID, Params.Get(3),      TRUE,    "Params.Get(3) = (3)   = TRUE") ;
+    AffirmIfEqual(TbID, Params.Get(4,8),  8D"14",    "Params.Get(4) = (4,8) = 8D""14""") ;
+    
+    blankline(2) ; 
+    log("Return std_logic_vector values as an integer") ;
+    AffirmIfEqual(TbID, Params.Get(5), 17, "Params.Get(5) = (17)") ; 
+    AffirmIfEqual(TbID, Params.Get(6), 18, "Params.Get(6) = (18)") ; 
+    AffirmIfEqual(TbID, Params.Get(7), 19, "Params.Get(7) = (19)") ; 
+    AffirmIfEqual(TbID, Params.Get(8), 20, "Params.Get(8) = (20)") ; 
+    AffirmIfEqual(TbID, Params.Get(9), 21, "Params.Get(9) = (21)") ; 
 
     blankline(2) ; 
-    Print("Return integer values as an std_logic_vector or boolean") ;
-    Print("Params.Get(0) = (0000000A): " & to_hstring(std_logic_vector'(Params.Get(0)))) ;
-    Print("Params.Get(1) = (B): "        & to_hstring(std_logic_vector'(Params.Get(1,4)))) ;
-    Print("Params.Get(2) = (FALSE): "    & to_string(boolean'(Params.Get(2)))) ;
-    Print("Params.Get(3) = (TRUE): "     & to_string(boolean'(Params.Get(3)))) ;
-    Print("Params.Get(4) = (0D): "       & to_hstring(std_logic_vector'(Params.Get(4,8)))) ;
-    
-    blankline(2) ; 
-    Print("Return std_logic_vector values as an std_logic_vector") ;
-    Print("Params.Get(5) = (17)x5: " & to_string(std_logic_vector'(Params.Get(5)))) ;
-    Print("Params.Get(6) = (18)x6: " & to_string(std_logic_vector'(Params.Get(6)))) ;
-    Print("Params.Get(7) = (19)x7: " & to_string(std_logic_vector'(Params.Get(7)))) ;
-    Print("Params.Get(8) = (20)x8: " & to_string(std_logic_vector'(Params.Get(8)))) ;
-    Print("Params.Get(9) = (21)x9: " & to_string(std_logic_vector'(Params.Get(9)))) ;
-    
-    blankline(2) ; 
-    Print("Write using Set((0,1,2,3,4,5,6,7,8,9))") ;
+    log("Params.Set((0,1,2,3,4,5,6,7,8,9))") ;
     Params.Set((0,1,2,3,4,5,6,7,8,9)) ;
-
+ 
     blankline(2) ; 
-    Print("Return all values as an integer") ;
+    log("Check reading values as an integer") ;
     for i in 0 to 9 loop
-      Print("Params.Get(i) = (" & to_string(i) & "): " & to_string(integer'(Params.Get(i)))) ;
+      AffirmIfEqual(TbID, Params.Get(i), i, "Params.Get(i) = " & to_string(i)) ;
     end loop ; 
     
     blankline(2) ; 
-    Print("Return all values as an std_logic_vector") ;
+    log("Check reading values as a std_logic_vector") ;
     for i in 0 to 9 loop
-      Print("Params.Get(i) = (" & to_string(i) & "): " & to_string(std_logic_vector'(Params.Get(i)))) ;
-    end loop ;     
-    
-    blankline(2) ; 
-    Print("Write using Set((17,17,17,17,17,17,17,17,17,17)") ;
-    Params.Set((17,17,17,17,17,17,17,17,17,17)) ;
-
-    blankline(2) ; 
-    Print("Return all values as an integer") ;
-    for i in 0 to 9 loop
-      Print("Params.Get(i) = (" & to_string(i) & "): " & to_string(integer'(Params.Get(i)))) ;
+      AffirmIfEqual(TbID, Params.Get(i,4), to_slv(i,4), "Params.Get(i) = " & to_string(i)) ;
     end loop ; 
     
     blankline(2) ; 
-    Print("Return all values as an std_logic_vector") ;
-    for i in 0 to 9 loop
-      Print("Params.Get(i) = (" & to_string(i) & "): " & to_string(std_logic_vector'(Params.Get(i)))) ;
-    end loop ;     
-    
+    log("Params.Set((0, -1, -2, -3, -4, -5, -6, -7, -8, -9))") ;
+    Params.Set((0, -1, -2, -3, -4, -5, -6, -7, -8, -9)) ;
+ 
     blankline(2) ; 
-    Print("Write using Set((-1, -2, -3, -4, -5, -1, -2, -3, -4, -5))") ;
-    Params.Set((-1, -2, -3, -4, -5, -1, -2, -3, -4, -5)) ;
-
-    blankline(2) ; 
-    Print("Return all values as an integer") ;
-    for i in 0 to 9 loop
-      Print("Params.Get(i) = (" & to_string(i) & "): " & to_string(integer'(Params.Get(i)))) ;
+    log("Check reading values as an integer") ;
+    for i in 0 to 4 loop
+      AffirmIfEqual(TbID, Params.Get(i), -i, "Params.Get(i) = " & to_string(-i)) ;
+    end loop ; 
+    for i in 5 to 9 loop
+      CheckValue := to_integer(unsigned(to_signed(-i, i))) ;
+      AffirmIfEqual(TbID, Params.Get(i), CheckValue, "Params.Get(i) = " & to_string(CheckValue)) ;
     end loop ; 
     
     blankline(2) ; 
-    Print("Return all values as an std_logic_vector") ;
+    log("Check reading values as a std_logic_vector") ;
     for i in 0 to 9 loop
-      Print("Params.Get(i) = (" & to_string(i) & "): " & to_string(std_logic_vector'(Params.Get(i)))) ;
-    end loop ;     
+      AffirmIfEqual(TbID, Params.Get(i,5), std_logic_vector(to_signed(-i,5)), "Params.Get(i) = " & to_hstring(std_logic_vector(to_signed(-i,5)))) ;
+    end loop ; 
     
+    EndOfTestReports ;
     std.env.stop;
     
 --		procedure Init(nparams : in positive);

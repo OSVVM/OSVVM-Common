@@ -2,6 +2,8 @@
 
 | Revision  |  Release Summary | 
 ------------|----------- 
+| 2023.09   |  Made ModelParametersPkg a singleton.  Formalized testbench.  Older implementation in ModelParamstersPtPkg
+|           |  Updated Transaction Interface API
 | 2023.05   |  Updated API for Randomizing delays in VC   
 | 2022.11   |  Relocated tests cases for XxxTransactionPkg and InterruptHandler to here   
 | 2022.10   |  Updated InterruptHandler for BurstFIFO updates.   
@@ -14,6 +16,19 @@
 | 2020.02   |  Created by refactoring Axi4LiteMasterTransactionPkg
 
 
+## 2023.09  September 2023
+- Added ModelParametersPkg as a singleton
+   - PT implementation now in ModelParamstersPtPkg
+   - Updated OsvvmCommonContext
+- In StreamTransactionPkg, 
+   - Added ModelParametersIdType to Transaction Interface
+   - Added SendAndGet and SendAndGetBurst,
+   - Added OperationType ENUMs:  EXTEND_DIRECTIVE_OP, EXTEND_OP, EXTEND_TX_OP, EXTEND_RX_OP
+   - Added ClassifyUnimplementedOperation, ClassifyUnimplementedTransmitterOperation, ClassifyUnimplementedReceiverOperation
+- In AddressBusTransactionPkg, 
+   - Added ModelParametersIdType to Transaction Interface
+   - Added OperationType ENUMs: EXTEND_DIRECTIVE_OP, EXTEND_OP, EXTEND_WRITE_OP, EXTEND_READ_OP
+   - Added ClassifyUnimplementedOperation
 
 ## 2023.05  May 2023
 - In XxxTransactionPkg, 

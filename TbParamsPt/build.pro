@@ -1,5 +1,5 @@
-#  File Name:         RunAllTests.pro
-#  Revision:          STANDARD VERSION
+#  File Name:         testbench.pro
+#  Revision:          OSVVM MODELS STANDARD VERSION
 #
 #  Maintainer:        Jim Lewis      email:  jim@synthworks.com
 #  Contributor(s):
@@ -7,7 +7,7 @@
 #
 #
 #  Description:
-#        Script to run all Common tests  
+#        Script to compile the common  
 #
 #  Developed for:
 #        SynthWorks Design Inc.
@@ -17,12 +17,11 @@
 #
 #  Revision History:
 #    Date      Version    Description
-#     1/2022   2022.11    Initial - testbenches refactored from VC tests and moved here
-#
+#     1/2020   2020.05    Initial
 #
 #  This file is part of OSVVM.
 #  
-#  Copyright (c) 2022 by SynthWorks Design Inc.  
+#  Copyright (c) 2020 by SynthWorks Design Inc.  
 #  
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -36,24 +35,6 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #  
-
-## =============================================
-## Test StreamTransactionPkg and StreamTransactionArrayPkg
-include ./TbStream
-include ./TbStreamArray
-
-## =============================================
-## Test AddressBusTransactionPkg and AddressBusTransactionArrayPkg
-include ./TbAddressBus
-include ./TbAddressBusArray
-
-## =============================================
-## Test InterruptHandler 
-include ./TbInterrupt   
-
-## =============================================
-## Test Params Pkg   
-include ./TbParamsPt     
-include ./TbParams     
-
-
+library tb_ModelParams_PT
+analyze TbModelParameters.vhd
+simulate TbModelParameters

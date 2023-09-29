@@ -26,6 +26,8 @@
 --
 --  Revision History:
 --    Date      Version    Description
+--    09/2023   2023.09    Added ModelParametersIDType to Record, 
+--                         Added OperationType ENUMs:  EXTEND_DIRECTIVE_OP, EXTEND_OP, EXTEND_WRITE_OP, EXTEND_READ_OP
 --    05/2023   2023.05    Added SetDelayCoverageID and GetDelayCoverageID
 --    11/2022   2022.11    Added AddressBusRecArrayType
 --    01/2022   2022.01    Burst patterns - Burst, BurstInc, BurstRandom
@@ -63,6 +65,7 @@ library osvvm ;
   context osvvm.OsvvmContext ;
   use osvvm.ScoreboardPkg_slv.all ; 
 
+  use work.ModelParametersSingletonPkg.all ; 
   use work.FifoFillPkg_slv.all ; 
 
 package AddressBusTransactionPkg is
@@ -73,7 +76,7 @@ package AddressBusTransactionPkg is
   --  to the model via the transaction interface
   -- ========================================================
   type UnresolvedAddressBusOperationType is (
-    -- Default. Not required but recommended for debug
+    -- Default. Used by resolution function for Multiple Driver Detection
     NOT_DRIVEN,  
     --
     -- Model Directives
@@ -95,8 +98,11 @@ package AddressBusTransactionPkg is
     -- Model Options
     SET_MODEL_OPTIONS, 
     GET_MODEL_OPTIONS,
-    
-    INTERRUPT_RETURN,  -- Handled by InterruptHandler Component
+    -- VC Customization of Directives and Functional Operations
+    EXTEND_DIRECTIVE_OP,
+    EXTEND_OP,
+    -- Interrupt Return - used by InterruptHandler VC
+    INTERRUPT_RETURN,
     --
     --  bus operations                        Master                Responder
     --                       --------------------------------------------------------
@@ -106,6 +112,8 @@ package AddressBusTransactionPkg is
     ASYNC_WRITE,             -- Non-blocking (Tx Addr & Data)      (Rx Addr & Data)
     ASYNC_WRITE_ADDRESS,     -- Non-blocking (Tx Addr)             (Rx Addr)
     ASYNC_WRITE_DATA,        -- Non-blocking (Tx Data)             (Rx Data)
+    -- VC Customization of Write Operations
+    EXTEND_WRITE_OP,
     
     READ_OP,                 -- Blocking     (Tx Addr & Rx Data)   (Rx Addr & Tx Data)
     READ_ADDRESS,            -- Blocking     (Tx Addr)             (Rx Addr)
@@ -116,6 +124,8 @@ package AddressBusTransactionPkg is
     ASYNC_READ_ADDRESS,      -- Non-blocking (Tx Addr)             (Rx Addr)
     ASYNC_READ_DATA,         -- Non-blocking (Rx Data)             (Tx Data)
     ASYNC_READ_DATA_CHECK,   -- Non-blocking (Tx Data)       
+    -- VC Customization of Read Operations
+    EXTEND_READ_OP,
 
     WRITE_AND_READ,          -- Blocking     (Tx Addr & Data, Rx Addr & Data)      
     ASYNC_WRITE_AND_READ,    -- Non-blocking (Tx Addr & Data, Rx Addr)      
@@ -138,6 +148,7 @@ package AddressBusTransactionPkg is
 --    ASYNC_READ_BURST_DATA,
 --    ASYNC_READ_BURST,  -- Master cannot do this - Address, but data not ready.  Responder?  
 
+    -- Resolution function detected Multiple drivers
     MULTIPLE_DRIVER_DETECT  -- value used when multiple drivers are present
   ) ;
   
@@ -180,6 +191,10 @@ package AddressBusTransactionPkg is
     -- Burst FIFOs
     WriteBurstFifo     : ScoreboardIdType ; 
     ReadBurstFifo      : ScoreboardIdType ; 
+--    UseCheckFifo       : boolean_max ; 
+--    CheckFifo          : ScoreboardIdType ; 
+    -- Parameters - internal settings for the VC in a singleton data structure   
+    Params             : ModelParametersIDType ;  
     -- StatusMsgOn provides transaction messaging override.
     -- When true, print transaction messaging independent of 
     -- other verification based based controls.
@@ -947,6 +962,12 @@ package AddressBusTransactionPkg is
     constant Operation      : In AddressBusOperationType
   ) return boolean ;
 
+  ------------------------------------------------------------
+  function ClassifyUnimplementedOperation (
+  -----------------------------------------------------------
+    constant Operation        : In AddressBusOperationType ;
+    constant TransactionCount : in natural
+  ) return string ;
   
 end package AddressBusTransactionPkg ;
 
@@ -970,8 +991,6 @@ package body AddressBusTransactionPkg is
     return result ; 
 --    return maximum(s) ;
   end function resolved_max ;
-
-
 
   -- ========================================================
   --  Directive Transactions
@@ -2115,5 +2134,22 @@ package body AddressBusTransactionPkg is
 --      or (Operation = ASYNC_READ_BURST_ADDRESS)
 --      or (Operation = ASYNC_READ_BURST_DATA) ;
   end function IsBurst ;
+  
+  ------------------------------------------------------------
+  function ClassifyUnimplementedOperation (
+  -----------------------------------------------------------
+    constant Operation        : In AddressBusOperationType ;
+    constant TransactionCount : in natural
+  ) return string is
+  begin
+    if Operation = MULTIPLE_DRIVER_DETECT then
+      return "Multiple Drivers on Transaction Record." & 
+             "  Transaction # " & to_string(TransactionCount) ;
+    else
+      return "Unimplemented Transaction: " & to_string(Operation) & 
+             "  Transaction # " & to_string(TransactionCount) ;
+    end if ; 
+  end function ClassifyUnimplementedOperation ;
+
 
 end package body AddressBusTransactionPkg ;
