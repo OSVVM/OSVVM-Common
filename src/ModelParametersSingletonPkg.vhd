@@ -77,14 +77,14 @@ package ModelParametersSingletonPkg is
   
   procedure Set(ID : ModelParametersIDType; Index: in natural; Data: in integer);
   procedure Set(ID : ModelParametersIDType; Data:  in integer_vector);
-  procedure Set(ID : ModelParametersIDType; Index: in natural; Data: in integer; len: positive);
+  procedure Set(ID : ModelParametersIDType; Index: in natural; Data: in integer; Size: positive);
   procedure Set(ID : ModelParametersIDType; Index: in natural; Data: in boolean);
   procedure Set(ID : ModelParametersIDType; Index: in natural; Data: in std_logic_vector);
   
   impure function Get(ID : ModelParametersIDType; Index: natural) return integer;
   impure function Get(ID : ModelParametersIDType; Index: natural) return boolean;
   impure function Get(ID : ModelParametersIDType; Index: natural) return std_logic_vector;
-  impure function Get(ID : ModelParametersIDType; Index: natural; len: positive) return std_logic_vector;
+  impure function Get(ID : ModelParametersIDType; Index: natural; Size: natural) return std_logic_vector;
   
   ------------------------------------------------------------
   impure function GetAlertLogID (ID : ModelParametersIDType) return AlertLogIDType ;
@@ -107,7 +107,7 @@ package body ModelParametersSingletonPkg is
 		
 		procedure Set(ID : ModelParametersIDType; Index: in natural; Data: in integer);
 		procedure Set(ID : ModelParametersIDType; Data:  in integer_vector);
-		procedure Set(ID : ModelParametersIDType; Index: in natural; Data: in integer; len: positive);
+		procedure Set(ID : ModelParametersIDType; Index: in natural; Data: in integer; Size: positive);
 		procedure Set(ID : ModelParametersIDType; Index: in natural; Data: in boolean);
 		procedure Set(ID : ModelParametersIDType; Index: in natural; Data: in std_logic_vector);
 --		procedure Set(ID : ModelParametersIDType; Index: in natural; Data: in string);
@@ -115,7 +115,7 @@ package body ModelParametersSingletonPkg is
 		impure function Get(ID : ModelParametersIDType; Index: natural) return integer;
 		impure function Get(ID : ModelParametersIDType; Index: natural) return boolean;
 		impure function Get(ID : ModelParametersIDType; Index: natural) return std_logic_vector;
-		impure function Get(ID : ModelParametersIDType; Index: natural; len: positive) return std_logic_vector;
+    impure function Get(ID : ModelParametersIDType; Index: natural; Size: natural) return std_logic_vector;
 --		impure function Get(ID : ModelParametersIDType; Index: natural) return string;
 
     ------------------------------------------------------------
@@ -248,7 +248,7 @@ package body ModelParametersSingletonPkg is
 			if SingletonArrayPtr(ID.ID).ParamPtr /= NULL then
 -- probably a mistake to do this
 -- Should instead do a resize of the structure like in ScoreboardPkg.
-        Deallocate(ID) ; 
+        Deallocate(SingletonArrayPtr(ID.ID).ParamPtr) ; 
       end if; 
 			SingletonArrayPtr(ID.ID).ParamPtr := new ParameterRecArrayType(0 to NumParams-1);
 			for i in SingletonArrayPtr(ID.ID).ParamPtr'range loop
@@ -307,10 +307,10 @@ package body ModelParametersSingletonPkg is
 		end procedure Set;
 		
     ------------------------------------------------------------
-		procedure Set(ID : ModelParametersIDType; Index: in natural; Data: in integer; len: positive) is
+		procedure Set(ID : ModelParametersIDType; Index: in natural; Data: in integer; Size: positive) is
     ------------------------------------------------------------
-      -- to_signed correctly handles non-negative integers up len in length
-      constant SlvVal : std_logic_vector(len-1 downto 0) := std_logic_vector(to_signed(Data, len));
+      -- to_signed correctly handles non-negative integers up Size in length
+      constant SlvVal : std_logic_vector(Size-1 downto 0) := std_logic_vector(to_signed(Data, Size));
 		begin
       case SingletonArrayPtr(ID.ID).ParamPtr(Index).ParamType is 
         when NONE =>
@@ -361,7 +361,7 @@ package body ModelParametersSingletonPkg is
 		begin
       case SingletonArrayPtr(ID.ID).ParamPtr(Index).ParamType is 
         when NONE =>
-          alert(SingletonArrayPtr(ID.ID).AlertLogID, "ModelParametersPType.Get[natural, return integer] No value set");
+          alert(SingletonArrayPtr(ID.ID).AlertLogID, "ModelParametersSingletonType.Get[natural, return integer] No value set");
           return integer'left;
         
         when eINT =>
@@ -384,7 +384,7 @@ package body ModelParametersSingletonPkg is
 		begin
       case SingletonArrayPtr(ID.ID).ParamPtr(Index).ParamType is 
         when NONE =>
-          alert(SingletonArrayPtr(ID.ID).AlertLogID, "ModelParametersPType.Get[natural, return boolean] No value set");
+          alert(SingletonArrayPtr(ID.ID).AlertLogID, "ModelParametersSingletonType.Get[natural, return boolean] No value set");
           return boolean'left;
         
         when eINT =>
@@ -406,7 +406,7 @@ package body ModelParametersSingletonPkg is
 		begin
       case SingletonArrayPtr(ID.ID).ParamPtr(Index).ParamType is 
         when NONE =>
-          alert(SingletonArrayPtr(ID.ID).AlertLogID, "ModelParametersPType.Get[natural, return std_logic_vector] No value set");
+          alert(SingletonArrayPtr(ID.ID).AlertLogID, "ModelParametersSingletonType.Get[natural, return std_logic_vector] No value set");
           return 32SB"U";
         
         when eINT =>
@@ -423,22 +423,22 @@ package body ModelParametersSingletonPkg is
 		end function Get;
 		
     ------------------------------------------------------------
-		impure function Get(ID : ModelParametersIDType; Index: natural; len: positive) return std_logic_vector is
+    impure function Get(ID : ModelParametersIDType; Index: natural; Size: natural) return std_logic_vector is
     ------------------------------------------------------------
-      constant AllU   : std_logic_vector(len-1 downto 0) := (others => 'U') ; 
+      constant AllU   : std_logic_vector(Size-1 downto 0) := (others => 'U') ; 
       variable Result : signed(31 downto 0) ;
 		begin
       case SingletonArrayPtr(ID.ID).ParamPtr(Index).ParamType is 
         when NONE =>
-          alert(SingletonArrayPtr(ID.ID).AlertLogID, "ModelParametersPType.Get[natural, positive return std_logic_vector] No value set");
+          alert(SingletonArrayPtr(ID.ID).AlertLogID, "ModelParametersSingletonType.Get[natural, positive return std_logic_vector] No value set");
           return AllU;
         
         when eINT =>
           Result := to_signed(SingletonArrayPtr(ID.ID).ParamPtr(Index).IntParam, 32) ;
-          return std_logic_vector(Result(len-1 downto 0));
+          return std_logic_vector(Result(Size-1 downto 0));
 
         when eSLV =>
-          return resize(SingletonArrayPtr(ID.ID).ParamPtr(Index).SlvParam.all, len);
+          return resize(SingletonArrayPtr(ID.ID).ParamPtr(Index).SlvParam.all, Size);
 
         when eSTR =>
           Alert(SingletonArrayPtr(ID.ID).AlertLogID, "Expecting Type String") ; 
@@ -493,9 +493,9 @@ package body ModelParametersSingletonPkg is
     ModelParameters.Set(ID, Data) ; 
   end procedure Set ; 
 
-  procedure Set(ID : ModelParametersIDType; Index: in natural; Data: in integer; len: positive) is
+  procedure Set(ID : ModelParametersIDType; Index: in natural; Data: in integer; Size: positive) is
   begin
-    ModelParameters.Set(ID, Index, Data, len) ; 
+    ModelParameters.Set(ID, Index, Data, Size) ; 
   end procedure Set ; 
   
   procedure Set(ID : ModelParametersIDType; Index: in natural; Data: in boolean) is
@@ -524,9 +524,9 @@ package body ModelParametersSingletonPkg is
     return ModelParameters.Get(ID, Index) ; 
   end function Get ; 
   
-  impure function Get(ID : ModelParametersIDType; Index: natural; len: positive) return std_logic_vector is
+  impure function Get(ID : ModelParametersIDType; Index: natural; Size: natural) return std_logic_vector is
   begin
-    return ModelParameters.Get(ID, Index, len) ; 
+    return ModelParameters.Get(ID, Index, Size) ; 
   end function Get ; 
   
   
