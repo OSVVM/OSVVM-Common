@@ -412,9 +412,9 @@ package body FifoFillPkg_slv is
   ) is
     variable RV         : RandomPType ; 
     alias    aFirstWord : std_logic_vector(FirstWord'length-1 downto 0) is FirstWord ; 
-    constant FW_LEFT    : integer := minimum(30, FirstWord'length) - 1 ;
+--x    constant FW_LEFT    : integer := minimum(30, FirstWord'length) - 1 ;
   begin
-    RV.InitSeed(to_integer(MetaTo01(aFirstWord(FW_LEFT downto 0))) + Count, UseNewSeedMethods => TRUE) ;
+    RV.InitSeed(to_integer(MetaTo01(aFirstWord(minimum(30, FirstWord'length) - 1 downto 0))) + Count, UseNewSeedMethods => TRUE) ;
     Push( Fifo, FirstWord ) ;
     for i in 2 to Count loop
       Push( Fifo, RV.RandSlv(FirstWord'length) ) ;
