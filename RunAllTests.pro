@@ -37,6 +37,9 @@
 #  limitations under the License.
 #  
 
+if {$::osvvm::ToolNameVersion ne "XSIM-2023.2"}  {
+# These test cases use component instantiation and will not run under 2023.2 of Xilinx
+
 ## =============================================
 ## Test StreamTransactionPkg and StreamTransactionArrayPkg
 include ./TbStream
@@ -50,6 +53,7 @@ include ./TbAddressBusArray
 ## =============================================
 ## Test InterruptHandler 
 include ./TbInterrupt   
+}
 
 ## =============================================
 ## Test Params Pkg   
