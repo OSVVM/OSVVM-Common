@@ -1,5 +1,5 @@
-#  File Name:         RunAllTests.pro
-#  Revision:          STANDARD VERSION
+#  File Name:         common.pro
+#  Revision:          OSVVM MODELS STANDARD VERSION
 #
 #  Maintainer:        Jim Lewis      email:  jim@synthworks.com
 #  Contributor(s):
@@ -7,7 +7,7 @@
 #
 #
 #  Description:
-#        Script to run all Common tests  
+#        Top level script to compile the OSVVM common packages   
 #
 #  Developed for:
 #        SynthWorks Design Inc.
@@ -17,12 +17,14 @@
 #
 #  Revision History:
 #    Date      Version    Description
-#     1/2022   2022.11    Initial - testbenches refactored from VC tests and moved here
+#    11/2022   2022.11    Added AddressBusTransactionArrayPkg and AddressBusResponderTransactionArrayPkg
+#     1/2020   2020.01    Updated Licenses to Apache
+#     1/2019   2019.01    Compile Script for OSVVM Common library
 #
 #
 #  This file is part of OSVVM.
 #  
-#  Copyright (c) 2022 by SynthWorks Design Inc.  
+#  Copyright (c) 2019 - 2020 by SynthWorks Design Inc.  
 #  
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -35,29 +37,13 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#  
+#
+library OSVVM_Common
+
+analyze FifoFillPkg_slv.vhd ;
 
 if {$::osvvm::ToolNameVersion ne "XSIM-2023.2"}  {
-# These test cases use component instantiation and will not run under 2023.2 of Xilinx
-
-## =============================================
-## Test StreamTransactionPkg and StreamTransactionArrayPkg
-include ./TbStream
-include ./TbStreamArray
-
-## =============================================
-## Test AddressBusTransactionPkg and AddressBusTransactionArrayPkg
-include ./TbAddressBus
-include ./TbAddressBusArray
-
-## =============================================
-## Test InterruptHandler 
-include ./TbInterrupt   
+  analyze OsvvmCommonContext.vhd
+} else {
+  analyze OsvvmCommonContext_xilinx.vhd
 }
-
-## =============================================
-## Test Params Pkg   
-include ./TbParamsPt     
-include ./TbParams     
-
-

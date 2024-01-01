@@ -43,23 +43,43 @@ analyze ModelParametersPtPkg.vhd
 analyze ModelParametersSingletonPkg.vhd
 analyze FifoFillPkg_slv.vhd
 
-# MIT
-analyze StreamTransactionPkg.vhd
+# MIT Stream
+  analyze StreamTransactionPkg.vhd
+# Not Needed # if {$::osvvm::ToolNameVersion ne "XSIM-2023.2"}  {
+# Not Needed #   analyze StreamTransactionPkg.vhd
+# Not Needed # } else {
+# Not Needed # #  analyze StreamTransactionPkg_xilinx.vhd
+# Not Needed #   analyze StreamTransactionPkg.vhd
+# Not Needed # }
 analyze StreamTransactionArrayPkg.vhd
-analyze AddressBusTransactionPkg.vhd
+
+# MIT Address Bus - aka Memory Mapped
+# analyze AddressBusTransactionPkg.vhd
+if {$::osvvm::ToolNameVersion ne "XSIM-2023.2"}  {
+  analyze AddressBusTransactionPkg.vhd
+} else {
+  analyze AddressBusTransactionPkg_xilinx.vhd
+}
 analyze AddressBusTransactionArrayPkg.vhd
 analyze AddressBusResponderTransactionPkg.vhd
 analyze AddressBusResponderTransactionArrayPkg.vhd
 analyze AddressBusVersionCompatibilityPkg.vhd
 
 # Interrupt
-analyze InterruptGlobalSignalPkg.vhd
-analyze InterruptHandler.vhd
-analyze InterruptHandlerComponentPkg.vhd
-analyze InterruptGeneratorBit.vhd
-analyze InterruptGeneratorBitVti.vhd
-# analyze InterruptGenerator.vhd
-# analyze InterruptGeneratorVti.vhd
-analyze InterruptGeneratorComponentPkg.vhd
+if {$::osvvm::ToolNameVersion ne "XSIM-2023.2"}  {
+  analyze InterruptGlobalSignalPkg.vhd
+  analyze InterruptHandler.vhd
+  analyze InterruptHandlerComponentPkg.vhd
+  analyze InterruptGeneratorBit.vhd
+  analyze InterruptGeneratorBitVti.vhd
+  # analyze InterruptGenerator.vhd
+  # analyze InterruptGeneratorVti.vhd
+  analyze InterruptGeneratorComponentPkg.vhd
+}
 
-analyze OsvvmCommonContext.vhd
+# analyze OsvvmCommonContext.vhd
+if {$::osvvm::ToolNameVersion ne "XSIM-2023.2"}  {
+  analyze OsvvmCommonContext.vhd
+} else {
+  analyze OsvvmCommonContext_xilinx.vhd
+}
