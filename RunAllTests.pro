@@ -57,7 +57,7 @@ include ./TbInterrupt
 
 ## =============================================
 ## Test Params Pkg   
-include ./TbParamsPt     
 include ./TbParams     
+include ./TbParamsPt     
 
 

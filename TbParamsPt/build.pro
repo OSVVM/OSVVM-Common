@@ -35,6 +35,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #  
+TestSuite ModelParams_PT
 library tb_ModelParams_PT
 analyze TbModelParameters.vhd
 simulate TbModelParameters
