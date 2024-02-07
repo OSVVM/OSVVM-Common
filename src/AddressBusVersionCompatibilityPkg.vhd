@@ -67,8 +67,16 @@ package AddressBusVersionCompatibilityPkg is
   
 
 
-  alias MasterWrite is Write 
-    [AddressBusRecType, std_logic_vector, std_logic_vector, boolean];
+--  alias MasterWrite is Write [AddressBusRecType, std_logic_vector, std_logic_vector, boolean];
+  ------------------------------------------------------------
+  procedure MasterWrite (
+  -- do CPU Write Cycle
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             iData          : In    std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
+  ) ;
 
   ------------------------------------------------------------
   alias MasterWriteAsync is WriteAsync
@@ -95,8 +103,16 @@ package AddressBusVersionCompatibilityPkg is
     [AddressBusRecType, std_logic_vector, integer, boolean];
 
   ------------------------------------------------------------
-  alias MasterRead is Read
-    [AddressBusRecType, std_logic_vector, std_logic_vector, boolean];
+--  alias MasterRead is Read [AddressBusRecType, std_logic_vector, std_logic_vector, boolean];
+  ------------------------------------------------------------
+  procedure MasterRead (
+  -- do CPU Read Cycle and return data
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+    variable oData          : Out   std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
+  ) ;
 
   ------------------------------------------------------------
   alias MasterReadCheck is ReadCheck
@@ -196,4 +212,35 @@ package AddressBusVersionCompatibilityPkg is
     [AddressBusRecType, std_logic_vector, boolean];
   
 end package AddressBusVersionCompatibilityPkg ;
+package body AddressBusVersionCompatibilityPkg is 
+
+
+  ------------------------------------------------------------
+  procedure MasterWrite (
+  -- do CPU Write Cycle
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             iData          : In    std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
+  ) is
+  begin
+    Write(TransactionRec, iAddr, iData, StatusMsgOn) ; 
+  end procedure MasterWrite ;
+
+  ------------------------------------------------------------
+  procedure MasterRead (
+  -- do CPU Read Cycle and return data
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+    variable oData          : Out   std_logic_vector ;
+             StatusMsgOn    : In    boolean := false
+  ) is
+  begin
+    Read(TransactionRec, iAddr, oData, StatusMsgOn) ; 
+  end procedure MasterRead ;
+
+
+end package body AddressBusVersionCompatibilityPkg ; 
 

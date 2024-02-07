@@ -204,6 +204,8 @@ package AddressBusTransactionPkg is
     IntFromModel       : integer_max ; 
     BoolToModel        : boolean_max ; 
     BoolFromModel      : boolean_max ;
+    TimeToModel        : time_max ; 
+    TimeFromModel      : time_max ; 
     -- Verification Component Options Type  
     Options            : integer_max ;  
   end record AddressBusRecType ;
@@ -460,6 +462,14 @@ package AddressBusTransactionPkg is
   ) ;
   
   ------------------------------------------------------------
+  procedure SetModelOptions (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+    constant Option         : In    integer ;
+    constant OptVal         : In    time
+  ) ;
+
+  ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
     signal   TransactionRec : InOut AddressBusRecType ;
@@ -481,6 +491,14 @@ package AddressBusTransactionPkg is
     signal   TransactionRec : InOut AddressBusRecType ;
     constant Option         : In    integer ;
     variable OptVal         : Out   std_logic_vector
+  ) ;
+
+  ------------------------------------------------------------
+  procedure GetModelOptions (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+    constant Option         : In    integer ;
+    variable OptVal         : Out   time
   ) ;
 
   ------------------------------------------------------------
@@ -1277,6 +1295,20 @@ package body AddressBusTransactionPkg is
     TransactionRec.IntToModel    <= to_integer(OptVal) ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure SetModelOptions ;
+
+  ------------------------------------------------------------
+  procedure SetModelOptions (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+    constant Option         : In    integer ;
+    constant OptVal         : In    time
+  ) is
+  begin
+    TransactionRec.Operation     <= SET_MODEL_OPTIONS ;
+    TransactionRec.Options       <= Option ;
+    TransactionRec.TimeToModel   <= OptVal ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+  end procedure SetModelOptions ;
   
   ------------------------------------------------------------
   procedure GetModelOptions (
@@ -1318,6 +1350,20 @@ package body AddressBusTransactionPkg is
     TransactionRec.Options       <= Option ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     OptVal := to_slv(TransactionRec.IntFromModel, OptVal'length) ; 
+  end procedure GetModelOptions ;
+
+  ------------------------------------------------------------
+  procedure GetModelOptions (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+    constant Option         : In    integer ;
+    variable OptVal         : Out   time
+  ) is
+  begin
+    TransactionRec.Operation     <= GET_MODEL_OPTIONS ;
+    TransactionRec.Options       <= Option ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
+    OptVal := TransactionRec.TimeFromModel ; 
   end procedure GetModelOptions ;
 
   ------------------------------------------------------------

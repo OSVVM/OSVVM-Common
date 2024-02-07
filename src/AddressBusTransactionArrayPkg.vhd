@@ -201,6 +201,15 @@ package AddressBusTransactionArrayPkg is
   ) ;
   
   ------------------------------------------------------------
+  procedure SetModelOptions (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecArrayType ;
+    constant Index          : In    integer  ;
+    constant Option         : In    integer ;
+    constant OptVal         : In    time
+  ) ;
+
+  ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
     signal   TransactionRec : InOut AddressBusRecArrayType ;
@@ -227,6 +236,14 @@ package AddressBusTransactionArrayPkg is
     variable OptVal         : Out   std_logic_vector
   ) ;
 
+  ------------------------------------------------------------
+  procedure GetModelOptions (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecArrayType ;
+    constant Index          : In    integer  ;
+    constant Option         : In    integer ;
+    variable OptVal         : Out   time
+  ) ;
   ------------------------------------------------------------
   procedure InterruptReturn (
   ------------------------------------------------------------
@@ -1014,7 +1031,22 @@ package body AddressBusTransactionArrayPkg is
     TransactionRec(Index).IntToModel    <= to_integer(OptVal) ;
     AddressBusArrayRequestTransaction(TransactionRec => TransactionRec, Index => Index) ;
   end procedure SetModelOptions ;
-  
+ 
+  ------------------------------------------------------------
+  procedure SetModelOptions (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecArrayType ;
+    constant Index          : In    integer  ;
+    constant Option         : In    integer ;
+    constant OptVal         : In    time
+  ) is
+  begin
+    TransactionRec(Index).Operation     <= SET_MODEL_OPTIONS ;
+    TransactionRec(Index).Options       <= Option ;
+    TransactionRec(Index).TimeToModel   <= OptVal ;
+    AddressBusArrayRequestTransaction(TransactionRec => TransactionRec, Index => Index) ;
+  end procedure SetModelOptions ;
+
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
@@ -1058,6 +1090,21 @@ package body AddressBusTransactionArrayPkg is
     TransactionRec(Index).Options       <= Option ;
     AddressBusArrayRequestTransaction(TransactionRec => TransactionRec, Index => Index) ;
     OptVal := to_slv(TransactionRec(Index).IntFromModel, OptVal'length) ; 
+  end procedure GetModelOptions ;
+
+  ------------------------------------------------------------
+  procedure GetModelOptions (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecArrayType ;
+    constant Index          : In    integer  ;
+    constant Option         : In    integer ;
+    variable OptVal         : Out   time
+  ) is
+  begin
+    TransactionRec(Index).Operation     <= GET_MODEL_OPTIONS ;
+    TransactionRec(Index).Options       <= Option ;
+    AddressBusArrayRequestTransaction(TransactionRec => TransactionRec, Index => Index) ;
+    OptVal := TransactionRec(Index).TimeFromModel ; 
   end procedure GetModelOptions ;
 
   ------------------------------------------------------------
