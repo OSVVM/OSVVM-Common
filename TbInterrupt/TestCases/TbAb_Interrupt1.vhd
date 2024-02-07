@@ -60,7 +60,7 @@ begin
 
     -- Wait for testbench initialization 
     wait for 0 ns ;  wait for 0 ns ;
-    TranscriptOpen(OSVVM_OUTPUT_DIRECTORY & "TbAb_Interrupt1.txt") ;
+    TranscriptOpen ;
     SetTranscriptMirror(TRUE) ; 
 
     -- Wait for Design Reset
@@ -75,7 +75,7 @@ begin
     
     TranscriptClose ; 
     -- Printing differs in different simulators due to differences in process order execution
-    -- AlertIfDiff("./results/TbAb_Interrupt1.txt", "../AXI4/Axi4/testbench/validated_results/TbAb_Interrupt1.txt", "") ; 
+    -- AlertIfDiff("./results/TbAb_Interrupt1.log", "../AXI4/Axi4/testbench/validated_results/TbAb_Interrupt1.log", "") ; 
 
     EndOfTestReports ; 
     std.env.stop ; 

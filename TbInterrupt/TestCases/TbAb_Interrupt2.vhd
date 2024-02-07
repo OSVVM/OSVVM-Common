@@ -60,7 +60,7 @@ begin
 
     -- Wait for testbench initialization 
     wait for 0 ns ;  wait for 0 ns ;
-    TranscriptOpen(OSVVM_OUTPUT_DIRECTORY & "TbAb_Interrupt2.txt") ;
+    TranscriptOpen ;
     SetTranscriptMirror(TRUE) ; 
 
     -- Wait for Design Reset
