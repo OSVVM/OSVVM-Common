@@ -151,11 +151,34 @@ package FifoFillPkg_slv is
 
   ------------------------------------------------------------
   procedure PopBurstVector (
+  -- Pop values from the FIFO into the VectorOfWords parameter until FIFO Empty.
+  -- Width of VectorOfWords(i) shall match the width of the Fifo 
+  -- Count = number of words in the FIFO up to length of VectorOfWords
+  -- If no words in FIFO, Count = 0 
+  ------------------------------------------------------------
+    constant Fifo           : in    ScoreboardIdType ;
+    variable VectorOfWords  : out   slv_vector ;
+    variable Count          : out   natural 
+  ) ;
+
+  ------------------------------------------------------------
+  procedure PopBurstVector (
   -- Pop values from the FIFO into the VectorOfWords parameter.
   -- Each value popped will be FifoWidth bits wide.   
   ------------------------------------------------------------
     constant Fifo           : in    ScoreboardIdType ;
     variable VectorOfWords  : out   integer_vector 
+  ) ;
+
+  ------------------------------------------------------------
+  procedure PopBurstVector (
+  -- Pop values from the FIFO into the VectorOfWords parameter until FIFO Empty.
+  -- Count = number of words in the FIFO up to length of VectorOfWords
+  -- If no words in FIFO, Count = 0 
+  ------------------------------------------------------------
+    constant Fifo           : in    ScoreboardIdType ;
+    variable VectorOfWords  : out   integer_vector ;
+    variable Count          : out   natural 
   ) ;
 
   ------------------------------------------------------------
@@ -492,11 +515,43 @@ package body FifoFillPkg_slv is
   procedure PopBurstVector (
   ------------------------------------------------------------
     constant Fifo           : in    ScoreboardIdType ;
+    variable VectorOfWords  : out   slv_vector ;
+    variable Count          : out   natural 
+  ) is
+  begin
+    Count := 0 ; 
+    for i in VectorOfWords'range loop 
+      exit when empty(Fifo) ; 
+      VectorOfWords(i) := Pop(Fifo) ; 
+      Count := i ;
+    end loop ;
+  end procedure PopBurstVector ;
+
+  ------------------------------------------------------------
+  procedure PopBurstVector (
+  ------------------------------------------------------------
+    constant Fifo           : in    ScoreboardIdType ;
     variable VectorOfWords  : out   integer_vector 
   ) is
   begin
     for i in VectorOfWords'range loop 
       VectorOfWords(i) := to_integer(Pop(Fifo)) ; 
+    end loop ;
+  end procedure PopBurstVector ;
+
+  ------------------------------------------------------------
+  procedure PopBurstVector (
+  ------------------------------------------------------------
+    constant Fifo           : in    ScoreboardIdType ;
+    variable VectorOfWords  : out   integer_vector ;
+    variable Count          : out   natural 
+  ) is
+  begin
+    Count := 0 ; 
+    for i in VectorOfWords'range loop 
+      exit when empty(Fifo) ; 
+      VectorOfWords(i) := to_integer(Pop(Fifo)) ; 
+      Count := i ;
     end loop ;
   end procedure PopBurstVector ;
 
