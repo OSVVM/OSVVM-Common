@@ -2,6 +2,7 @@
 
 | Revision  |  Release Summary | 
 ------------|----------- 
+| 2024.03   |  Added Time to transaction record and SetModelOptions.  New overloading of PopBurstVector.
 | 2023.09   |  Made ModelParametersPkg a singleton.  Formalized testbench.  Older implementation in ModelParamstersPtPkg
 |           |  Updated Transaction Interface API
 | 2023.05   |  Updated API for Randomizing delays in VC   
@@ -14,6 +15,11 @@
 | 2020.10   |  Added Bursting to Stream Model Independent Transactions 
 | 2020.07   |  Updated for MIT and freed the slaves
 | 2020.02   |  Created by refactoring Axi4LiteMasterTransactionPkg
+
+
+## 2024.03  March 2024
+- In AddressBusTransactionPkg, added SetModelOptions for a parameter of type time.
+- In FifoFillPkg_Slv, added PopBurstVector that returns a count value for the size of its slv_vector or integer_vector parameters
 
 
 ## 2023.09  September 2023
