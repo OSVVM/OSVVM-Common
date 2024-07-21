@@ -60,7 +60,7 @@ package InterruptGlobalSignalPkg is
   constant INTERRUPT_ON_EDGE  : std_logic := '1' ;
   
   subtype InterruptGeneratorBitRecType is StreamRecType(DataToModel(0 downto 0),    DataFromModel(0 downto 0),    ParamToModel(NULL_RANGE_TYPE), ParamFromModel(NULL_RANGE_TYPE)) ;
-  subtype InterruptGeneratorRecArrayType  is StreamRecArrayType(open)(DataToModel(0 downto 0), DataFromModel(0 downto 0), ParamToModel(NULL_RANGE_TYPE), ParamFromModel(NULL_RANGE_TYPE)) ;
+--  subtype InterruptGeneratorRecArrayType  is StreamRecArrayType(open)(DataToModel(0 downto 0), DataFromModel(0 downto 0), ParamToModel(NULL_RANGE_TYPE), ParamFromModel(NULL_RANGE_TYPE)) ;
 
   subtype InterruptGeneratorRecType    is StreamRecType(DataToModel(gIntReq'range), DataFromModel(gIntReq'range), ParamToModel(NULL_RANGE_TYPE), ParamFromModel(NULL_RANGE_TYPE)) ; 
 
