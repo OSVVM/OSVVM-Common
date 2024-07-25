@@ -145,7 +145,7 @@ begin
 
   -- create Clock
   ------------------------------------------------------------
-  Osvvm.TbUtilPkg.CreateClock (
+  Osvvm.ClockResetPkg.CreateClock (
   ------------------------------------------------------------
     Clk        => Clk,
     Period     => Tperiod_Clk
@@ -153,7 +153,7 @@ begin
 
   -- create nReset
   ------------------------------------------------------------
-  Osvvm.TbUtilPkg.CreateReset (
+  Osvvm.ClockResetPkg.CreateReset (
   ------------------------------------------------------------
     Reset       => nReset,
     ResetActive => '0',
