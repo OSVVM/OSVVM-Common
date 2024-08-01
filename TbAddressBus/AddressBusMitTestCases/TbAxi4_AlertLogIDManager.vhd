@@ -58,7 +58,7 @@ begin
     TbSubordinateID  <= GetAlertLogID("Subordinate") ;
     SetLogEnable(PASSED, TRUE) ;    -- Enable PASSED logs
     SetLogEnable(INFO, TRUE) ;    -- Enable INFO logs
-    SetAlertStopCount(FAILURE, 2) ;    -- Enable INFO logs
+    SetAlertStopCount(FAILURE, 12) ;    -- Enable INFO logs
 
     -- Wait for testbench initialization 
     wait for 0 ns ;  wait for 0 ns ;
