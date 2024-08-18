@@ -114,6 +114,42 @@ package StreamTransactionArrayPkg is
     variable  ErrorCount       : out   natural
   ) ; 
   
+  -- ========================================================
+  --  Delay Coverage Transactions   
+  --  Get Delay Coverage ID to change delay coverage parameters.
+  -- ========================================================
+  ------------------------------------------------------------
+  procedure SetUseRandomDelays (
+  ------------------------------------------------------------
+    signal    TransactionRec : InOut StreamRecArrayType ;
+    constant  Index          : in    integer ;
+    constant  OptVal         : In    boolean := TRUE
+  ) ;
+
+  ------------------------------------------------------------
+  procedure GetUseRandomDelays (
+  ------------------------------------------------------------
+    signal    TransactionRec : InOut StreamRecArrayType ;
+    constant  Index          : in    integer ;
+    variable  OptVal         : Out   boolean
+  ) ;
+
+  ------------------------------------------------------------
+  procedure SetDelayCoverageID (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecArrayType ;
+    constant  Index            : in    integer ;
+    constant  DelayCov         : in    DelayCoverageIdType 
+  ) ;
+
+  ------------------------------------------------------------
+  procedure GetDelayCoverageID (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecArrayType ;
+    constant  Index            : in    integer ;
+    variable  DelayCov         : out   DelayCoverageIdType 
+  ) ;
+
   ------------------------------------------------------------
   --  SetBurstMode and GetBurstMode
   --  are directive transactions that configure the burst mode 
@@ -352,6 +388,27 @@ package StreamTransactionArrayPkg is
 --  alias SendBurst is SendBurstVector[StreamRecArrayType, slv_vector, boolean] ; 
 
   ------------------------------------------------------------
+  procedure SendBurstVector (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecArrayType ;
+    constant  Index            : in    integer ;
+    constant  VectorOfWords    : in    integer_vector ;
+    constant  Param            : in    std_logic_vector ;
+    constant  FifoWidth        : in    integer ; 
+    constant  StatusMsgOn      : in    boolean := false
+  ) ;
+  
+  ------------------------------------------------------------
+  procedure SendBurstVector (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecArrayType ;
+    constant  Index            : in    integer ;
+    constant  VectorOfWords    : in    integer_vector ;
+    constant  FifoWidth        : in    integer ; 
+    constant  StatusMsgOn      : in    boolean := false
+  ) ;
+
+  ------------------------------------------------------------
   procedure SendBurstIncrement (
   ------------------------------------------------------------
     signal    TransactionRec   : inout StreamRecArrayType ;
@@ -463,6 +520,27 @@ package StreamTransactionArrayPkg is
   
 --  alias SendBurstAsync is SendBurstVectorAsync[StreamRecArrayType, slv_vector, std_logic_vector, boolean] ; 
 --  alias SendBurstAsync is SendBurstVectorAsync[StreamRecArrayType, slv_vector, boolean] ; 
+
+  ------------------------------------------------------------
+  procedure SendBurstVectorAsync (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecArrayType ;
+    constant  Index            : in    integer ;
+    constant  VectorOfWords    : in    integer_vector ;
+    constant  Param            : in    std_logic_vector ;
+    constant  FifoWidth        : in    integer ; 
+    constant  StatusMsgOn      : in    boolean := false
+  ) ;
+  
+  ------------------------------------------------------------
+  procedure SendBurstVectorAsync (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecArrayType ;
+    constant  Index            : in    integer ;
+    constant  VectorOfWords    : in    integer_vector ;
+    constant  FifoWidth        : in    integer ; 
+    constant  StatusMsgOn      : in    boolean := false
+  ) ;
 
   ------------------------------------------------------------
   procedure SendBurstIncrementAsync (
@@ -754,6 +832,27 @@ package StreamTransactionArrayPkg is
 --  alias CheckBurst is CheckBurstVector[StreamRecArrayType, slv_vector, boolean] ; 
 
   ------------------------------------------------------------
+  procedure CheckBurstVector (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecArrayType ;
+    constant  Index            : in    integer ;
+    constant  VectorOfWords    : in    integer_vector ;
+    constant  Param            : in    std_logic_vector ;
+    constant  FifoWidth        : in    integer ; 
+    constant  StatusMsgOn      : in    boolean := false
+  ) ;
+  
+  ------------------------------------------------------------
+  procedure CheckBurstVector (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecArrayType ;
+    constant  Index            : in    integer ;
+    constant  VectorOfWords    : in    integer_vector ;
+    constant  FifoWidth        : in    integer ; 
+    constant  StatusMsgOn      : in    boolean := false
+  ) ;
+
+  ------------------------------------------------------------
   procedure CheckBurstIncrement (
   ------------------------------------------------------------
     signal    TransactionRec   : inout StreamRecArrayType ;
@@ -941,6 +1040,53 @@ package StreamTransactionArrayPkg is
     constant  StatusMsgOn      : in    boolean := false
   ) ;  
 
+  -- ========================================================
+  --  Send And Get Transactions
+  -- 
+  -- ========================================================
+  ------------------------------------------------------------
+  procedure SendAndGet (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecArrayType ;
+    constant  Index            : in    integer ;
+    constant  iData            : in    std_logic_vector ;
+    constant  iParam           : in    std_logic_vector ;
+    variable  oData            : out   std_logic_vector ;
+    variable  oParam           : out   std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
+  ) ;  
+
+  ------------------------------------------------------------
+  procedure SendAndGet (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecArrayType ;
+    constant  Index            : in    integer ;
+    constant  iData            : in    std_logic_vector ;
+    variable  oData            : out   std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
+  ) ;  
+
+  ------------------------------------------------------------
+  procedure SendAndGetBurst (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecArrayType ;
+    constant  Index            : in    integer ;
+    constant  iNumFifoWords    : in    integer ;
+    constant  iParam           : in    std_logic_vector ;
+    variable  oNumFifoWords    : out   integer ;
+    variable  oParam           : out   std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
+  ) ; 
+
+  ------------------------------------------------------------
+  procedure SendAndGetBurst (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecArrayType ;
+    constant  Index            : in    integer ;
+    constant  iNumFifoWords    : in    integer ;
+    variable  oNumFifoWords    : out   integer ;
+    constant  StatusMsgOn      : in    boolean := false 
+  ) ; 
 
   -- ========================================================
   --  Pseudo Transactions
@@ -1185,7 +1331,62 @@ package body StreamTransactionArrayPkg is
     ErrorCount := GetAlertCount(AlertLogID => AlertLogID) ;
   end procedure GetErrorCount ; 
   
-  
+  -- ========================================================
+  --  Delay Coverage Transactions   
+  --  Get Delay Coverage ID to change delay coverage parameters.
+  -- ========================================================
+  ------------------------------------------------------------
+  procedure SetUseRandomDelays (
+  ------------------------------------------------------------
+    signal    TransactionRec : InOut StreamRecArrayType ;
+    constant  Index          : in    integer ;
+    constant  OptVal         : In    boolean := TRUE
+  ) is
+  begin
+    TransactionRec(Index).Operation     <= SET_USE_RANDOM_DELAYS ;
+    TransactionRec(Index).BoolToModel   <= OptVal ;
+    StreamArrayRequestTransaction(TransactionRec => TransactionRec, Index => Index) ;
+  end procedure SetUseRandomDelays ;
+
+  ------------------------------------------------------------
+  procedure GetUseRandomDelays (
+  ------------------------------------------------------------
+    signal    TransactionRec : InOut StreamRecArrayType ;
+    constant  Index          : in    integer ;
+    variable  OptVal         : Out   boolean
+  ) is
+  begin
+    TransactionRec(Index).Operation     <= GET_USE_RANDOM_DELAYS ;
+    StreamArrayRequestTransaction(TransactionRec => TransactionRec, Index => Index) ;
+    OptVal := TransactionRec(Index).BoolFromModel    ;
+  end procedure GetUseRandomDelays ;
+
+  ------------------------------------------------------------
+  procedure SetDelayCoverageID (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecArrayType ;
+    constant  Index            : in    integer ;
+    constant  DelayCov         : in    DelayCoverageIdType 
+  ) is
+  begin
+    TransactionRec(Index).Operation     <= SET_DELAYCOV_ID ;
+    TransactionRec(Index).IntToModel    <= DelayCov.ID ;
+    StreamArrayRequestTransaction(TransactionRec => TransactionRec, Index => Index) ;
+  end procedure SetDelayCoverageID ;
+
+  ------------------------------------------------------------
+  procedure GetDelayCoverageID (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecArrayType ;
+    constant  Index            : in    integer ;
+    variable  DelayCov         : out   DelayCoverageIdType 
+  ) is
+  begin
+    TransactionRec(Index).Operation     <= GET_DELAYCOV_ID ;
+    StreamArrayRequestTransaction(TransactionRec => TransactionRec, Index => Index) ;
+    DelayCov := GetDelayCoverage(TransactionRec(Index).IntFromModel) ; 
+  end procedure GetDelayCoverageID ;
+
   -- ========================================================
   --  Set and Get Burst Mode   
   --  Set Burst Mode for models that do bursting.
@@ -1563,6 +1764,34 @@ package body StreamTransactionArrayPkg is
   end procedure SendBurstVector ;
   
   ------------------------------------------------------------
+  procedure SendBurstVector (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecArrayType ;
+    constant  Index            : in    integer ;
+    constant  VectorOfWords    : in    integer_vector ;
+    constant  Param            : in    std_logic_vector ;
+    constant  FifoWidth        : in    integer ; 
+    constant  StatusMsgOn      : in    boolean := false
+  ) is
+  begin
+    PushBurstVector(TransactionRec(Index).BurstFifo, VectorOfWords, FifoWidth) ;
+    LocalSendBurst(TransactionRec, Index, SEND_BURST, VectorOfWords'length, Param, StatusMsgOn) ; 
+  end procedure SendBurstVector ;
+  
+  ------------------------------------------------------------
+  procedure SendBurstVector (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecArrayType ;
+    constant  Index            : in    integer ;
+    constant  VectorOfWords    : in    integer_vector ;
+    constant  FifoWidth        : in    integer ; 
+    constant  StatusMsgOn      : in    boolean := false
+  ) is
+  begin
+    SendBurstVector(TransactionRec, Index, VectorOfWords, "", FifoWidth, StatusMsgOn) ; 
+  end procedure SendBurstVector ;
+  
+  ------------------------------------------------------------
   procedure SendBurstIncrement (
   ------------------------------------------------------------
     signal    TransactionRec   : inout StreamRecArrayType ;
@@ -1707,6 +1936,34 @@ package body StreamTransactionArrayPkg is
     SendBurstVectorAsync(TransactionRec, Index, VectorOfWords, "", StatusMsgOn) ; 
   end procedure SendBurstVectorAsync ;
   
+  ------------------------------------------------------------
+  procedure SendBurstVectorAsync (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecArrayType ;
+    constant  Index            : in    integer ;
+    constant  VectorOfWords    : in    integer_vector ;
+    constant  Param            : in    std_logic_vector ;
+    constant  FifoWidth        : in    integer ; 
+    constant  StatusMsgOn      : in    boolean := false
+  ) is
+  begin
+    PushBurstVector(TransactionRec(Index).BurstFifo, VectorOfWords, FifoWidth) ;
+    LocalSendBurst(TransactionRec, Index, SEND_BURST_ASYNC, VectorOfWords'length, Param, StatusMsgOn) ; 
+  end procedure SendBurstVectorAsync ;
+  
+  ------------------------------------------------------------
+  procedure SendBurstVectorAsync (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecArrayType ;
+    constant  Index            : in    integer ;
+    constant  VectorOfWords    : in    integer_vector ;
+    constant  FifoWidth        : in    integer ; 
+    constant  StatusMsgOn      : in    boolean := false
+  ) is
+  begin
+    SendBurstVectorAsync(TransactionRec, Index, VectorOfWords, "", FifoWidth, StatusMsgOn) ; 
+  end procedure SendBurstVectorAsync ;
+
   ------------------------------------------------------------
   procedure SendBurstIncrementAsync (
   ------------------------------------------------------------
@@ -2151,6 +2408,34 @@ package body StreamTransactionArrayPkg is
   end procedure CheckBurstVector ;
   
   ------------------------------------------------------------
+  procedure CheckBurstVector (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecArrayType ;
+    constant  Index            : in    integer ;
+    constant  VectorOfWords    : in    integer_vector ;
+    constant  Param            : in    std_logic_vector ;
+    constant  FifoWidth        : in    integer ; 
+    constant  StatusMsgOn      : in    boolean := false
+  ) is
+  begin
+    PushBurstVector(TransactionRec(Index).BurstFifo, VectorOfWords, FifoWidth) ;
+    LocalCheckBurst(TransactionRec, Index, CHECK_BURST, VectorOfWords'length, Param, StatusMsgOn) ;
+  end procedure CheckBurstVector ;
+  
+  ------------------------------------------------------------
+  procedure CheckBurstVector (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecArrayType ;
+    constant  Index            : in    integer ;
+    constant  VectorOfWords    : in    integer_vector ;
+    constant  FifoWidth        : in    integer ; 
+    constant  StatusMsgOn      : in    boolean := false
+  ) is
+  begin
+    CheckBurstVector(TransactionRec, Index, VectorOfWords, "", FifoWidth, StatusMsgOn) ; 
+  end procedure CheckBurstVector ;
+  
+  ------------------------------------------------------------
   procedure CheckBurstIncrement (
   ------------------------------------------------------------
     signal    TransactionRec   : inout StreamRecArrayType ;
@@ -2303,6 +2588,39 @@ package body StreamTransactionArrayPkg is
   end procedure TryCheckBurstVector ;
   
   ------------------------------------------------------------
+  procedure TryCheckBurstVector (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecArrayType ;
+    constant  Index            : in    integer ;
+    constant  VectorOfWords    : in    integer_vector ;
+    constant  Param            : in    std_logic_vector ;
+    variable  Available        : out   boolean ;
+    constant  FifoWidth        : in    integer ; 
+    constant  StatusMsgOn      : in    boolean := false
+  ) is
+  begin
+    GotBurst(TransactionRec, Index, VectorOfWords'length, Available) ; 
+    if Available then 
+      PushBurstVector(TransactionRec(Index).BurstFifo, VectorOfWords, FifoWidth) ;
+      LocalCheckBurst(TransactionRec, Index, CHECK_BURST, VectorOfWords'length, Param, StatusMsgOn) ;
+    end if ; 
+  end procedure TryCheckBurstVector ;
+    
+  ------------------------------------------------------------
+  procedure TryCheckBurstVector (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecArrayType ;
+    constant  Index            : in    integer ;
+    constant  VectorOfWords    : in    integer_vector ;
+    variable  Available        : out   boolean ;
+    constant  FifoWidth        : in    integer ; 
+    constant  StatusMsgOn      : in    boolean := false
+  ) is
+  begin
+    TryCheckBurstVector(TransactionRec, Index, VectorOfWords, "", Available, FifoWidth, StatusMsgOn) ;
+  end procedure TryCheckBurstVector ;
+
+  ------------------------------------------------------------
   procedure TryCheckBurstIncrement (
   ------------------------------------------------------------
     signal    TransactionRec   : inout StreamRecArrayType ;
@@ -2402,6 +2720,72 @@ package body StreamTransactionArrayPkg is
   begin
     TryCheckBurstRandom(TransactionRec, Index, CoverID, NumFifoWords, FifoWidth, "", Available, StatusMsgOn) ;
   end procedure TryCheckBurstRandom ;  
+
+  -- ========================================================
+  --  Send And Get Transactions
+  -- 
+  -- ========================================================
+  ------------------------------------------------------------
+  procedure SendAndGet (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecArrayType ;
+    constant  Index            : in    integer ;
+    constant  iData            : in    std_logic_vector ;
+    constant  iParam           : in    std_logic_vector ;
+    variable  oData            : out   std_logic_vector ;
+    variable  oParam           : out   std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
+  ) is 
+  begin
+    LocalSend(TransactionRec, Index, SEND_AND_GET, iData, iParam, StatusMsgOn) ;
+    oData  := SafeResize(TransactionRec(Index).DataFromModel,  oData'length) ; 
+    oParam := SafeResize(TransactionRec(Index).ParamFromModel, oParam'length) ; 
+  end procedure SendAndGet ;  
+
+  ------------------------------------------------------------
+  procedure SendAndGet (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecArrayType ;
+    constant  Index            : in    integer ;
+    constant  iData            : in    std_logic_vector ;
+    variable  oData            : out   std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
+  ) is 
+  begin
+    LocalSend(TransactionRec, Index, SEND_AND_GET, iData, "", StatusMsgOn) ;
+    oData  := SafeResize(TransactionRec(Index).DataFromModel, oData'length) ; 
+  end procedure SendAndGet ;  
+
+  ------------------------------------------------------------
+  procedure SendAndGetBurst (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecArrayType ;
+    constant  Index            : in    integer ;
+    constant  iNumFifoWords    : in    integer ;
+    constant  iParam           : in    std_logic_vector ;
+    variable  oNumFifoWords    : out   integer ;
+    variable  oParam           : out   std_logic_vector ;
+    constant  StatusMsgOn      : in    boolean := false 
+  ) is 
+  begin
+    LocalSendBurst(TransactionRec, Index, SEND_AND_GET_BURST, iNumFifoWords, iParam, StatusMsgOn) ;
+    oNumFifoWords := TransactionRec(Index).IntFromModel ;
+    oParam        := SafeResize(TransactionRec(Index).ParamFromModel, oParam'length) ; 
+  end procedure SendAndGetBurst ; 
+
+  ------------------------------------------------------------
+  procedure SendAndGetBurst (
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecArrayType ;
+    constant  Index            : in    integer ;
+    constant  iNumFifoWords    : in    integer ;
+    variable  oNumFifoWords    : out   integer ;
+    constant  StatusMsgOn      : in    boolean := false 
+  ) is 
+  begin
+    LocalSendBurst(TransactionRec, Index, SEND_AND_GET_BURST, iNumFifoWords, "", StatusMsgOn) ;
+    oNumFifoWords := TransactionRec(Index).IntFromModel ;
+  end procedure SendAndGetBurst ; 
 
   -- ========================================================
   --  Pseudo Transactions
