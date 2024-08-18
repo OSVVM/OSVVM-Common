@@ -1295,10 +1295,22 @@ package StreamTransactionPkg is
   ) return string ;
 
   ------------------------------------------------------------
+  function ClassifyUnimplementedOperation (
+  -----------------------------------------------------------
+    constant  TransactionRec   : in StreamRecType 
+  ) return string ;
+
+  ------------------------------------------------------------
   function ClassifyUnimplementedTransmitterOperation (
   -----------------------------------------------------------
     constant  Operation        : in StreamOperationType;
     constant  TransactionCount : in natural
+  ) return string ;
+
+  ------------------------------------------------------------
+  function ClassifyUnimplementedTransmitterOperation (
+  -----------------------------------------------------------
+    constant  TransactionRec   : in StreamRecType 
   ) return string ;
   
   ------------------------------------------------------------
@@ -1308,6 +1320,11 @@ package StreamTransactionPkg is
     constant  TransactionCount : in natural
   ) return string ;
 
+  ------------------------------------------------------------
+  function ClassifyUnimplementedReceiverOperation (
+  -----------------------------------------------------------
+    constant  TransactionRec   : in StreamRecType 
+  ) return string ;
 end StreamTransactionPkg ;
 
 package body StreamTransactionPkg is 
@@ -2886,6 +2903,15 @@ package body StreamTransactionPkg is
   end function ClassifyUnimplementedOperation ;
 
   ------------------------------------------------------------
+  function ClassifyUnimplementedOperation (
+  -----------------------------------------------------------
+    constant  TransactionRec   : in StreamRecType 
+  ) return string is
+  begin
+    return ClassifyUnimplementedOperation(TransactionRec.Operation, TransactionRec.Rdy) ; 
+  end function ClassifyUnimplementedOperation ;
+
+  ------------------------------------------------------------
   function ClassifyUnimplementedTransmitterOperation (
   -----------------------------------------------------------
     constant  Operation        : in StreamOperationType;
@@ -2902,6 +2928,15 @@ package body StreamTransactionPkg is
       return "Unimplemented Transaction: " & to_string(Operation) & 
              "  Transaction # " & to_string(TransactionCount) ;
     end if ; 
+  end function ClassifyUnimplementedTransmitterOperation ;
+
+  ------------------------------------------------------------
+  function ClassifyUnimplementedTransmitterOperation (
+  -----------------------------------------------------------
+    constant  TransactionRec   : in StreamRecType 
+  ) return string is
+  begin
+    return ClassifyUnimplementedTransmitterOperation(TransactionRec.Operation, TransactionRec.Rdy) ; 
   end function ClassifyUnimplementedTransmitterOperation ;
   
   ------------------------------------------------------------
@@ -2921,6 +2956,15 @@ package body StreamTransactionPkg is
       return "Unimplemented Transaction: " & to_string(Operation) & 
              "  Transaction # " & to_string(TransactionCount) ;
     end if ; 
+  end function ClassifyUnimplementedReceiverOperation ;
+
+  ------------------------------------------------------------
+  function ClassifyUnimplementedReceiverOperation (
+  -----------------------------------------------------------
+    constant  TransactionRec   : in StreamRecType 
+  ) return string is
+  begin
+    return ClassifyUnimplementedReceiverOperation(TransactionRec.Operation, TransactionRec.Rdy) ; 
   end function ClassifyUnimplementedReceiverOperation ;
 
 end StreamTransactionPkg ;
