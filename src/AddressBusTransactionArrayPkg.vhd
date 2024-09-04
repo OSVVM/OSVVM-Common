@@ -147,6 +147,60 @@ package AddressBusTransactionArrayPkg is
   ) ;
 
   -- ========================================================
+  --  Delay Coverage Transactions   
+  --  Get Delay Coverage ID to change delay coverage parameters.
+  -- ========================================================
+  ------------------------------------------------------------
+  procedure SetUseRandomDelays (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecArrayType ;
+    constant Index          : In    integer  ;
+    constant OptVal         : In    boolean := TRUE
+  ) ;
+
+  ------------------------------------------------------------
+  procedure GetUseRandomDelays (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecArrayType ;
+    constant Index          : In    integer  ;
+    variable OptVal         : Out   boolean
+  ) ;
+  
+  ------------------------------------------------------------
+  procedure SetDelayCoverageID (
+  ------------------------------------------------------------
+    signal   TransactionRec : inout AddressBusRecArrayType ;
+    constant ArrayIndex     : In    integer  ;
+    constant DelayCov       : in    DelayCoverageIdType ;
+    constant Index          : in    integer := 1 
+  ) ;
+
+  ------------------------------------------------------------
+  procedure GetDelayCoverageID (
+  ------------------------------------------------------------
+    signal   TransactionRec : inout AddressBusRecArrayType ;
+    constant ArrayIndex     : In    integer  ;
+    variable DelayCov       : out   DelayCoverageIdType ;
+    constant Index          : in    integer := 1 
+  ) ;
+
+  ------------------------------------------------------------
+  procedure SetDelayCoverageID (
+  ------------------------------------------------------------
+    signal   TransactionRec : inout AddressBusRecArrayType ;
+    constant Index          : In    integer  ;
+    constant DelayCov       : in    DelayCoverageIdArrayType 
+  ) ;
+
+  ------------------------------------------------------------
+  procedure GetDelayCoverageID (
+  ------------------------------------------------------------
+    signal   TransactionRec : inout AddressBusRecArrayType ;
+    constant Index          : In    integer  ;
+    variable DelayCov       : out   DelayCoverageIdArrayType 
+  ) ;
+
+  -- ========================================================
   --  Set and Get Burst Mode   
   --  Set Burst Mode for models that do bursting.
   -- ========================================================
@@ -953,6 +1007,92 @@ package body AddressBusTransactionArrayPkg is
 --    ReportNonZeroAlerts(AlertLogID => ModelID) ;
     ErrorCount := GetAlertCount(AlertLogID => ModelID) ;
   end procedure GetErrorCount ;
+
+  -- ========================================================
+  --  Delay Coverage Transactions   
+  --  Get Delay Coverage ID to change delay coverage parameters.
+  -- ========================================================
+  ------------------------------------------------------------
+  procedure SetUseRandomDelays (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecArrayType ;
+    constant Index          : In    integer  ;
+    constant OptVal         : In    boolean := TRUE
+  ) is
+  begin
+    TransactionRec(Index).Operation     <= SET_USE_RANDOM_DELAYS ;
+    TransactionRec(Index).BoolToModel   <= OptVal ;
+    AddressBusArrayRequestTransaction(TransactionRec => TransactionRec, Index => Index) ;
+  end procedure SetUseRandomDelays ;
+
+  ------------------------------------------------------------
+  procedure GetUseRandomDelays (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecArrayType ;
+    constant Index          : In    integer  ;
+    variable OptVal         : Out   boolean
+  ) is
+  begin
+    TransactionRec(Index).Operation     <= GET_USE_RANDOM_DELAYS ;
+    AddressBusArrayRequestTransaction(TransactionRec => TransactionRec, Index => Index) ;
+    OptVal := TransactionRec(Index).BoolFromModel    ;
+  end procedure GetUseRandomDelays ;
+  
+  ------------------------------------------------------------
+  procedure SetDelayCoverageID (
+  ------------------------------------------------------------
+    signal   TransactionRec : inout AddressBusRecArrayType ;
+    constant ArrayIndex     : In    integer  ;
+    constant DelayCov       : in    DelayCoverageIdType ;
+    constant Index          : in    integer := 1 
+  ) is
+  begin
+    TransactionRec(Index).Operation     <= SET_DELAYCOV_ID ;
+    TransactionRec(Index).IntToModel    <= DelayCov.ID ;
+    TransactionRec(Index).Options       <= Index ; 
+    AddressBusArrayRequestTransaction(TransactionRec => TransactionRec, Index => ArrayIndex) ;
+  end procedure SetDelayCoverageID ;
+
+  ------------------------------------------------------------
+  procedure GetDelayCoverageID (
+  ------------------------------------------------------------
+    signal   TransactionRec : inout AddressBusRecArrayType ;
+    constant ArrayIndex     : In    integer  ;
+    variable DelayCov       : out   DelayCoverageIdType ;
+    constant Index          : in    integer := 1 
+  ) is
+  begin
+    TransactionRec(Index).Operation     <= GET_DELAYCOV_ID ;
+    TransactionRec(Index).Options       <= Index ; 
+    AddressBusArrayRequestTransaction(TransactionRec => TransactionRec, Index => ArrayIndex) ;
+    DelayCov := GetDelayCoverage(TransactionRec(Index).IntFromModel) ; 
+  end procedure GetDelayCoverageID ;
+
+  ------------------------------------------------------------
+  procedure SetDelayCoverageID (
+  ------------------------------------------------------------
+    signal   TransactionRec : inout AddressBusRecArrayType ;
+    constant Index          : In    integer  ;
+    constant DelayCov       : in    DelayCoverageIdArrayType 
+  ) is
+  begin
+    for i in DelayCov'range loop
+      SetDelayCoverageID(TransactionRec, Index, DelayCov(i), i) ; 
+    end loop ; 
+  end procedure SetDelayCoverageID ;
+
+  ------------------------------------------------------------
+  procedure GetDelayCoverageID (
+  ------------------------------------------------------------
+    signal   TransactionRec : inout AddressBusRecArrayType ;
+    constant Index          : In    integer  ;
+    variable DelayCov       : out   DelayCoverageIdArrayType 
+  ) is
+  begin
+    for i in DelayCov'range loop
+      GetDelayCoverageID(TransactionRec, Index, DelayCov(i), i) ; 
+    end loop ; 
+  end procedure GetDelayCoverageID ;
 
   -- ========================================================
   --  Set and Get Burst Mode   

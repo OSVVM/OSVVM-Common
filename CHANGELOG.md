@@ -2,6 +2,7 @@
 
 | Revision  |  Release Summary | 
 ------------|----------- 
+| 2024.09   |  Shorter calls for ClassifyUnimplementedOperation(TransRec)
 | 2024.07   |  Updated testbench calls to CreateClock for it being refactored to ClockResetPkg
 | 2024.03   |  Added Time to transaction record and SetModelOptions.  New overloading of PopBurstVector.
 | 2023.09   |  Made ModelParametersPkg a singleton.  Formalized testbench.  Older implementation in ModelParamstersPtPkg
@@ -16,6 +17,11 @@
 | 2020.10   |  Added Bursting to Stream Model Independent Transactions 
 | 2020.07   |  Updated for MIT and freed the slaves
 | 2020.02   |  Created by refactoring Axi4LiteMasterTransactionPkg
+
+## 2024.09 September 2024
+- AddressBusTransactionPkg - Added shorter call to ClassifyUnimplementedOperation
+- StreamTransactionPkg - Added shorter call to ClassifyUnimplementedTransmitterOperation, ClassifyUnimplementedReceiverOperation
+- Updated AddressBusTransactionArrayPkg - added missing features from AddressBusTransactionPkg
 
 ## 2024.07  July 2024
 -  Updated testbench calls to CreateClock for it being refactored to ClockResetPkg

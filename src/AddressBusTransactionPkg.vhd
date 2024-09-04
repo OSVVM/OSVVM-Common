@@ -987,6 +987,12 @@ package AddressBusTransactionPkg is
     constant TransactionCount : in natural
   ) return string ;
   
+   ------------------------------------------------------------
+  function ClassifyUnimplementedOperation (
+  -----------------------------------------------------------
+    constant   TransactionRec : in AddressBusRecType 
+  ) return string ;
+ 
 end package AddressBusTransactionPkg ;
 
 -- /////////////////////////////////////////////////////////////////////////////////////////
@@ -2196,6 +2202,15 @@ package body AddressBusTransactionPkg is
              "  Transaction # " & to_string(TransactionCount) ;
     end if ; 
   end function ClassifyUnimplementedOperation ;
+
+  ------------------------------------------------------------
+  function ClassifyUnimplementedOperation (
+  -----------------------------------------------------------
+    constant   TransactionRec : in AddressBusRecType 
+  ) return string is
+  begin
+    return ClassifyUnimplementedOperation(TransactionRec.Operation, TransactionRec.Rdy) ; 
+  end function ClassifyUnimplementedOperation ; 
 
 
 end package body AddressBusTransactionPkg ;
