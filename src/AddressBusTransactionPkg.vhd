@@ -645,6 +645,16 @@ package AddressBusTransactionPkg is
   ) ;
   
   ------------------------------------------------------------
+  procedure WriteBurstVector (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             VectorOfWords  : In    integer_vector ;
+             FifoWidth      : In    integer ; 
+             StatusMsgOn    : In    boolean := false
+  ) ;
+
+  ------------------------------------------------------------
   procedure WriteBurstIncrement (
   ------------------------------------------------------------
     signal   TransactionRec : InOut AddressBusRecType ;
@@ -697,6 +707,16 @@ package AddressBusTransactionPkg is
   ) ;
   
   ------------------------------------------------------------
+  procedure WriteBurstVectorAsync (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             VectorOfWords  : In    integer_vector ;
+             FifoWidth      : In    integer ; 
+             StatusMsgOn    : In    boolean := false
+  ) ;
+
+  ------------------------------------------------------------
   procedure WriteBurstIncrementAsync (
   ------------------------------------------------------------
     signal   TransactionRec : InOut AddressBusRecType ;
@@ -746,6 +766,16 @@ package AddressBusTransactionPkg is
              StatusMsgOn    : In    boolean := false
   ) ;
   
+  ------------------------------------------------------------
+  procedure ReadCheckBurstVector (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             VectorOfWords  : In    integer_vector ;
+             FifoWidth      : In    integer ; 
+             StatusMsgOn    : In    boolean := false
+  ) ;
+
   ------------------------------------------------------------
   procedure ReadCheckBurstIncrement (
   ------------------------------------------------------------
@@ -1753,6 +1783,20 @@ package body AddressBusTransactionPkg is
   end procedure WriteBurstVector ;
   
   ------------------------------------------------------------
+  procedure WriteBurstVector (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             VectorOfWords  : In    integer_vector ;
+             FifoWidth      : In    integer ; 
+             StatusMsgOn    : In    boolean := false
+  ) is
+  begin
+    PushBurstVector(TransactionRec.WriteBurstFifo, VectorOfWords, FifoWidth) ;
+    WriteBurst(TransactionRec, iAddr, VectorOfWords'length, StatusMsgOn) ; 
+  end procedure WriteBurstVector ;
+  
+  ------------------------------------------------------------
   procedure WriteBurstIncrement (
   ------------------------------------------------------------
     signal   TransactionRec : InOut AddressBusRecType ;
@@ -1826,6 +1870,20 @@ package body AddressBusTransactionPkg is
   ) is
   begin
     PushBurstVector(TransactionRec.WriteBurstFifo, VectorOfWords) ; 
+    WriteBurstAsync(TransactionRec, iAddr, VectorOfWords'length, StatusMsgOn) ; 
+  end procedure WriteBurstVectorAsync ;
+  
+  ------------------------------------------------------------
+  procedure WriteBurstVectorAsync (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             VectorOfWords  : In    integer_vector ;
+             FifoWidth      : In    integer ; 
+             StatusMsgOn    : In    boolean := false
+  ) is
+  begin
+    PushBurstVector(TransactionRec.WriteBurstFifo, VectorOfWords, FifoWidth) ; 
     WriteBurstAsync(TransactionRec, iAddr, VectorOfWords'length, StatusMsgOn) ; 
   end procedure WriteBurstVectorAsync ;
   
@@ -1906,6 +1964,20 @@ package body AddressBusTransactionPkg is
   begin
     ReadBurst(TransactionRec, iAddr, VectorOfWords'length, StatusMsgOn) ; 
     CheckBurstVector(TransactionRec.ReadBurstFifo, VectorOfWords) ;
+  end procedure ReadCheckBurstVector ;
+  
+  ------------------------------------------------------------
+  procedure ReadCheckBurstVector (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecType ;
+             iAddr          : In    std_logic_vector ;
+             VectorOfWords  : In    integer_vector ;
+             FifoWidth      : In    integer ; 
+             StatusMsgOn    : In    boolean := false
+  ) is
+  begin
+    ReadBurst(TransactionRec, iAddr, VectorOfWords'length, StatusMsgOn) ; 
+    CheckBurstVector(TransactionRec.ReadBurstFifo, VectorOfWords, FifoWidth) ;
   end procedure ReadCheckBurstVector ;
   
   ------------------------------------------------------------

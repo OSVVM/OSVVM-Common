@@ -453,6 +453,17 @@ package AddressBusTransactionArrayPkg is
   ) ;
   
   ------------------------------------------------------------
+  procedure WriteBurstVector (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecArrayType ;
+    constant Index          : In    integer  ;
+             iAddr          : In    std_logic_vector ;
+             VectorOfWords  : In    integer_vector ;
+             FifoWidth      : In    integer ; 
+             StatusMsgOn    : In    boolean := false
+  ) ;
+
+  ------------------------------------------------------------
   procedure WriteBurstIncrement (
   ------------------------------------------------------------
     signal   TransactionRec : InOut AddressBusRecArrayType ;
@@ -510,6 +521,17 @@ package AddressBusTransactionArrayPkg is
   ) ;
   
   ------------------------------------------------------------
+  procedure WriteBurstVectorAsync (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecArrayType ;
+    constant Index          : In    integer  ;
+             iAddr          : In    std_logic_vector ;
+             VectorOfWords  : In    integer_vector ;
+             FifoWidth      : In    integer ; 
+             StatusMsgOn    : In    boolean := false
+  ) ;
+
+  ------------------------------------------------------------
   procedure WriteBurstIncrementAsync (
   ------------------------------------------------------------
     signal   TransactionRec : InOut AddressBusRecArrayType ;
@@ -564,6 +586,17 @@ package AddressBusTransactionArrayPkg is
              StatusMsgOn    : In    boolean := false
   ) ;
   
+  ------------------------------------------------------------
+  procedure ReadCheckBurstVector (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecArrayType ;
+    constant Index          : In    integer  ;
+             iAddr          : In    std_logic_vector ;
+             VectorOfWords  : In    integer_vector ;
+             FifoWidth      : In    integer ; 
+             StatusMsgOn    : In    boolean := false
+  ) ;
+
   ------------------------------------------------------------
   procedure ReadCheckBurstIncrement (
   ------------------------------------------------------------
@@ -1647,6 +1680,21 @@ package body AddressBusTransactionArrayPkg is
   end procedure WriteBurstVector ;
   
   ------------------------------------------------------------
+  procedure WriteBurstVector (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecArrayType ;
+    constant Index          : In    integer  ;
+             iAddr          : In    std_logic_vector ;
+             VectorOfWords  : In    integer_vector ;
+             FifoWidth      : In    integer ; 
+             StatusMsgOn    : In    boolean := false
+  ) is
+  begin
+    PushBurstVector(TransactionRec(Index).WriteBurstFifo, VectorOfWords, FifoWidth) ; 
+    WriteBurst(TransactionRec, Index, iAddr, VectorOfWords'length, StatusMsgOn) ; 
+  end procedure WriteBurstVector ;
+  
+  ------------------------------------------------------------
   procedure WriteBurstIncrement (
   ------------------------------------------------------------
     signal   TransactionRec : InOut AddressBusRecArrayType ;
@@ -1729,6 +1777,21 @@ package body AddressBusTransactionArrayPkg is
   end procedure WriteBurstVectorAsync ;
   
   ------------------------------------------------------------
+  procedure WriteBurstVectorAsync (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecArrayType ;
+    constant Index          : In    integer  ;
+             iAddr          : In    std_logic_vector ;
+             VectorOfWords  : In    integer_vector ;
+             FifoWidth      : In    integer ; 
+             StatusMsgOn    : In    boolean := false
+  ) is
+  begin
+    PushBurstVector(TransactionRec(Index).WriteBurstFifo, VectorOfWords, FifoWidth) ; 
+    WriteBurstAsync(TransactionRec, Index, iAddr, VectorOfWords'length, StatusMsgOn) ; 
+  end procedure WriteBurstVectorAsync ;
+
+  ------------------------------------------------------------
   procedure WriteBurstIncrementAsync (
   ------------------------------------------------------------
     signal   TransactionRec : InOut AddressBusRecArrayType ;
@@ -1810,6 +1873,21 @@ package body AddressBusTransactionArrayPkg is
   begin
     ReadBurst(TransactionRec, Index, iAddr, VectorOfWords'length, StatusMsgOn) ; 
     CheckBurstVector(TransactionRec(Index).ReadBurstFifo, VectorOfWords) ;
+  end procedure ReadCheckBurstVector ;
+  
+  ------------------------------------------------------------
+  procedure ReadCheckBurstVector (
+  ------------------------------------------------------------
+    signal   TransactionRec : InOut AddressBusRecArrayType ;
+    constant Index          : In    integer  ;
+             iAddr          : In    std_logic_vector ;
+             VectorOfWords  : In    integer_vector ;
+             FifoWidth      : In    integer ; 
+             StatusMsgOn    : In    boolean := false
+  ) is
+  begin
+    ReadBurst(TransactionRec, Index, iAddr, VectorOfWords'length, StatusMsgOn) ; 
+    CheckBurstVector(TransactionRec(Index).ReadBurstFifo, VectorOfWords, FifoWidth) ;
   end procedure ReadCheckBurstVector ;
   
   ------------------------------------------------------------
