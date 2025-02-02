@@ -122,7 +122,7 @@ begin
           Alert(ModelID, "No clocks in this VC.  Not waiting.") ;
           
         when GET_ALERTLOG_ID =>
-          TransRec.IntFromModel <= ModelID ;
+          TransRec.IntFromModel <= integer(ModelID) ;
 
         when GET_TRANSACTION_COUNT =>
           TransRec.IntFromModel <= TransRec.Rdy ;
