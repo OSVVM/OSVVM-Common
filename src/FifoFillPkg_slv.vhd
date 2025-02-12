@@ -521,7 +521,7 @@ package body FifoFillPkg_slv is
   begin
     Count := 0 ; 
     for i in VectorOfWords'range loop 
-      exit when empty(Fifo) ; 
+      exit when IsEmpty(Fifo) ; 
       VectorOfWords(i) := Pop(Fifo) ; 
       Count := i ;
     end loop ;
@@ -549,7 +549,7 @@ package body FifoFillPkg_slv is
   begin
     Count := 0 ; 
     for i in VectorOfWords'range loop 
-      exit when empty(Fifo) ; 
+      exit when IsEmpty(Fifo) ; 
       VectorOfWords(i) := to_integer(Pop(Fifo)) ; 
       Count := i ;
     end loop ;
@@ -733,7 +733,7 @@ package body FifoFillPkg_slv is
     aData := (aData'range => 'U') ;  -- Default Undriven
     Valid := TRUE ; 
     GetWord : while Index <= DataLeft loop  
-      if not Empty(Fifo) then 
+      if not IsEmpty(Fifo) then 
         aData(Index+7 downto Index) := Pop(Fifo) ; 
         BytesToSend := BytesToSend - 1 ; 
         exit when BytesToSend = 0 ; 
