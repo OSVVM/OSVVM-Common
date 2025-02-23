@@ -47,6 +47,9 @@ architecture MemoryBurstBytePattern1 of TestCtrl is
   constant DATA_WIDTH : integer := IfElse(BURST_MODE = ADDRESS_BUS_BURST_BYTE_MODE, 8, AXI_DATA_WIDTH)  ;  
   constant DATA_ZERO  : std_logic_vector := (DATA_WIDTH - 1 downto 0 => '0') ; 
 
+--!! Works around Xilinx 2024.02 issue with single element arrays
+  subtype  Slv_v1_8 is slv_vector(1 to 1)(7 downto 0) ; 
+
 begin
 
   ------------------------------------------------------------
@@ -125,10 +128,10 @@ begin
     ReadCheckBurstRandom(ManagerRec, 1, X"0000_3001", X"30", 13) ;
 
     log("Write 9 words, with bytes in all different byte positions") ;
-    WriteBurstVector(ManagerRec, 1, X"0000_5050", (1 => X"01")) ;
-    WriteBurstVector(ManagerRec, 1, X"0000_5051", (1 => X"02")) ;
-    WriteBurstVector(ManagerRec, 1, X"0000_5052", (1 => X"03")) ;
-    WriteBurstVector(ManagerRec, 1, X"0000_5053", (1 => X"04")) ;
+    WriteBurstVector(ManagerRec, 1, X"0000_5050", Slv_v1_8'(1 => X"01")) ;
+    WriteBurstVector(ManagerRec, 1, X"0000_5051", Slv_v1_8'(1 => X"02")) ;
+    WriteBurstVector(ManagerRec, 1, X"0000_5052", Slv_v1_8'(1 => X"03")) ;
+    WriteBurstVector(ManagerRec, 1, X"0000_5053", Slv_v1_8'(1 => X"04")) ;
 
     WriteBurstVector(ManagerRec, 1, X"0000_5060", (X"05", X"06")) ;
     WriteBurstVector(ManagerRec, 1, X"0000_5071", (X"07", X"08")) ;
@@ -138,10 +141,10 @@ begin
     WriteBurstVector(ManagerRec, 1, X"0000_50A1", (X"0E", X"0F", X"10")) ;
 
 
-    ReadCheckBurstVector(ManagerRec, 1, X"0000_5050", (1 => X"01")) ;
-    ReadCheckBurstVector(ManagerRec, 1, X"0000_5051", (1 => X"02")) ;
-    ReadCheckBurstVector(ManagerRec, 1, X"0000_5052", (1 => X"03")) ;
-    ReadCheckBurstVector(ManagerRec, 1, X"0000_5053", (1 => X"04")) ;
+    ReadCheckBurstVector(ManagerRec, 1, X"0000_5050", Slv_v1_8'(1 => X"01")) ;
+    ReadCheckBurstVector(ManagerRec, 1, X"0000_5051", Slv_v1_8'(1 => X"02")) ;
+    ReadCheckBurstVector(ManagerRec, 1, X"0000_5052", Slv_v1_8'(1 => X"03")) ;
+    ReadCheckBurstVector(ManagerRec, 1, X"0000_5053", Slv_v1_8'(1 => X"04")) ;
 
     ReadCheckBurstVector(ManagerRec, 1, X"0000_5060", (X"05", X"06")) ;
     ReadCheckBurstVector(ManagerRec, 1, X"0000_5071", (X"07", X"08")) ;
