@@ -67,11 +67,11 @@ analyze AddressBusVersionCompatibilityPkg.vhd
 
 # Interrupt
 if {$::osvvm::ToolNameVersion ne "XSIM-2023.2"}  {
-  analyze InterruptGlobalSignalPkg.vhd
+  analyze InterruptGlobalSignalPkg.vhd   [NoNullRangeWarning]
   analyze InterruptHandler.vhd
   analyze InterruptHandlerComponentPkg.vhd
   analyze InterruptGeneratorBit.vhd
-  analyze InterruptGeneratorBitVti.vhd
+  analyze InterruptGeneratorBitVti.vhd   [NoNullRangeWarning]
   # analyze InterruptGenerator.vhd
   # analyze InterruptGeneratorVti.vhd
   analyze InterruptGeneratorComponentPkg.vhd
