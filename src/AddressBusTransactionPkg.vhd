@@ -915,10 +915,27 @@ package AddressBusTransactionPkg is
   ) ; 
 
   -- ========================================================
-  --  Verification Component Support Functions
+  --  Verification Component Support Subprograms
   --  These help decode the operation value (AddressBusOperationType)  
   --  to determine properties about the operation
   -- ========================================================
+  ------------------------------------------------------------
+  procedure DoDirectiveTransactions (
+  --  Wait until pending transaction completes
+  ------------------------------------------------------------
+    signal   TransRec              : InOut AddressBusRecType ;
+    signal   Clk                   : In    std_logic ; 
+    constant ModelID               : In    AlertLogIDType ;
+    signal   UseCoverageDelays     : InOut boolean ; 
+    signal   DelayCovID            : InOut DelayCoverageIDArrayType ; 
+    signal   BurstFifoMode         : InOut integer ;
+    signal   TransactionDone       : In    boolean ;
+    signal   WriteTransactionDone  : In    boolean ;
+    signal   ReadTransactionDone   : In    boolean ;
+    constant WriteTransactionCount : In    integer ; 
+    constant ReadTransactionCount  : In    integer 
+  ) ;
+
   ------------------------------------------------------------
   function IsWriteAddress (
   -- TRUE for a transaction includes write address
@@ -2062,6 +2079,100 @@ package body AddressBusTransactionPkg is
   -- ========================================================
   --  Verification Component Support
   -- ========================================================
+  ------------------------------------------------------------
+  procedure DoDirectiveTransactions (
+  --  Wait until pending transaction completes
+  ------------------------------------------------------------
+    signal   TransRec              : InOut AddressBusRecType ;
+    signal   Clk                   : In    std_logic ; 
+    constant ModelID               : In    AlertLogIDType ;
+    signal   UseCoverageDelays     : InOut boolean ; 
+    signal   DelayCovID            : InOut DelayCoverageIDArrayType ; 
+    signal   BurstFifoMode         : InOut integer ;
+    signal   TransactionDone       : In    boolean ;
+    signal   WriteTransactionDone  : In    boolean ;
+    signal   ReadTransactionDone   : In    boolean ;
+    constant WriteTransactionCount : In    integer ; 
+    constant ReadTransactionCount  : In    integer 
+  ) is
+    constant DELAY_COV_LENGTH : integer := DelayCovID'length ;
+    alias aDelayCovID : DelayCoverageIDArrayType(1 to DELAY_COV_LENGTH) is DelayCovID ;
+    variable Index    : integer ;
+  begin
+
+    case TransRec.Operation is
+      -- Execute Standard Directive Transactions
+
+      when WAIT_FOR_CLOCK =>
+        WaitForClock(Clk, TransRec.IntToModel) ;
+
+      when GET_ALERTLOG_ID =>
+        TransRec.IntFromModel  <= integer(ModelID) ;
+
+      when GET_TRANSACTION_COUNT =>
+        TransRec.IntFromModel  <= integer(TransRec.Rdy) ; 
+      
+      when GET_WRITE_TRANSACTION_COUNT =>
+        TransRec.IntFromModel  <= WriteTransactionCount ; 
+        
+      when GET_READ_TRANSACTION_COUNT =>
+        TransRec.IntFromModel  <= ReadTransactionCount ;
+
+      when WAIT_FOR_TRANSACTION =>
+        if not TransactionDone then
+          wait until TransactionDone ;
+        end if ; 
+
+      when WAIT_FOR_READ_TRANSACTION =>
+        if not ReadTransactionDone then
+          wait until ReadTransactionDone ;
+        end if ; 
+
+      when WAIT_FOR_WRITE_TRANSACTION =>
+        if not WriteTransactionDone then
+          wait until WriteTransactionDone ;
+        end if ; 
+
+      when SET_USE_RANDOM_DELAYS =>        
+        UseCoverageDelays      <= TransRec.BoolToModel ; 
+
+      when GET_USE_RANDOM_DELAYS =>
+        TransRec.BoolFromModel <= UseCoverageDelays ;
+
+      when SET_DELAYCOV_ID =>
+        Index := TransRec.Options ;
+        if Index >= 1 or Index <= DELAY_COV_LENGTH then 
+          aDelayCovID(Index) <= GetDelayCoverage(TransRec.IntToModel) ;
+        else
+          Alert(ModelID, ClassifyUnimplementedOperation(TransRec) & " Option: " & to_string(Index), FAILURE) ; 
+        end if ; 
+        UseCoverageDelays      <= TRUE ; 
+
+      when GET_DELAYCOV_ID =>
+        Index := TransRec.Options ;
+        if Index >= 1 or Index <= DELAY_COV_LENGTH then 
+          TransRec.IntFromModel  <= aDelayCovID(Index).ID  ;
+        else
+          Alert(ModelID, ClassifyUnimplementedOperation(TransRec) & " Option: " & to_string(Index), FAILURE) ; 
+        end if ; 
+        UseCoverageDelays      <= TRUE ; 
+
+      when SET_BURST_MODE =>                      
+        BurstFifoMode          <= TransRec.IntToModel ;
+        AlertIf(ModelID, not IsAddressBusBurstMode(TransRec.IntToModel), 
+          "Invalid Burst Mode " & to_string(TransRec.IntToModel), FAILURE) ;
+            
+      when GET_BURST_MODE =>                      
+        TransRec.IntFromModel  <= BurstFifoMode ;
+
+      -- The End -- Done
+      when others =>
+        -- Signal multiple Driver Detect or not implemented transactions.
+        Alert(ModelID, ClassifyUnimplementedOperation(TransRec), FAILURE) ;
+
+    end case ;
+  end procedure DoDirectiveTransactions ; 
+        
   ------------------------------------------------------------
   function IsWriteAddress (
   -----------------------------------------------------------
