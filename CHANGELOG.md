@@ -2,6 +2,7 @@
 
 | Revision  |  Release Summary | 
 ------------|----------- 
+| 2025.04   |  Added DoDirectiveTransactions as an experiment for Wishbone
 | 2024.11   |  WriteBurstVector, WriteBurstVectorAsync, and CheckBurstVector for Integer_vector
 | 2024.09   |  Shorter calls for ClassifyUnimplementedOperation(TransRec)
 | 2024.07   |  Updated testbench calls to CreateClock for it being refactored to ClockResetPkg
