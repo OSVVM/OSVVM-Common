@@ -38,7 +38,7 @@
 #  limitations under the License.
 #  
 
-analyze OsvvmTestCommonPkg.vhd
+analyze [CreateTestCaseCommonPkg OsvvmTestCommonPkg ../ValidatedResults]
 
 analyze TestCtrl_e.vhd
 analyze TbStream.vhd
