@@ -75,7 +75,7 @@ begin
     
     TranscriptClose ; 
     -- Printing differs in different simulators due to differences in process order execution
-    -- AlertIfDiff("./results/TbAb_InterruptNoHandler1.txt", "../AXI4/Axi4/testbench/validated_results/TbAb_InterruptNoHandler1.txt", "") ; 
+    -- AffirmIfTranscriptsMatch(PATH_TO_VALIDATED_RESULTS) ;
 
     EndOfTestReports ; 
     std.env.stop ; 
