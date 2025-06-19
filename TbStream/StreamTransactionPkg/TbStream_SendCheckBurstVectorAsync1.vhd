@@ -76,7 +76,7 @@ begin
     AlertIf(GetAffirmCount < 1, "Test is not Self-Checking");
     
     TranscriptClose ; 
---    AlertIfDiff("./results/TbStream_SendCheckBurstVectorAsync1.txt", "../sim_shared/validated_results/TbStream_SendCheckBurstVectorAsync1.txt", "") ; 
+--    AffirmIfTranscriptsMatch(PATH_TO_VALIDATED_RESULTS) ;
     
     EndOfTestReports ; 
     std.env.stop ; 
