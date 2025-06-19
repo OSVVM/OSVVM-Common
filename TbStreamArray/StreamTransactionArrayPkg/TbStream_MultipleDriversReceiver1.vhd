@@ -72,7 +72,7 @@ begin
     
     AffirmIf(GetAlertCount = AlertCountType'(FAILURE => 1, ERROR => 0, WARNING => 0), "Expecting: (FAILURE => 1, ERROR => 0, WARNING => 0)") ;
     TranscriptClose ; 
---    AlertIfDiff("./results/TbStream_MultipleDriversReceiver1.txt", "../sim_shared/validated_results/TbStream_MultipleDriversReceiver1.txt", "") ; 
+--    AffirmIfTranscriptsMatch(PATH_TO_VALIDATED_RESULTS) ;
     
     EndOfTestReports(ExternalErrors => (FAILURE => -1, ERROR => 0, WARNING => 0)) ; 
     std.env.stop ;
