@@ -42,8 +42,4 @@ library OSVVM_Common
 
 analyze FifoFillPkg_slv.vhd ;
 
-if {$::osvvm::ToolNameVersion ne "XSIM-2023.2"}  {
-  analyze OsvvmCommonContext.vhd
-} else {
-  analyze OsvvmCommonContext_xilinx.vhd
-}
+analyze OsvvmCommonContext.vhd
