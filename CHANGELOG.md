@@ -2,6 +2,7 @@
 
 | Revision  |  Release Summary | 
 ------------|----------- 
+| 2025.06   |  build.pro replaced <DirectoryName>.pro.  Autogenerate OsvvmTestCommonPkg.  Update testbenches for TranscriptOpen and AffirmIfTranscriptsMatch
 | 2025.04   |  Added DoDirectiveTransactions as an experiment for Wishbone
 | 2024.11   |  WriteBurstVector, WriteBurstVectorAsync, and CheckBurstVector for Integer_vector
 | 2024.09   |  Shorter calls for ClassifyUnimplementedOperation(TransRec)
