@@ -96,10 +96,11 @@ package AddressBusTransactionArrayPkg is
   ------------------------------------------------------------
     signal   TransactionRec : InOut AddressBusRecArrayType ;
     constant Index          : In    integer  ;
-    constant NumberOfClocks : In    natural := 1
+    constant NumberOfClocks : In    natural := 1 ;
+    constant ClkActive      : In    std_logic := CLK_ACTIVE
   ) ;
 
-  alias NoOp is WaitForClock [AddressBusRecArrayType, integer, natural] ;
+  alias NoOp is WaitForClock [AddressBusRecArrayType, integer, natural, std_logic] ;
 
   ------------------------------------------------------------
   procedure GetTransactionCount (
@@ -956,11 +957,13 @@ package body AddressBusTransactionArrayPkg is
   ------------------------------------------------------------
     signal   TransactionRec : InOut AddressBusRecArrayType ;
     constant Index          : In    integer  ;
-    constant NumberOfClocks : In    natural := 1
+    constant NumberOfClocks : In    natural := 1 ;
+    constant ClkActive      : In    std_logic := CLK_ACTIVE
   ) is
   begin
     TransactionRec(Index).Operation     <= WAIT_FOR_CLOCK ;
     TransactionRec(Index).IntToModel    <= NumberOfClocks ; 
+    TransactionRec(Index).Options       <= std_logic'POS(ClkActive) ; -- recycling field
     AddressBusArrayRequestTransaction(TransactionRec => TransactionRec, Index => Index) ;
   end procedure WaitForClock ;
 
