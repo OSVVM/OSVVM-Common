@@ -39,4 +39,4 @@
 #  limitations under the License.
 #
 library OSVVM_Common
-include src/Common.pro
+include src

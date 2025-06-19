@@ -1,4 +1,4 @@
-#  File Name:         common.pro
+#  File Name:         build_one.pro
 #  Revision:          OSVVM MODELS STANDARD VERSION
 #
 #  Maintainer:        Jim Lewis      email:  jim@synthworks.com
