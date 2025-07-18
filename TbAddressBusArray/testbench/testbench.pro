@@ -38,7 +38,7 @@
 #  limitations under the License.
 #  
 
-analyze OsvvmTestCommonPkg.vhd
+analyze [CreateTestCaseCommonPkg OsvvmTestCommonPkg ../ValidatedResults]
 analyze TestCtrl_e.vhd
 analyze TbAxi4.vhd
 analyze TbAxi4Memory.vhd

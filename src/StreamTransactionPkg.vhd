@@ -25,6 +25,7 @@
 --
 --  Revision History:
 --    Date      Version    Description
+--    06/2025   2025.06    Added ClkActive to WaitForClock 
 --    09/2023   2023.09    Added ModelParametersIDType to Record, 
 --                         Added SendAndGet and SendAndGetBurst,
 --                         Added OperationType ENUMs:  EXTEND_DIRECTIVE_OP, EXTEND_OP, EXTEND_TX_OP, EXTEND_RX_OP
@@ -42,7 +43,7 @@
 --
 --  This file is part of OSVVM.
 --  
---  Copyright (c) 2019 - 2023 by SynthWorks Design Inc.  
+--  Copyright (c) 2019 - 2025 by SynthWorks Design Inc.  
 --  
 --  Licensed under the Apache License, Version 2.0 (the "License");
 --  you may not use this file except in compliance with the License.
@@ -251,10 +252,11 @@ package StreamTransactionPkg is
   -- relative to the verification component clock
   ------------------------------------------------------------
     signal    TransactionRec   : inout StreamRecType ;
-    constant  WaitCycles       : in    natural := 1
+    constant  WaitCycles       : in    natural := 1 ;
+    constant  ClkActive        : in    std_logic := CLK_ACTIVE
   ) ; 
   
- alias NoOp is WaitForClock [StreamRecType, natural] ;
+ alias NoOp is WaitForClock [StreamRecType, natural, std_logic] ;
 
   ------------------------------------------------------------
   procedure GetTransactionCount (
@@ -1379,11 +1381,13 @@ package body StreamTransactionPkg is
   -- relative to the verification component clock
   ------------------------------------------------------------
     signal    TransactionRec   : inout StreamRecType ;
-    constant  WaitCycles       : in    natural := 1
+    constant  WaitCycles       : in    natural := 1 ;
+    constant  ClkActive        : in    std_logic := CLK_ACTIVE
   ) is
   begin
     TransactionRec.Operation   <= WAIT_FOR_CLOCK ;
     TransactionRec.IntToModel  <= WaitCycles ; 
+    TransactionRec.Options     <= std_logic'POS(ClkActive) ; -- recycling field
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
   end procedure WaitForClock ; 
 

@@ -26,6 +26,7 @@
 --
 --  Revision History:
 --    Date      Version    Description
+--    06/2025   2025.06    Added ClkActive to WaitForClock 
 --    09/2023   2023.09    Added ModelParametersIDType to Record, 
 --                         Added OperationType ENUMs:  EXTEND_DIRECTIVE_OP, EXTEND_OP, EXTEND_WRITE_OP, EXTEND_READ_OP
 --    05/2023   2023.05    Added SetDelayCoverageID and GetDelayCoverageID
@@ -41,7 +42,7 @@
 --
 --  This file is part of OSVVM.
 --  
---  Copyright (c) 2017 - 2023 by SynthWorks Design Inc.  
+--  Copyright (c) 2017 - 2025 by SynthWorks Design Inc.  
 --  
 --  Licensed under the Apache License, Version 2.0 (the "License");
 --  you may not use this file except in compliance with the License.
@@ -286,10 +287,11 @@ package AddressBusTransactionPkg is
   -- relative to the verification component clock
   ------------------------------------------------------------
     signal   TransactionRec : InOut AddressBusRecType ;
-    constant NumberOfClocks : In    natural := 1
+    constant NumberOfClocks : In    natural := 1 ;
+    constant ClkActive      : In    std_logic := CLK_ACTIVE
   ) ;
 
-  alias NoOp is WaitForClock [AddressBusRecType, natural] ;
+  alias NoOp is WaitForClock [AddressBusRecType, natural, std_logic] ;
 
   ------------------------------------------------------------
   procedure GetTransactionCount (
@@ -1105,11 +1107,13 @@ package body AddressBusTransactionPkg is
   -- Directive:  Wait for NumberOfClocks number of clocks in the model
   ------------------------------------------------------------
     signal   TransactionRec : InOut AddressBusRecType ;
-    constant NumberOfClocks : In    natural := 1
+    constant NumberOfClocks : In    natural := 1 ;
+    constant ClkActive      : In    std_logic := CLK_ACTIVE
   ) is
   begin
     TransactionRec.Operation     <= WAIT_FOR_CLOCK ;
     TransactionRec.IntToModel    <= NumberOfClocks ; 
+    TransactionRec.Options       <= std_logic'POS(ClkActive) ; -- recycling field
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure WaitForClock ;
 
@@ -2104,7 +2108,7 @@ package body AddressBusTransactionPkg is
       -- Execute Standard Directive Transactions
 
       when WAIT_FOR_CLOCK =>
-        WaitForClock(Clk, TransRec.IntToModel) ;
+        WaitForClock(Clk, TransRec.IntToModel, std_logic'val(TransRec.Options)) ;
 
       when GET_ALERTLOG_ID =>
         TransRec.IntFromModel  <= integer(ModelID) ;

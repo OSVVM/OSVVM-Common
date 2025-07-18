@@ -39,4 +39,29 @@
 #  limitations under the License.
 #
 library OSVVM_Common
-include src/Common.pro
+analyze ModelParametersPtPkg.vhd
+analyze ModelParametersSingletonPkg.vhd
+analyze FifoFillPkg_slv.vhd
+
+# MIT Stream
+analyze StreamTransactionPkg.vhd
+analyze StreamTransactionArrayPkg.vhd
+
+# MIT Address Bus - aka Memory Mapped
+analyze AddressBusTransactionPkg.vhd
+analyze AddressBusTransactionArrayPkg.vhd
+analyze AddressBusResponderTransactionPkg.vhd
+analyze AddressBusResponderTransactionArrayPkg.vhd
+analyze AddressBusVersionCompatibilityPkg.vhd
+
+# Interrupt
+analyze InterruptGlobalSignalPkg.vhd   [NoNullRangeWarning]
+analyze InterruptHandler.vhd
+analyze InterruptHandlerComponentPkg.vhd
+analyze InterruptGeneratorBit.vhd
+analyze InterruptGeneratorBitVti.vhd   [NoNullRangeWarning]
+# analyze InterruptGenerator.vhd
+# analyze InterruptGeneratorVti.vhd
+analyze InterruptGeneratorComponentPkg.vhd
+
+analyze OsvvmCommonContext.vhd

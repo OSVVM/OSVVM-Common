@@ -26,12 +26,13 @@
 --
 --  Revision History:
 --    Date      Version    Description
+--    06/2025   2025.06    Added ClkActive to WaitForClock 
 --    11/2022   2022.11    initial
 --
 --
 --  This file is part of OSVVM.
 --  
---  Copyright (c) 2022 by SynthWorks Design Inc.  
+--  Copyright (c) 2022-2025 by SynthWorks Design Inc.  
 --  
 --  Licensed under the Apache License, Version 2.0 (the "License");
 --  you may not use this file except in compliance with the License.
@@ -83,7 +84,8 @@ package StreamTransactionArrayPkg is
   ------------------------------------------------------------
     signal    TransactionRec   : inout StreamRecArrayType ;
     constant  Index            : in    integer ;
-    constant  WaitCycles       : in    natural := 1
+    constant  WaitCycles       : in    natural := 1 ;
+    constant  ClkActive        : in    std_logic := CLK_ACTIVE
   ) ; 
   
   ------------------------------------------------------------
@@ -1279,11 +1281,13 @@ package body StreamTransactionArrayPkg is
   ------------------------------------------------------------
     signal    TransactionRec   : inout StreamRecArrayType ;
     constant  Index            : in    integer ;
-    constant  WaitCycles       : in    natural := 1
+    constant  WaitCycles       : in    natural := 1 ;
+    constant  ClkActive        : in    std_logic := CLK_ACTIVE
   ) is
   begin
     TransactionRec(Index).Operation   <= WAIT_FOR_CLOCK ;
     TransactionRec(Index).IntToModel  <= WaitCycles ; 
+    TransactionRec(Index).Options     <= std_logic'POS(ClkActive) ; -- recycling field
     StreamArrayRequestTransaction(TransactionRec => TransactionRec, Index => Index) ; 
   end procedure WaitForClock ; 
 

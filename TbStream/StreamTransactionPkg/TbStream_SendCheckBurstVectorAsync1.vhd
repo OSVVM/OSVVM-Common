@@ -72,13 +72,11 @@ begin
 
     -- Wait for test to finish
     WaitForBarrier(TestDone, 5 ms) ;
-    AlertIf(now >= 5 ms, "Test finished due to timeout") ;
-    AlertIf(GetAffirmCount < 1, "Test is not Self-Checking");
     
     TranscriptClose ; 
---    AlertIfDiff("./results/TbStream_SendCheckBurstVectorAsync1.txt", "../sim_shared/validated_results/TbStream_SendCheckBurstVectorAsync1.txt", "") ; 
+--    AffirmIfTranscriptsMatch(PATH_TO_VALIDATED_RESULTS) ;
     
-    EndOfTestReports ; 
+    EndOfTestReports(TimeOut => (now >= 5 ms)) ; 
     std.env.stop ; 
     wait ; 
   end process ControlProc ; 

@@ -58,7 +58,7 @@ begin
 
     -- Wait for testbench initialization 
     wait for 0 ns ;  wait for 0 ns ;
-    TranscriptOpen(OSVVM_RESULTS_DIR & "TbStream_MultipleDriversReceiver1.txt") ;
+    TranscriptOpen ;
     SetTranscriptMirror(TRUE) ; 
 
     -- Wait for Design Reset
@@ -67,13 +67,11 @@ begin
 
     -- Wait for test to finish
     WaitForBarrier(TestDone, 35 ms) ;
-    AlertIf(now >= 35 ms, "Test finished due to timeout") ;
---    AlertIf(GetAffirmCount < 1, "Test is not Self-Checking");
     
     TranscriptClose ; 
---    AlertIfDiff("./results/TbStream_MultipleDriversReceiver1.txt", "../sim_shared/validated_results/TbStream_MultipleDriversReceiver1.txt", "") ; 
+--    AffirmIfTranscriptsMatch(PATH_TO_VALIDATED_RESULTS) ;
     
-    EndOfTestReports(ExternalErrors => (FAILURE => -1, ERROR => 0, WARNING => 0)) ; 
+    EndOfTestReports(ExternalErrors => (FAILURE => -1, ERROR => 0, WARNING => 0), TimeOut => (now >= 35 ms)) ;  
     std.env.stop ;
     wait ; 
   end process ControlProc ; 

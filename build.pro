@@ -1,5 +1,5 @@
-#  File Name:         testbench.pro
-#  Revision:          STANDARD VERSION
+#  File Name:         common.pro
+#  Revision:          OSVVM MODELS STANDARD VERSION
 #
 #  Maintainer:        Jim Lewis      email:  jim@synthworks.com
 #  Contributor(s):
@@ -7,7 +7,7 @@
 #
 #
 #  Description:
-#        Script to run one Axi Stream test  
+#        Top level script to compile the OSVVM common packages   
 #
 #  Developed for:
 #        SynthWorks Design Inc.
@@ -17,8 +17,9 @@
 #
 #  Revision History:
 #    Date      Version    Description
-#     1/2019   2019.01    Compile Script for OSVVM
+#    11/2022   2022.11    Added AddressBusTransactionArrayPkg and AddressBusResponderTransactionArrayPkg
 #     1/2020   2020.01    Updated Licenses to Apache
+#     1/2019   2019.01    Compile Script for OSVVM Common library
 #
 #
 #  This file is part of OSVVM.
@@ -36,9 +37,6 @@
 #  WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
-#  
-
-analyze [CreateTestCaseCommonPkg OsvvmTestCommonPkg ../ValidatedResults]
-
-analyze TestCtrl_e.vhd
-analyze TbStream.vhd
+#
+library OSVVM_Common
+include src
