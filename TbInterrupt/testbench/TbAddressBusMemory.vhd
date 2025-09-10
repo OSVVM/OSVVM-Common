@@ -142,16 +142,16 @@ architecture TestHarness of TbAddressBusMemory is
   
 begin
 
-  -- create Clock
   ------------------------------------------------------------
+  -- create Clock
   Osvvm.ClockResetPkg.CreateClock (
   ------------------------------------------------------------
     Clk        => Clk,
     Period     => Tperiod_Clk
   )  ;
 
-  -- create nReset
   ------------------------------------------------------------
+  -- create nReset
   Osvvm.ClockResetPkg.CreateReset (
   ------------------------------------------------------------
     Reset       => nReset,
@@ -162,7 +162,11 @@ begin
   ) ;
 
   ------------------------------------------------------------
-  Axi4PassThru_1 : Axi4PassThru 
+  -- Axi4PassThru
+  --   A stand-in for the DUT AXI bus interface 
+  --   Shows how the DUT connects to the testbench
+  --   As a Pass Thru it connects its Axi4 Manager ports to the Axi4 Subordinate ports
+  DUT : Axi4PassThru 
   ------------------------------------------------------------
   port map (
   -- AXI Manager Interface - Driven By PassThru
@@ -279,6 +283,26 @@ begin
     sRUser        => AxiBus1.ReadData.User,   
     sRID          => AxiBus1.ReadData.ID
   ) ;
+
+  ------------------------------------------------------------
+  -- InterruptGen
+  --   A stand-in for the DUT interrupt generation 
+  --   Generates interrupts under control of transactions in TestCtrl
+  InterruptGen : for i in NUM_INTERRUPTS-1 downto 0 generate
+  ------------------------------------------------------------
+    InterruptGeneratorBit_1 : InterruptGeneratorBit 
+    generic map (
+      MODEL_ID_NAME    => "InterruptGeneratorBit_" & to_string(i),
+      POLARITY         => '1'
+    ) 
+    port map (
+      -- Interrupt Input
+      IntReq          => IntReq(i), 
+      
+      -- Transaction port
+      TransRec        => InterruptRecArray(i)
+    ) ;
+  end generate InterruptGen ;
     
   ------------------------------------------------------------
   Memory_1 : Axi4Memory
@@ -323,6 +347,9 @@ begin
   ) ;
 
   ------------------------------------------------------------
+  --  InterruptHandler
+  --    Selects between ManagerRec and InterruptRec 
+  --    and forwards it as VCRec to Axi4Manager.
   InterruptHandler_1 : InterruptHandler 
   ------------------------------------------------------------
   port map (
@@ -336,23 +363,6 @@ begin
     -- To Verification Component
     VCRec        => VCRec
   ) ;
-
-  ------------------------------------------------------------
-  InterruptGen : for i in NUM_INTERRUPTS-1 downto 0 generate
-  ------------------------------------------------------------
-    InterruptGeneratorBit_1 : InterruptGeneratorBit 
-    generic map (
-      MODEL_ID_NAME    => "InterruptGeneratorBit_" & to_string(i),
-      POLARITY         => '1'
-    ) 
-    port map (
-      -- Interrupt Input
-      IntReq          => IntReq(i), 
-      
-      -- Transaction port
-      TransRec        => InterruptRecArray(i)
-    ) ;
-  end generate InterruptGen ;
 
   ------------------------------------------------------------
   Monitor : process(IntReq)
