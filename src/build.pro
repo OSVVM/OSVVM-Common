@@ -45,26 +45,27 @@ analyze ModelParametersSingletonPkg.vhd
 analyze FifoFillPkg_slv.vhd
 
 # MIT Stream
-analyze StreamTransactionPkg.vhd
-# if {$::osvvm::VhdlVersion >= 2019}  {
-#   analyze StreamModeViewPkg.vhd
-# } else {
-#   analyze deprecated/StreamModeViewPkg_c.vhd  ;# empty package
-# }
-analyze StreamTransactionArrayPkg.vhd
+if {$::osvvm::VhdlVersion >= 2019 && $::osvvm::Supports2019Interface}  {
+  analyze StreamTransactionPkg.vhd
+  analyze StreamTransactionArrayPkg.vhd
+} else {
+  analyze deprecated/StreamTransactionPkg.vhd
+  analyze deprecated/StreamTransactionArrayPkg.vhd
+}
 
 # MIT Address Bus - aka Memory Mapped
 # analyze AddressBusTransactionPkg.vhd
-if {$::osvvm::VhdlVersion >= 2019}  {
+if {$::osvvm::VhdlVersion >= 2019 && $::osvvm::Supports2019Interface}  {
   analyze AddressBusTransactionPkg.vhd
-#  analyze AddressBusModeViewPkg.vhd
+  analyze AddressBusTransactionArrayPkg.vhd
+  analyze AddressBusResponderTransactionPkg.vhd
+  analyze AddressBusResponderTransactionArrayPkg.vhd
 } else {
-  analyze deprecated/AddressBusTransactionPkg_c.vhd  
-#  analyze deprecated/AddressBusModeViewPkg_c.vhd  ;# empty package
+  analyze deprecated/AddressBusTransactionPkg.vhd  
+  analyze deprecated/AddressBusTransactionArrayPkg.vhd
+  analyze deprecated/AddressBusResponderTransactionPkg.vhd
+  analyze deprecated/AddressBusResponderTransactionArrayPkg.vhd
 }
-analyze AddressBusTransactionArrayPkg.vhd
-analyze AddressBusResponderTransactionPkg.vhd
-analyze AddressBusResponderTransactionArrayPkg.vhd
 analyze AddressBusVersionCompatibilityPkg.vhd
 
 # Interrupt
