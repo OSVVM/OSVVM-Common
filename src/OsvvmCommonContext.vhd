@@ -47,8 +47,10 @@ context OsvvmCommonContext is
     
     -- MIT
     use osvvm_common.StreamTransactionPkg.all ; 
+--    use OSVVM_Common.StreamModeViewPkg.all ; 
     use osvvm_common.StreamTransactionArrayPkg.all ; 
     use OSVVM_Common.AddressBusTransactionPkg.all ; 
+--    use OSVVM_Common.AddressBusModeViewPkg.all ; 
     use OSVVM_Common.AddressBusTransactionArrayPkg.all ; 
     use OSVVM_Common.AddressBusResponderTransactionPkg.all ;
     use OSVVM_Common.AddressBusResponderTransactionArrayPkg.all ;
