@@ -227,49 +227,7 @@ package AddressBusTransactionPkg is
   --         ) ;
   -- --------------------------------------------------------
   
-  view AddressBusTestCtrlView of AddressBusRecType is 
-    -- Handshaking controls
-    --   Used by RequestTransaction in the Transaction Procedures
-    --   Used by WaitForTransaction in the Verification Component
-    --   RequestTransaction and WaitForTransaction are in osvvm.TbUtilPkg
-    Rdy                : out ;
-    Ack                : in ;
-    -- Transaction Type
-    Operation          : out ;
-    -- Address to verification component and its width
-    -- Width may be smaller than Address
-    Address            : out ;
-    AddrWidth          : out ;
-    -- Data to and from the verification component and its width.
-    -- Width will be smaller than Data for byte operations
-    -- Width size requirements are enforced in the verification component
-    DataToModel        : out ;
-    DataFromModel      : in ;
-    DataWidth          : out ;
-    -- Burst FIFOs
-    WriteBurstFifo     : in ; 
-    ReadBurstFifo      : in ; 
---    UseCheckFifo       : boolean_max ; 
---    CheckFifo          : ScoreboardIdType ; 
-    -- Parameters - internal settings for the VC in a singleton data structure   
-    Params             : in ;  
-    -- StatusMsgOn provides transaction messaging override.
-    -- When true, print transaction messaging independent of 
-    -- other verification based based controls.
-    StatusMsgOn        : out ;
-    -- Verification Component Options Parameters - used by SetModelOptions
-    IntToModel         : out ;
-    IntFromModel       : in ; 
-    BoolToModel        : out ; 
-    BoolFromModel      : in ;
-    TimeToModel        : out ; 
-    TimeFromModel      : in ; 
-    -- Verification Component Options Type  
-    Options            : out ;  
-  end view AddressBusTestCtrlView ;
-  
-  alias AddressBusVerificationComponentView is AddressBusTestCtrlView'converse ;
-  alias AddressBusVcView is AddressBusVerificationComponentView ; 
+--!TODO add VHDL-2018 Interfaces
 
 
   -- ========================================================
@@ -306,21 +264,21 @@ package AddressBusTransactionPkg is
   procedure WaitForTransaction (
   --  Wait until pending transaction completes
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType 
+    signal   TransactionRec : InOut AddressBusRecType 
   ) ; 
 
   ------------------------------------------------------------
   procedure WaitForWriteTransaction (
   --  Wait until pending transaction completes
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType 
+    signal   TransactionRec : InOut AddressBusRecType 
   ) ; 
 
   ------------------------------------------------------------
   procedure WaitForReadTransaction (
   --  Wait until pending transaction completes
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType 
+    signal   TransactionRec : InOut AddressBusRecType 
   ) ;
   
   ------------------------------------------------------------
@@ -328,7 +286,7 @@ package AddressBusTransactionPkg is
   -- Wait for NumberOfClocks number of clocks 
   -- relative to the verification component clock
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     constant NumberOfClocks : In    natural := 1 ;
     constant ClkActive      : In    std_logic := CLK_ACTIVE
   ) ;
@@ -339,14 +297,14 @@ package AddressBusTransactionPkg is
   procedure GetTransactionCount (
   -- Get the number of transactions handled by the model.  
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     variable Count          : Out   integer
   ) ;
 
   ------------------------------------------------------------
   procedure GetWriteTransactionCount (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     variable Count          : Out   integer
   ) ;
 
@@ -354,7 +312,7 @@ package AddressBusTransactionPkg is
   procedure GetReadTransactionCount (
   -- Get the number of read transactions handled by the model.  
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     variable Count          : Out   integer
   ) ;
 
@@ -362,7 +320,7 @@ package AddressBusTransactionPkg is
   procedure GetAlertLogID (
   -- Get the AlertLogID from the verification component.
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     variable AlertLogID     : Out   AlertLogIDType
   ) ;
 
@@ -371,7 +329,7 @@ package AddressBusTransactionPkg is
   -- Error reporting for testbenches that do not use OSVVM AlertLogPkg
   -- Returns error count.  If an error count /= 0, also print errors
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     variable ErrorCount     : Out   natural
   ) ;
 
@@ -384,21 +342,21 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure SetUseRandomDelays (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     constant OptVal         : In    boolean := TRUE
   ) ;
   
   ------------------------------------------------------------
   procedure GetUseRandomDelays (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     variable OptVal         : Out   boolean
   ) ;
 
   ------------------------------------------------------------
   procedure SetDelayCoverageID (
   ------------------------------------------------------------
-    signal    TransactionRec   : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal    TransactionRec   : inout AddressBusRecType ;
     constant  DelayCov         : in    DelayCoverageIdType ;
     constant  Index            : in    integer := 1 
   ) ;
@@ -406,7 +364,7 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure GetDelayCoverageID (
   ------------------------------------------------------------
-    signal    TransactionRec   : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal    TransactionRec   : inout AddressBusRecType ;
     variable  DelayCov         : out   DelayCoverageIdType ;
     constant  Index            : in    integer := 1 
   ) ;
@@ -414,14 +372,14 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure SetDelayCoverageID (
   ------------------------------------------------------------
-    signal    TransactionRec   : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal    TransactionRec   : inout AddressBusRecType ;
     constant  DelayCov         : in    DelayCoverageIdArrayType 
   ) ;
 
   ------------------------------------------------------------
   procedure GetDelayCoverageID (
   ------------------------------------------------------------
-    signal    TransactionRec   : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal    TransactionRec   : inout AddressBusRecType ;
     variable  DelayCov         : out   DelayCoverageIdArrayType 
   ) ;
 
@@ -456,14 +414,14 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure SetBurstMode (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     constant OptVal         : In    AddressBusFifoBurstModeType
   ) ;
 
   ------------------------------------------------------------
   procedure GetBurstMode (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     variable OptVal         : Out   AddressBusFifoBurstModeType
   ) ;
 
@@ -484,7 +442,7 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     constant Option         : In    integer ;
     constant OptVal         : In    boolean
   ) ;
@@ -492,7 +450,7 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     constant Option         : In    integer ;
     constant OptVal         : In    integer
   ) ;
@@ -500,7 +458,7 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     constant Option         : In    integer ;
     constant OptVal         : In    std_logic_vector
   ) ;
@@ -508,7 +466,7 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     constant Option         : In    integer ;
     constant OptVal         : In    time
   ) ;
@@ -516,7 +474,7 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     constant Option         : In    integer ;
     variable OptVal         : Out   boolean
   ) ;
@@ -524,7 +482,7 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     constant Option         : In    integer ;
     variable OptVal         : Out   integer
   ) ;
@@ -532,7 +490,7 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     constant Option         : In    integer ;
     variable OptVal         : Out   std_logic_vector
   ) ;
@@ -540,7 +498,7 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     constant Option         : In    integer ;
     variable OptVal         : Out   time
   ) ;
@@ -548,7 +506,7 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure InterruptReturn (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType 
+    signal   TransactionRec : InOut AddressBusRecType 
   ) ;
 
 
@@ -570,7 +528,7 @@ package AddressBusTransactionPkg is
   procedure Write (
   -- Blocking Write Transaction. 
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              iData          : In    std_logic_vector ;
              StatusMsgOn    : In    boolean := false
@@ -580,7 +538,7 @@ package AddressBusTransactionPkg is
   procedure WriteAsync (
   -- Asynchronous / Non-Blocking Write Transaction
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              iData          : In    std_logic_vector ;
              StatusMsgOn    : In    boolean := false
@@ -590,7 +548,7 @@ package AddressBusTransactionPkg is
   procedure Read (
   -- Blocking Read Transaction.
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
     variable oData          : Out   std_logic_vector ;
              StatusMsgOn    : In    boolean := false
@@ -600,7 +558,7 @@ package AddressBusTransactionPkg is
   procedure ReadCheck (
   -- Blocking Read Transaction and check iData, rather than returning a value.
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              iData          : In    std_logic_vector ;
              StatusMsgOn    : In    boolean := false
@@ -612,7 +570,7 @@ package AddressBusTransactionPkg is
   -- WaitTime is the number of clocks to wait between reads.
   -- oData is the value read.
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
     variable oData          : Out   std_logic_vector ;
              Index          : In    Integer ;
@@ -626,7 +584,7 @@ package AddressBusTransactionPkg is
   -- Read location (iAddr) until Data(IndexI) = ValueI
   -- WaitTime is the number of clocks to wait between reads.
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              Index          : In    Integer ;
              BitValue       : In    std_logic ;
@@ -638,7 +596,7 @@ package AddressBusTransactionPkg is
   procedure WriteAndRead (
   -- Write and Read Cycle that use same address and are dispatched together
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              iData          : In    std_logic_vector ;
     variable oData          : Out   std_logic_vector ;
@@ -651,7 +609,7 @@ package AddressBusTransactionPkg is
   -- Dispatch Read Address.  Do not wait for Read Data.  
   -- Retrieve read data with ReadData or TryReadData
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              iData          : In    std_logic_vector ;
              StatusMsgOn    : In    boolean := false
@@ -673,7 +631,7 @@ package AddressBusTransactionPkg is
   -- Data is provided separately via a WriteBurstFifo.   
   -- NumFifoWords specifies the number of items from the FIFO to be transferred.
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              NumFifoWords   : In    integer ;
              StatusMsgOn    : In    boolean := false
@@ -682,7 +640,7 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure WriteBurstVector (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              VectorOfWords  : In    slv_vector ;
              StatusMsgOn    : In    boolean := false
@@ -691,7 +649,7 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure WriteBurstVector (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              VectorOfWords  : In    integer_vector ;
              FifoWidth      : In    integer ; 
@@ -701,7 +659,7 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure WriteBurstIncrement (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              FirstWord      : In    std_logic_vector ;
              NumFifoWords   : In    integer ;
@@ -711,7 +669,7 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure WriteBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              FirstWord      : In    std_logic_vector ;
              NumFifoWords   : In    integer ;
@@ -721,7 +679,7 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure WriteBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              CoverID        : In    CoverageIDType ;
              NumFifoWords   : In    integer ;
@@ -735,7 +693,7 @@ package AddressBusTransactionPkg is
   -- Data is provided separately via a WriteBurstFifo.   
   -- NumFifoWords specifies the number of bytes to be transferred.
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              NumFifoWords   : In    integer ;
              StatusMsgOn    : In    boolean := false
@@ -744,7 +702,7 @@ package AddressBusTransactionPkg is
 ------------------------------------------------------------
   procedure WriteBurstVectorAsync (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              VectorOfWords  : In    slv_vector ;
              StatusMsgOn    : In    boolean := false
@@ -753,7 +711,7 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure WriteBurstVectorAsync (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              VectorOfWords  : In    integer_vector ;
              FifoWidth      : In    integer ; 
@@ -763,7 +721,7 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure WriteBurstIncrementAsync (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              FirstWord      : In    std_logic_vector ;
              NumFifoWords   : In    integer ;
@@ -773,7 +731,7 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure WriteBurstRandomAsync (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              FirstWord      : In    std_logic_vector ;
              NumFifoWords   : In    integer ;
@@ -783,7 +741,7 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure WriteBurstRandomAsync (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              CoverID        : In    CoverageIDType ;
              NumFifoWords   : In    integer ;
@@ -795,7 +753,7 @@ package AddressBusTransactionPkg is
   procedure ReadBurst (
   -- Blocking Read Burst.
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              NumFifoWords   : In    integer ;
              StatusMsgOn    : In    boolean := false
@@ -804,7 +762,7 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure ReadCheckBurstVector (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              VectorOfWords  : In    slv_vector ;
              StatusMsgOn    : In    boolean := false
@@ -813,7 +771,7 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure ReadCheckBurstVector (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              VectorOfWords  : In    integer_vector ;
              FifoWidth      : In    integer ; 
@@ -823,7 +781,7 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure ReadCheckBurstIncrement (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              FirstWord      : In    std_logic_vector ;
              NumFifoWords   : In    integer ;
@@ -833,7 +791,7 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure ReadCheckBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              FirstWord      : In    std_logic_vector ;
              NumFifoWords   : In    integer ;
@@ -843,7 +801,7 @@ package AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure ReadCheckBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              CoverID        : In    CoverageIDType ;
              NumFifoWords   : In    integer ;
@@ -865,7 +823,7 @@ package AddressBusTransactionPkg is
   procedure WriteAddressAsync (
   -- Non-blocking Write Address 
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              StatusMsgOn    : In    boolean := false
   ) ;
@@ -874,7 +832,7 @@ package AddressBusTransactionPkg is
   procedure WriteDataAsync (
   -- Non-blocking Write Data 
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              iData          : In    std_logic_vector ;
              StatusMsgOn    : In    boolean := false
@@ -884,7 +842,7 @@ package AddressBusTransactionPkg is
   procedure WriteDataAsync (
   -- Non-blocking Write Data.  iAddr = 0.  
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iData          : In    std_logic_vector ;
              StatusMsgOn    : In    boolean := false
   ) ;
@@ -893,7 +851,7 @@ package AddressBusTransactionPkg is
   procedure ReadAddressAsync (
   -- Non-blocking Read Address
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              StatusMsgOn    : In    boolean := false
   ) ;
@@ -902,7 +860,7 @@ package AddressBusTransactionPkg is
   procedure ReadData (
   -- Blocking Read Data
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     variable oData          : Out   std_logic_vector ;
              StatusMsgOn    : In    boolean := false
   ) ;
@@ -911,7 +869,7 @@ package AddressBusTransactionPkg is
   procedure ReadCheckData (
   -- Blocking Read data and check iData, rather than returning a value.
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iData          : In    std_logic_vector ;
              StatusMsgOn    : In    boolean := false
   ) ;
@@ -922,7 +880,7 @@ package AddressBusTransactionPkg is
   -- If data is available, get it and return available TRUE.
   -- Otherwise Return Available FALSE.
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     variable oData          : Out   std_logic_vector ;
     variable Available      : Out   boolean ;
              StatusMsgOn    : In    boolean := false
@@ -934,7 +892,7 @@ package AddressBusTransactionPkg is
   -- If data is available, check it and return available TRUE.
   -- Otherwise Return Available FALSE.
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iData          : In    std_logic_vector ;
     variable Available      : Out   boolean ;
              StatusMsgOn    : In    boolean := false
@@ -948,14 +906,14 @@ package AddressBusTransactionPkg is
   procedure ReleaseTransactionRecord (
   --  Must run on same delta cycle as AcquireTransactionRecord
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType 
+    signal   TransactionRec : InOut AddressBusRecType 
   ) ; 
   
   ------------------------------------------------------------
   procedure AcquireTransactionRecord (
   --  Must run on same delta cycle as ReleaseTransactionRecord
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType 
+    signal   TransactionRec : InOut AddressBusRecType 
   ) ; 
 
   -- ========================================================
@@ -967,7 +925,7 @@ package AddressBusTransactionPkg is
   procedure DoDirectiveTransactions (
   --  Wait until pending transaction completes
   ------------------------------------------------------------
-    signal   TransRec              : view AddressBusVerificationComponentView of AddressBusRecType ;
+    signal   TransRec              : InOut AddressBusRecType ;
     signal   Clk                   : In    std_logic ; 
     constant ModelID               : In    AlertLogIDType ;
     signal   UseCoverageDelays     : InOut boolean ; 
@@ -1115,64 +1073,59 @@ package body AddressBusTransactionPkg is
   procedure WaitForTransaction (
   --  Wait until pending transaction completes
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType 
+    signal   TransactionRec : InOut AddressBusRecType 
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     TransactionRec.Operation     <= WAIT_FOR_TRANSACTION ;
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ; 
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
   end procedure WaitForTransaction ; 
 
   ------------------------------------------------------------
   procedure WaitForWriteTransaction (
   --  Wait until pending transaction completes
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType 
+    signal   TransactionRec : InOut AddressBusRecType 
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     TransactionRec.Operation     <= WAIT_FOR_WRITE_TRANSACTION ;
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ; 
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
   end procedure WaitForWriteTransaction ; 
 
   ------------------------------------------------------------
   procedure WaitForReadTransaction (
   --  Wait until pending transaction completes
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType 
+    signal   TransactionRec : InOut AddressBusRecType 
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     TransactionRec.Operation     <= WAIT_FOR_READ_TRANSACTION ;
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ; 
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
   end procedure WaitForReadTransaction ; 
 
   ------------------------------------------------------------
   procedure WaitForClock (
   -- Directive:  Wait for NumberOfClocks number of clocks in the model
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     constant NumberOfClocks : In    natural := 1 ;
     constant ClkActive      : In    std_logic := CLK_ACTIVE
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     TransactionRec.Operation     <= WAIT_FOR_CLOCK ;
     TransactionRec.IntToModel    <= NumberOfClocks ; 
     TransactionRec.Options       <= std_logic'POS(ClkActive) ; -- recycling field
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure WaitForClock ;
 
   ------------------------------------------------------------
   procedure GetTransactionCount (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     variable Count          : Out   integer
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     TransactionRec.Operation     <= GET_TRANSACTION_COUNT ;
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
 
     -- Return AlertLogID
     Count := TransactionRec.IntFromModel ;
@@ -1182,13 +1135,12 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure GetWriteTransactionCount (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     variable Count          : Out   integer
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     TransactionRec.Operation     <= GET_WRITE_TRANSACTION_COUNT ;
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
 
     -- Return AlertLogID
     Count := TransactionRec.IntFromModel ;
@@ -1197,13 +1149,12 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure GetReadTransactionCount (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     variable Count          : Out   integer
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     TransactionRec.Operation     <= GET_READ_TRANSACTION_COUNT ;
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
 
     -- Return AlertLogID
     Count := TransactionRec.IntFromModel ;
@@ -1212,13 +1163,12 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure GetAlertLogID (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     variable AlertLogID     : Out   AlertLogIDType
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     TransactionRec.Operation     <= GET_ALERTLOG_ID ;
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
 
     -- Return AlertLogID
     AlertLogID := AlertLogIDType(TransactionRec.IntFromModel) ;
@@ -1229,7 +1179,7 @@ package body AddressBusTransactionPkg is
   -- Error reporting for testbenches that do not use AlertLogPkg
   -- Returns error count.  If an error count /= 0, also print it
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     variable ErrorCount     : Out   natural
   ) is
     variable ModelID : AlertLogIDType ;
@@ -1246,63 +1196,59 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure SetUseRandomDelays (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     constant OptVal         : In    boolean := TRUE
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     TransactionRec.Operation     <= SET_USE_RANDOM_DELAYS ;
     TransactionRec.BoolToModel   <= OptVal ;
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure SetUseRandomDelays ;
 
   ------------------------------------------------------------
   procedure GetUseRandomDelays (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     variable OptVal         : Out   boolean
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     TransactionRec.Operation     <= GET_USE_RANDOM_DELAYS ;
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     OptVal := TransactionRec.BoolFromModel    ;
   end procedure GetUseRandomDelays ;
   
   ------------------------------------------------------------
   procedure SetDelayCoverageID (
   ------------------------------------------------------------
-    signal    TransactionRec   : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal    TransactionRec   : inout AddressBusRecType ;
     constant  DelayCov         : in    DelayCoverageIdType ;
     constant  Index            : in    integer := 1 
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     TransactionRec.Operation     <= SET_DELAYCOV_ID ;
     TransactionRec.IntToModel    <= DelayCov.ID ;
     TransactionRec.Options       <= Index ; 
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure SetDelayCoverageID ;
 
   ------------------------------------------------------------
   procedure GetDelayCoverageID (
   ------------------------------------------------------------
-    signal    TransactionRec   : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal    TransactionRec   : inout AddressBusRecType ;
     variable  DelayCov         : out   DelayCoverageIdType ;
     constant  Index            : in    integer := 1 
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     TransactionRec.Operation     <= GET_DELAYCOV_ID ;
     TransactionRec.Options       <= Index ; 
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     DelayCov := GetDelayCoverage(TransactionRec.IntFromModel) ; 
   end procedure GetDelayCoverageID ;
 
   ------------------------------------------------------------
   procedure SetDelayCoverageID (
   ------------------------------------------------------------
-    signal    TransactionRec   : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal    TransactionRec   : inout AddressBusRecType ;
     constant  DelayCov         : in    DelayCoverageIdArrayType 
   ) is
   begin
@@ -1314,7 +1260,7 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure GetDelayCoverageID (
   ------------------------------------------------------------
-    signal    TransactionRec   : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal    TransactionRec   : inout AddressBusRecType ;
     variable  DelayCov         : out   DelayCoverageIdArrayType 
   ) is
   begin
@@ -1330,26 +1276,24 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure SetBurstMode (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     constant OptVal         : In    AddressBusFifoBurstModeType
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     TransactionRec.Operation     <= SET_BURST_MODE ;
     TransactionRec.IntToModel    <= OptVal ;
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure SetBurstMode ;
 
   ------------------------------------------------------------
   procedure GetBurstMode (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     variable OptVal         : Out   AddressBusFifoBurstModeType
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     TransactionRec.Operation     <= GET_BURST_MODE ;
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     OptVal := TransactionRec.IntFromModel ; 
   end procedure GetBurstMode ;
 
@@ -1370,144 +1314,134 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     constant Option         : In    integer ;
     constant OptVal         : In    boolean
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     TransactionRec.Operation     <= SET_MODEL_OPTIONS ;
     TransactionRec.Options       <= Option ;
     TransactionRec.BoolToModel   <= OptVal ;
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure SetModelOptions ;
 
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     constant Option         : In    integer ;
     constant OptVal         : In    integer
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     TransactionRec.Operation     <= SET_MODEL_OPTIONS ;
     TransactionRec.Options       <= Option ;
     TransactionRec.IntToModel    <= OptVal ;
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure SetModelOptions ;
 
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     constant Option         : In    integer ;
     constant OptVal         : In    std_logic_vector
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     TransactionRec.Operation     <= SET_MODEL_OPTIONS ;
     TransactionRec.Options       <= Option ;
     TransactionRec.IntToModel    <= to_integer(OptVal) ;
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure SetModelOptions ;
 
   ------------------------------------------------------------
   procedure SetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     constant Option         : In    integer ;
     constant OptVal         : In    time
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     TransactionRec.Operation     <= SET_MODEL_OPTIONS ;
     TransactionRec.Options       <= Option ;
     TransactionRec.TimeToModel   <= OptVal ;
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure SetModelOptions ;
   
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     constant Option         : In    integer ;
     variable OptVal         : Out   boolean
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     TransactionRec.Operation     <= GET_MODEL_OPTIONS ;
     TransactionRec.Options       <= Option ;
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     OptVal := TransactionRec.BoolFromModel    ;
   end procedure GetModelOptions ;
 
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     constant Option         : In    integer ;
     variable OptVal         : Out   integer
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     TransactionRec.Operation     <= GET_MODEL_OPTIONS ;
     TransactionRec.Options       <= Option ;
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     OptVal := TransactionRec.IntFromModel ; 
   end procedure GetModelOptions ;
 
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     constant Option         : In    integer ;
     variable OptVal         : Out   std_logic_vector
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     TransactionRec.Operation     <= GET_MODEL_OPTIONS ;
     TransactionRec.Options       <= Option ;
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     OptVal := to_slv(TransactionRec.IntFromModel, OptVal'length) ; 
   end procedure GetModelOptions ;
 
   ------------------------------------------------------------
   procedure GetModelOptions (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     constant Option         : In    integer ;
     variable OptVal         : Out   time
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     TransactionRec.Operation     <= GET_MODEL_OPTIONS ;
     TransactionRec.Options       <= Option ;
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     OptVal := TransactionRec.TimeFromModel ; 
   end procedure GetModelOptions ;
 
   ------------------------------------------------------------
   procedure InterruptReturn (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType 
+    signal   TransactionRec : InOut AddressBusRecType 
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     TransactionRec.Operation     <= INTERRUPT_RETURN ;
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure InterruptReturn ;
 
   ------------------------------------------------------------
   procedure Write (
   -- do CPU Write Cycle
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              iData          : In    std_logic_vector ;
              StatusMsgOn    : In    boolean := false
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     -- Put values in record
     TransactionRec.Operation     <= WRITE_OP ;
@@ -1517,19 +1451,18 @@ package body AddressBusTransactionPkg is
     TransactionRec.DataWidth     <= iData'length ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure Write ;
 
   ------------------------------------------------------------
   procedure WriteAsync (
   -- dispatch CPU Write Cycle
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              iData          : In    std_logic_vector ;
              StatusMsgOn    : In    boolean := false
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     -- Put values in record
     TransactionRec.Operation     <= ASYNC_WRITE ;
@@ -1539,18 +1472,17 @@ package body AddressBusTransactionPkg is
     TransactionRec.DataWidth     <= iData'length ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure WriteAsync ;
 
   ------------------------------------------------------------
   procedure WriteAddressAsync (
   -- dispatch CPU Write Address Cycle
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              StatusMsgOn    : In    boolean := false
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     -- Put values in record
     TransactionRec.Operation     <= ASYNC_WRITE_ADDRESS ;
@@ -1559,19 +1491,18 @@ package body AddressBusTransactionPkg is
     TransactionRec.DataWidth     <= 0 ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure WriteAddressAsync ;
 
   ------------------------------------------------------------
   procedure WriteDataAsync (
   -- dispatch CPU Write Data Cycle
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              iData          : In    std_logic_vector ;
              StatusMsgOn    : In    boolean := false
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     -- Put values in record
     TransactionRec.Operation     <= ASYNC_WRITE_DATA ;
@@ -1581,13 +1512,13 @@ package body AddressBusTransactionPkg is
     TransactionRec.DataWidth     <= iData'length ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure WriteDataAsync ;
   
   ------------------------------------------------------------
   procedure WriteDataAsync (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iData          : In    std_logic_vector ;
              StatusMsgOn    : In    boolean := false
   ) is
@@ -1599,12 +1530,11 @@ package body AddressBusTransactionPkg is
   procedure Read (
   -- do CPU Read Cycle and return data
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
     variable oData          : Out   std_logic_vector ;
              StatusMsgOn    : In    boolean := false
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     -- Put values in record
     TransactionRec.Operation     <= READ_OP ;
@@ -1613,7 +1543,7 @@ package body AddressBusTransactionPkg is
     TransactionRec.DataWidth     <= oData'length ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     -- Return Results
     oData  := SafeResize(TransactionRec.DataFromModel, oData'length) ;
   end procedure Read ;
@@ -1622,12 +1552,11 @@ package body AddressBusTransactionPkg is
   procedure ReadCheck (
   -- do CPU Read Cycle and check supplied data
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              iData          : In    std_logic_vector ;
              StatusMsgOn    : In    boolean := false
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     -- Put values in record
     TransactionRec.Operation     <= READ_CHECK ;
@@ -1637,18 +1566,17 @@ package body AddressBusTransactionPkg is
     TransactionRec.DataWidth     <= iData'length ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure ReadCheck ;
 
   ------------------------------------------------------------
   procedure ReadAddressAsync (
   -- dispatch CPU Read Address Cycle
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              StatusMsgOn    : In    boolean := false
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     -- Put values in record
     TransactionRec.Operation     <= ASYNC_READ_ADDRESS ;
@@ -1658,18 +1586,17 @@ package body AddressBusTransactionPkg is
     TransactionRec.DataWidth     <= 0 ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure ReadAddressAsync ;
 
   ------------------------------------------------------------
   procedure ReadData (
   -- Do CPU Read Data Cycle
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     variable oData          : Out   std_logic_vector ;
              StatusMsgOn    : In    boolean := false
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     -- Put values in record
     TransactionRec.Operation     <= READ_DATA ;
@@ -1677,7 +1604,7 @@ package body AddressBusTransactionPkg is
     TransactionRec.DataWidth     <= oData'length ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     -- Return Results
     oData  := SafeResize(TransactionRec.DataFromModel, oData'length) ;
   end procedure ReadData ;
@@ -1686,11 +1613,10 @@ package body AddressBusTransactionPkg is
   procedure ReadCheckData (
   -- Do CPU Read Data Cycle and check received Data
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iData          : In    std_logic_vector ;
              StatusMsgOn    : In    boolean := false
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     -- Put values in record
     TransactionRec.Operation     <= READ_DATA_CHECK ;
@@ -1699,7 +1625,7 @@ package body AddressBusTransactionPkg is
     TransactionRec.DataWidth     <= iData'length ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure ReadCheckData ;
 
   ------------------------------------------------------------
@@ -1708,12 +1634,11 @@ package body AddressBusTransactionPkg is
   -- If data is available, get it and return available TRUE.
   -- Otherwise Return Available FALSE.
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
     variable oData          : Out   std_logic_vector ;
     variable Available      : Out   boolean ;
              StatusMsgOn    : In    boolean := false
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     -- Put values in record
     TransactionRec.Operation     <= ASYNC_READ_DATA ;
@@ -1721,7 +1646,7 @@ package body AddressBusTransactionPkg is
     TransactionRec.DataWidth     <= oData'length ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     -- Return Results
     oData  := SafeResize(TransactionRec.DataFromModel, oData'length) ;
     Available := TransactionRec.BoolFromModel ;
@@ -1733,12 +1658,11 @@ package body AddressBusTransactionPkg is
   -- If data is available, check it and return available TRUE.
   -- Otherwise Return Available FALSE.
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iData          : In    std_logic_vector ;
     variable Available      : Out   boolean ;
              StatusMsgOn    : In    boolean := false
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     -- Put values in record
     TransactionRec.Operation     <= ASYNC_READ_DATA_CHECK ;
@@ -1747,7 +1671,7 @@ package body AddressBusTransactionPkg is
     TransactionRec.DataWidth     <= iData'length ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     Available := TransactionRec.BoolFromModel ;
   end procedure TryReadCheckData ;
 
@@ -1755,7 +1679,7 @@ package body AddressBusTransactionPkg is
   procedure ReadPoll (
   -- Read location (iAddr) until Data(IndexI) = ValueI
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
     variable oData          : Out   std_logic_vector ;
              Index          : In    Integer ;
@@ -1782,7 +1706,7 @@ package body AddressBusTransactionPkg is
   procedure ReadPoll (
   -- Read location (iAddr) until Data(IndexI) = ValueI
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              Index          : In    Integer ;
              BitValue       : In    std_logic ;
@@ -1798,13 +1722,12 @@ package body AddressBusTransactionPkg is
   procedure WriteAndRead (
   -- Write and Read Cycle that use same address and are dispatched together
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              iData          : In    std_logic_vector ;
     variable oData          : Out   std_logic_vector ;
              StatusMsgOn    : In    boolean := false
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     -- Put values in record
     TransactionRec.Operation     <= WRITE_AND_READ ;
@@ -1814,7 +1737,7 @@ package body AddressBusTransactionPkg is
     TransactionRec.DataWidth     <= iData'length ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     -- Return Results
     oData  := SafeResize(TransactionRec.DataFromModel, oData'length) ;  
   end procedure WriteAndRead ;
@@ -1825,12 +1748,11 @@ package body AddressBusTransactionPkg is
   -- Dispatch Read Address.  Do not wait for Read Data.  
   -- Retrieve read data with ReadData or TryReadData
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              iData          : In    std_logic_vector ;
              StatusMsgOn    : In    boolean := false
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     -- Put values in record
     TransactionRec.Operation     <= ASYNC_WRITE_AND_READ ;
@@ -1840,7 +1762,7 @@ package body AddressBusTransactionPkg is
     TransactionRec.DataWidth     <= iData'length ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure WriteAndReadAsync ;
   
   -- ========================================================
@@ -1851,12 +1773,11 @@ package body AddressBusTransactionPkg is
   procedure WriteBurst (
   -- do CPU Write Cycle
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              NumFifoWords   : In    integer ;
              StatusMsgOn    : In    boolean := false
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     -- Put values in record
     TransactionRec.Operation     <= WRITE_BURST ;
@@ -1866,13 +1787,13 @@ package body AddressBusTransactionPkg is
     TransactionRec.DataWidth     <= NumFifoWords ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure WriteBurst ;
   
   ------------------------------------------------------------
   procedure WriteBurstVector (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              VectorOfWords  : In    slv_vector ;
              StatusMsgOn    : In    boolean := false
@@ -1885,7 +1806,7 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure WriteBurstVector (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              VectorOfWords  : In    integer_vector ;
              FifoWidth      : In    integer ; 
@@ -1899,7 +1820,7 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure WriteBurstIncrement (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              FirstWord      : In    std_logic_vector ;
              NumFifoWords   : In    integer ;
@@ -1913,7 +1834,7 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure WriteBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              FirstWord      : In    std_logic_vector ;
              NumFifoWords   : In    integer ;
@@ -1927,7 +1848,7 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure WriteBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              CoverID        : In    CoverageIDType ;
              NumFifoWords   : In    integer ;
@@ -1943,12 +1864,11 @@ package body AddressBusTransactionPkg is
   procedure WriteBurstAsync (
   -- dispatch CPU Write Cycle
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              NumFifoWords   : In    integer ;
              StatusMsgOn    : In    boolean := false
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     -- Put values in record
     TransactionRec.Operation     <= ASYNC_WRITE_BURST ;
@@ -1958,13 +1878,13 @@ package body AddressBusTransactionPkg is
     TransactionRec.DataWidth     <= NumFifoWords ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
   end procedure WriteBurstAsync ;
   
   ------------------------------------------------------------
   procedure WriteBurstVectorAsync (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              VectorOfWords  : In    slv_vector ;
              StatusMsgOn    : In    boolean := false
@@ -1977,7 +1897,7 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure WriteBurstVectorAsync (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              VectorOfWords  : In    integer_vector ;
              FifoWidth      : In    integer ; 
@@ -1991,7 +1911,7 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure WriteBurstIncrementAsync (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              FirstWord      : In    std_logic_vector ;
              NumFifoWords   : In    integer ;
@@ -2005,7 +1925,7 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure WriteBurstRandomAsync (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              FirstWord      : In    std_logic_vector ;
              NumFifoWords   : In    integer ;
@@ -2019,7 +1939,7 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure WriteBurstRandomAsync (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              CoverID        : In    CoverageIDType ;
              NumFifoWords   : In    integer ;
@@ -2035,12 +1955,11 @@ package body AddressBusTransactionPkg is
   procedure ReadBurst (
   -- do CPU Read Cycle and return data
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              NumFifoWords   : In    integer ;
              StatusMsgOn    : In    boolean := false
   ) is
-    alias RecRdy is TransactionRec.Rdy ; 
   begin
     -- Put values in record
     TransactionRec.Operation     <= READ_BURST ;
@@ -2050,7 +1969,7 @@ package body AddressBusTransactionPkg is
 --??    TransactionRec.DataWidth     <= 0 ;
     TransactionRec.StatusMsgOn   <= StatusMsgOn ;
     -- Start Transaction
-    RequestTransaction(Rdy => RecRdy, Ack => TransactionRec.Ack) ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
 --??    -- Return Results
 --??    NumFifoWords := TransactionRec.IntFromModel ;
   end procedure ReadBurst ;
@@ -2058,7 +1977,7 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure ReadCheckBurstVector (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              VectorOfWords  : In    slv_vector ;
              StatusMsgOn    : In    boolean := false
@@ -2071,7 +1990,7 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure ReadCheckBurstVector (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              VectorOfWords  : In    integer_vector ;
              FifoWidth      : In    integer ; 
@@ -2085,7 +2004,7 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure ReadCheckBurstIncrement (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              FirstWord      : In    std_logic_vector ;
              NumFifoWords   : In    integer ;
@@ -2099,7 +2018,7 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure ReadCheckBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              FirstWord      : In    std_logic_vector ;
              NumFifoWords   : In    integer ;
@@ -2113,7 +2032,7 @@ package body AddressBusTransactionPkg is
   ------------------------------------------------------------
   procedure ReadCheckBurstRandom (
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType ;
+    signal   TransactionRec : InOut AddressBusRecType ;
              iAddr          : In    std_logic_vector ;
              CoverID        : In    CoverageIDType ;
              NumFifoWords   : In    integer ;
@@ -2133,7 +2052,7 @@ package body AddressBusTransactionPkg is
   procedure ReleaseTransactionRecord (
   --  Must run on same delta cycle as AcquireTransactionRecord
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType 
+    signal   TransactionRec : InOut AddressBusRecType 
   ) is
   begin
     -- Set everything driven by TestCtrl to type'left (except Rdy)
@@ -2153,7 +2072,7 @@ package body AddressBusTransactionPkg is
   procedure AcquireTransactionRecord (
   --  Must run on same delta cycle as ReleaseTransactionRecord
   ------------------------------------------------------------
-    signal   TransactionRec : view AddressBusTestCtrlView of AddressBusRecType 
+    signal   TransactionRec : InOut AddressBusRecType 
   ) is
   begin
     -- Start Driving Rdy on next delta cycle with the current value.  
@@ -2168,7 +2087,7 @@ package body AddressBusTransactionPkg is
   procedure DoDirectiveTransactions (
   --  Wait until pending transaction completes
   ------------------------------------------------------------
-    signal   TransRec              : view AddressBusVerificationComponentView of AddressBusRecType ;
+    signal   TransRec              : InOut AddressBusRecType ;
     signal   Clk                   : In    std_logic ; 
     constant ModelID               : In    AlertLogIDType ;
     signal   UseCoverageDelays     : InOut boolean ; 
