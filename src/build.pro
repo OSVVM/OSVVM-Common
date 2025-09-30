@@ -17,6 +17,7 @@
 #
 #  Revision History:
 #    Date      Version    Description
+#    10/2025   2025.10    Added AddressBusModeViewPkg and StreamModeViewPkg
 #    11/2022   2022.11    Added AddressBusTransactionArrayPkg and AddressBusResponderTransactionArrayPkg
 #     1/2020   2020.01    Updated Licenses to Apache
 #     1/2019   2019.01    Compile Script for OSVVM Common library
@@ -24,7 +25,7 @@
 #
 #  This file is part of OSVVM.
 #  
-#  Copyright (c) 2019 - 2020 by SynthWorks Design Inc.  
+#  Copyright (c) 2019 - 2025 by SynthWorks Design Inc.  
 #  
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -45,10 +46,22 @@ analyze FifoFillPkg_slv.vhd
 
 # MIT Stream
 analyze StreamTransactionPkg.vhd
+# if {$::osvvm::VhdlVersion >= 2019}  {
+#   analyze StreamModeViewPkg.vhd
+# } else {
+#   analyze deprecated/StreamModeViewPkg_c.vhd  ;# empty package
+# }
 analyze StreamTransactionArrayPkg.vhd
 
 # MIT Address Bus - aka Memory Mapped
-analyze AddressBusTransactionPkg.vhd
+# analyze AddressBusTransactionPkg.vhd
+if {$::osvvm::VhdlVersion >= 2019}  {
+  analyze AddressBusTransactionPkg.vhd
+#  analyze AddressBusModeViewPkg.vhd
+} else {
+  analyze deprecated/AddressBusTransactionPkg_c.vhd  
+#  analyze deprecated/AddressBusModeViewPkg_c.vhd  ;# empty package
+}
 analyze AddressBusTransactionArrayPkg.vhd
 analyze AddressBusResponderTransactionPkg.vhd
 analyze AddressBusResponderTransactionArrayPkg.vhd
