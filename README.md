@@ -70,7 +70,7 @@ You can find the project [Authors here](AUTHORS.md) and
    * OsvvmCommonContext.vhd
       * Context declaration to include all above packages
       
-For current compile order see Common/common.pro.
+For current compile order see Common/build.pro.
 
 ### Verification
    * AddressBusTransactionPkg and AddressBusResponderTransactionPkg
