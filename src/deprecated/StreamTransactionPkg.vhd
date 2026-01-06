@@ -258,6 +258,9 @@ package StreamTransactionPkg is
   
  alias NoOp is WaitForClock [StreamRecType, natural, std_logic] ;
 
+  constant STREAM_TRANSACTION_COUNT         : integer := 0 ; 
+  constant STREAM_PENDING_TRANSACTION_COUNT : integer := 1 ; 
+  
   ------------------------------------------------------------
   procedure GetTransactionCount (
   -- Get the number of transactions handled by the model.  
@@ -267,6 +270,16 @@ package StreamTransactionPkg is
   ) ; 
 
   ------------------------------------------------------------
+  procedure GetPendingTransactionCount (
+  -- Get the pending transaction count.  
+  -- For Transmitters, this is send operations not completed
+  -- For Receivers, this is received values not read (via get)
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  TransactionCount  : out   integer 
+  ) ;
+
+    ------------------------------------------------------------
   procedure GetAlertLogID (
   -- Get the AlertLogID from the verification component.
   ------------------------------------------------------------
@@ -372,6 +385,12 @@ package StreamTransactionPkg is
     signal    TransactionRec   : inout StreamRecType ;
     variable  OptVal           : out   StreamFifoBurstModeType
   ) ;
+
+  ------------------------------------------------------------
+  function IsStreamBurstMode (
+  -----------------------------------------------------------
+    constant StreamFifoBurstMode : In StreamFifoBurstModeType 
+  ) return boolean ;
 
   ------------------------------------------------------------
   --  GotBurst   
@@ -1258,6 +1277,21 @@ package StreamTransactionPkg is
   --  to determine properties about the operation
   -- ========================================================
   ------------------------------------------------------------
+  procedure DoDirectiveTransactions (
+  --  Do OSVVM stream directive transactions
+  ------------------------------------------------------------
+    signal    TransRec                 : InOut StreamRecType ;
+    signal    Clk                      : In    std_logic ; 
+    constant  ModelID                  : In    AlertLogIDType ;
+    signal    UseCoverageDelays        : InOut boolean ; 
+    signal    DelayCovID               : InOut DelayCoverageIDType ; 
+    signal    BurstFifoMode            : InOut integer ;
+    signal    TransactionDone          : In    boolean ;
+    constant  TransactionCount         : In    integer ;
+    constant  PendingTransactionCount  : In    integer 
+  ) ;
+
+    ------------------------------------------------------------
   function IsBlocking (
   -----------------------------------------------------------
     constant  Operation        : in StreamOperationType
@@ -1400,9 +1434,26 @@ package body StreamTransactionPkg is
   ) is
   begin
     TransactionRec.Operation   <= GET_TRANSACTION_COUNT ;
+    TransactionRec.Options     <= STREAM_TRANSACTION_COUNT ;
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
     TransactionCount := TransactionRec.IntFromModel ; 
   end procedure GetTransactionCount ; 
+
+  ------------------------------------------------------------
+  procedure GetPendingTransactionCount (
+  -- Get the pending transaction count.  
+  -- For Transmitters, this is send operations not completed
+  -- For Receivers, this is received values not read (via get)
+  ------------------------------------------------------------
+    signal    TransactionRec   : inout StreamRecType ;
+    variable  TransactionCount  : out   integer 
+  ) is
+  begin
+    TransactionRec.Operation   <= GET_TRANSACTION_COUNT ;
+    TransactionRec.Options     <= STREAM_PENDING_TRANSACTION_COUNT ;
+    RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ; 
+    TransactionCount := TransactionRec.IntFromModel ; 
+  end procedure GetPendingTransactionCount ; 
 
   ------------------------------------------------------------
   procedure GetAlertLogID (
@@ -1515,6 +1566,18 @@ package body StreamTransactionPkg is
     RequestTransaction(Rdy => TransactionRec.Rdy, Ack => TransactionRec.Ack) ;
     OptVal := TransactionRec.IntFromModel ; 
   end procedure GetBurstMode ;
+
+  ------------------------------------------------------------
+  function IsStreamBurstMode (
+  -----------------------------------------------------------
+    constant StreamFifoBurstMode : In StreamFifoBurstModeType 
+  ) return boolean is
+  begin
+    return
+      (StreamFifoBurstMode = STREAM_BURST_WORD_MODE) or
+      (StreamFifoBurstMode = STREAM_BURST_WORD_PARAM_MODE) or
+      (StreamFifoBurstMode = STREAM_BURST_BYTE_MODE) ;
+  end function IsStreamBurstMode ;
 
   ------------------------------------------------------------
   --  GotBurst   
@@ -2844,6 +2907,71 @@ package body StreamTransactionPkg is
   --  These help decode the operation value (StreamOperationType)  
   --  to determine properties about the operation
   -- ========================================================
+  ------------------------------------------------------------
+  procedure DoDirectiveTransactions (
+  --  Do OSVVM stream directive transactions
+  ------------------------------------------------------------
+    signal    TransRec                 : InOut StreamRecType ;
+    signal    Clk                      : In    std_logic ; 
+    constant  ModelID                  : In    AlertLogIDType ;
+    signal    UseCoverageDelays        : InOut boolean ; 
+    signal    DelayCovID               : InOut DelayCoverageIDType ; 
+    signal    BurstFifoMode            : InOut integer ;
+    signal    TransactionDone          : In    boolean ;
+    constant  TransactionCount         : In    integer ;
+    constant  PendingTransactionCount  : In    integer 
+  ) is
+  begin
+    case TransRec.Operation is
+      -- Execute Standard Directive Transactions
+      when WAIT_FOR_CLOCK =>
+        WaitForClock(Clk, TransRec.IntToModel, std_logic'val(TransRec.Options)) ;
+
+      when GET_ALERTLOG_ID =>
+        TransRec.IntFromModel  <= integer(ModelID) ;
+
+      when GET_TRANSACTION_COUNT =>
+        if TransRec.Options = STREAM_PENDING_TRANSACTION_COUNT then
+          TransRec.IntFromModel  <= PendingTransactionCount ; 
+        else
+          TransRec.IntFromModel  <= TransactionCount ; 
+        end if ; 
+      
+      when WAIT_FOR_TRANSACTION =>
+        if not TransactionDone then
+          wait until TransactionDone ;
+        end if ; 
+
+      when SET_USE_RANDOM_DELAYS =>        
+        UseCoverageDelays      <= TransRec.BoolToModel ; 
+
+      when GET_USE_RANDOM_DELAYS =>
+        TransRec.BoolFromModel <= UseCoverageDelays ;
+
+      when SET_DELAYCOV_ID =>
+        DelayCovID <= GetDelayCoverage(TransRec.IntToModel) ;
+        UseCoverageDelays      <= TRUE ; 
+
+      when GET_DELAYCOV_ID =>
+        TransRec.IntFromModel  <= DelayCovID.ID  ;
+        UseCoverageDelays      <= TRUE ; 
+
+      when SET_BURST_MODE =>                      
+        BurstFifoMode          <= TransRec.IntToModel ;
+        AlertIf(ModelID, not IsStreamBurstMode(TransRec.IntToModel), 
+          "Invalid Burst Mode " & to_string(TransRec.IntToModel), FAILURE) ;
+            
+      when GET_BURST_MODE =>                      
+        TransRec.IntFromModel  <= BurstFifoMode ;
+
+      -- The End -- Done
+      when others =>
+        -- Signal multiple Driver Detect or not implemented transactions.
+        Alert(ModelID, ClassifyUnimplementedOperation(TransRec), FAILURE) ;
+
+    end case ;
+  end procedure DoDirectiveTransactions ; 
+        
   ------------------------------------------------------------
   function IsBlocking (
   -----------------------------------------------------------
