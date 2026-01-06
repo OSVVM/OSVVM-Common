@@ -472,7 +472,7 @@ package AddressBusTransactionPkg is
   -- BurstFIFOs and Burst Mode Controls
   -- The burst FIFOs hold bursts of data that is to be sent to 
   -- or was received from the interface.   The burst FIFO can be 
-  -- configured in the modes defined for StreamFifoBurstModeType.
+  -- configured in the modes defined for AddressBusFifoBurstModeType.
   -- Currently these modes defined as a subtype of integer, shown below.
   -- The intention of using integers is to facilitate model specific 
   -- extensions without the need to define separate transactions.
