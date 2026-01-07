@@ -1008,7 +1008,7 @@ package AddressBusTransactionPkg is
   -- ========================================================
   ------------------------------------------------------------
   procedure DoDirectiveTransactions (
-  --  Wait until pending transaction completes
+  -- Execute Standard Directive Transactions, Report Multiple Drivers and Unsupported Transactions
   ------------------------------------------------------------
     signal   TransRec              : view AddressBusVerificationComponentView of AddressBusRecType ;
     signal   Clk                   : In    std_logic ; 
@@ -2170,7 +2170,7 @@ package body AddressBusTransactionPkg is
   -- ========================================================
   ------------------------------------------------------------
   procedure DoDirectiveTransactions (
-  --  Wait until pending transaction completes
+  -- Execute Standard Directive Transactions, Report Multiple Drivers and Unsupported Transactions
   ------------------------------------------------------------
     signal   TransRec              : view AddressBusVerificationComponentView of AddressBusRecType ;
     signal   Clk                   : In    std_logic ; 
@@ -2190,8 +2190,6 @@ package body AddressBusTransactionPkg is
   begin
 
     case TransRec.Operation is
-      -- Execute Standard Directive Transactions
-
       when WAIT_FOR_CLOCK =>
         WaitForClock(Clk, TransRec.IntToModel, std_logic'val(TransRec.Options)) ;
 

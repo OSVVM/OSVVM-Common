@@ -923,7 +923,7 @@ package AddressBusTransactionPkg is
   -- ========================================================
   ------------------------------------------------------------
   procedure DoDirectiveTransactions (
-  --  Wait until pending transaction completes
+  -- Execute Standard Directive Transactions, Report Multiple Drivers and Unsupported Transactions
   ------------------------------------------------------------
     signal   TransRec              : InOut AddressBusRecType ;
     signal   Clk                   : In    std_logic ; 
@@ -2085,7 +2085,7 @@ package body AddressBusTransactionPkg is
   -- ========================================================
   ------------------------------------------------------------
   procedure DoDirectiveTransactions (
-  --  Wait until pending transaction completes
+  -- Execute Standard Directive Transactions, Report Multiple Drivers and Unsupported Transactions
   ------------------------------------------------------------
     signal   TransRec              : InOut AddressBusRecType ;
     signal   Clk                   : In    std_logic ; 

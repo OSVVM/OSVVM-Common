@@ -1291,6 +1291,18 @@ package StreamTransactionPkg is
     constant  PendingTransactionCount  : In    integer 
   ) ;
 
+  ------------------------------------------------------------
+  procedure DoDirectiveTransactions (
+  --  Do OSVVM stream directive transactions.  No Burst.  No Random Delays.
+  ------------------------------------------------------------
+    signal    TransRec                 : InOut StreamRecType ;
+    signal    Clk                      : In    std_logic ; 
+    constant  ModelID                  : In    AlertLogIDType ;
+    signal    TransactionDone          : In    boolean ;
+    constant  TransactionCount         : In    integer ;
+    constant  PendingTransactionCount  : In    integer 
+  ) ;
+
     ------------------------------------------------------------
   function IsBlocking (
   -----------------------------------------------------------
@@ -2971,7 +2983,47 @@ package body StreamTransactionPkg is
 
     end case ;
   end procedure DoDirectiveTransactions ; 
-        
+
+  ------------------------------------------------------------
+  procedure DoDirectiveTransactions (
+  --  Do OSVVM stream directive transactions - No Burst.  No Random Delays.
+  ------------------------------------------------------------
+    signal    TransRec                 : InOut StreamRecType ;
+    signal    Clk                      : In    std_logic ; 
+    constant  ModelID                  : In    AlertLogIDType ;
+    signal    TransactionDone          : In    boolean ;
+    constant  TransactionCount         : In    integer ;
+    constant  PendingTransactionCount  : In    integer 
+  ) is
+  begin
+    case TransRec.Operation is
+      -- Execute Standard Directive Transactions
+      when WAIT_FOR_CLOCK =>
+        WaitForClock(Clk, TransRec.IntToModel, std_logic'val(TransRec.Options)) ;
+
+      when GET_ALERTLOG_ID =>
+        TransRec.IntFromModel  <= integer(ModelID) ;
+
+      when GET_TRANSACTION_COUNT =>
+        if TransRec.Options = STREAM_PENDING_TRANSACTION_COUNT then
+          TransRec.IntFromModel  <= PendingTransactionCount ; 
+        else
+          TransRec.IntFromModel  <= TransactionCount ; 
+        end if ; 
+      
+      when WAIT_FOR_TRANSACTION =>
+        if not TransactionDone then
+          wait until TransactionDone ;
+        end if ; 
+
+      -- The End -- Done
+      when others =>
+        -- Signal multiple Driver Detect or not implemented transactions.
+        Alert(ModelID, ClassifyUnimplementedOperation(TransRec), FAILURE) ;
+
+    end case ;
+  end procedure DoDirectiveTransactions ; 
+
   ------------------------------------------------------------
   function IsBlocking (
   -----------------------------------------------------------
