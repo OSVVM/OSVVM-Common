@@ -2114,7 +2114,8 @@ package body AddressBusTransactionPkg is
         TransRec.IntFromModel  <= integer(ModelID) ;
 
       when GET_TRANSACTION_COUNT =>
-        TransRec.IntFromModel  <= integer(TransRec.Rdy) ; 
+--!!        TransRec.IntFromModel  <= integer(TransRec.Rdy) ; 
+        TransRec.IntFromModel  <= WriteTransactionCount + ReadTransactionCount ; 
       
       when GET_WRITE_TRANSACTION_COUNT =>
         TransRec.IntFromModel  <= WriteTransactionCount ; 
