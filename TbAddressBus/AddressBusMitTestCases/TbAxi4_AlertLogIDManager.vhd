@@ -58,7 +58,7 @@ begin
     TbSubordinateID  <= GetAlertLogID("Subordinate") ;
     SetLogEnable(PASSED, TRUE) ;    -- Enable PASSED logs
     SetLogEnable(INFO, TRUE) ;    -- Enable INFO logs
-    SetAlertStopCount(FAILURE, 12) ;    -- Enable INFO logs
+    SetAlertStopCount(FAILURE, 2) ;    -- Enable INFO logs
 
     -- Wait for testbench initialization 
     wait for 0 ns ;  wait for 0 ns ;
@@ -77,6 +77,7 @@ begin
     -- AffirmIfTranscriptsMatch(PATH_TO_VALIDATED_RESULTS) ;
 
     EndOfTestReports(ExternalErrors => (FAILURE => -1, ERROR => -1, WARNING => -1), TimeOut => (now >= 35 ms)) ; 
+
     std.env.stop ;
     wait ; 
   end process ControlProc ; 
