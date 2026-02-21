@@ -47,8 +47,8 @@ library ieee ;
 library osvvm ;
     context osvvm.OsvvmContext ;
     
-library OSVVM_Common ; 
-  use OSVVM_Common.ModelParametersSingletonPkg.all ; 
+library osvvm_common ; 
+  use osvvm_common.ModelParametersSingletonPkg.all ; 
     
 entity TbModelParameters2 is
 end entity TbModelParameters2 ; 

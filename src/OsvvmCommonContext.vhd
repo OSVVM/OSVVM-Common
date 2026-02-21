@@ -41,24 +41,24 @@
 
 context OsvvmCommonContext is
     library osvvm_common ;  
-    use OSVVM_Common.ModelParametersPkg.all ; 
-    use OSVVM_Common.ModelParametersSingletonPkg.all ; 
-    use OSVVM_Common.FifoFillPkg_slv.all ;  
+    use osvvm_common.ModelParametersPkg.all ; 
+    use osvvm_common.ModelParametersSingletonPkg.all ; 
+    use osvvm_common.FifoFillPkg_slv.all ;  
     
     -- MIT
     use osvvm_common.StreamTransactionPkg.all ; 
---    use OSVVM_Common.StreamModeViewPkg.all ; 
+--    use osvvm_common.StreamModeViewPkg.all ; 
     use osvvm_common.StreamTransactionArrayPkg.all ; 
-    use OSVVM_Common.AddressBusTransactionPkg.all ; 
---    use OSVVM_Common.AddressBusModeViewPkg.all ; 
-    use OSVVM_Common.AddressBusTransactionArrayPkg.all ; 
-    use OSVVM_Common.AddressBusResponderTransactionPkg.all ;
-    use OSVVM_Common.AddressBusResponderTransactionArrayPkg.all ;
-    use OSVVM_Common.AddressBusVersionCompatibilityPkg.all ;  
+    use osvvm_common.AddressBusTransactionPkg.all ; 
+--    use osvvm_common.AddressBusModeViewPkg.all ; 
+    use osvvm_common.AddressBusTransactionArrayPkg.all ; 
+    use osvvm_common.AddressBusResponderTransactionPkg.all ;
+    use osvvm_common.AddressBusResponderTransactionArrayPkg.all ;
+    use osvvm_common.AddressBusVersionCompatibilityPkg.all ;  
     
     -- Interrupt
-    use OSVVM_Common.InterruptGlobalSignalPkg.all ;
-    use OSVVM_Common.InterruptHandlerComponentPkg.all ;
-    use OSVVM_Common.InterruptGeneratorComponentPkg.all ;
+    use osvvm_common.InterruptGlobalSignalPkg.all ;
+    use osvvm_common.InterruptHandlerComponentPkg.all ;
+    use osvvm_common.InterruptGeneratorComponentPkg.all ;
 end context OsvvmCommonContext ; 
 
