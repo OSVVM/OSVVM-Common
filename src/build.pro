@@ -17,6 +17,7 @@
 #
 #  Revision History:
 #    Date      Version    Description
+#    10/2025   2025.10    Added AddressBusModeViewPkg and StreamModeViewPkg
 #    11/2022   2022.11    Added AddressBusTransactionArrayPkg and AddressBusResponderTransactionArrayPkg
 #     1/2020   2020.01    Updated Licenses to Apache
 #     1/2019   2019.01    Compile Script for OSVVM Common library
@@ -24,7 +25,7 @@
 #
 #  This file is part of OSVVM.
 #  
-#  Copyright (c) 2019 - 2020 by SynthWorks Design Inc.  
+#  Copyright (c) 2019 - 2025 by SynthWorks Design Inc.  
 #  
 #  Licensed under the Apache License, Version 2.0 (the "License");
 #  you may not use this file except in compliance with the License.
@@ -38,20 +39,33 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 #
-library OSVVM_Common
+library osvvm_common
 analyze ModelParametersPtPkg.vhd
 analyze ModelParametersSingletonPkg.vhd
 analyze FifoFillPkg_slv.vhd
 
 # MIT Stream
-analyze StreamTransactionPkg.vhd
-analyze StreamTransactionArrayPkg.vhd
+if {$::osvvm::VhdlVersion >= 2019 && $::osvvm::Supports2019Interface}  {
+  analyze StreamTransactionPkg.vhd
+  analyze StreamTransactionArrayPkg.vhd
+} else {
+  analyze deprecated/StreamTransactionPkg.vhd
+  analyze deprecated/StreamTransactionArrayPkg.vhd
+}
 
 # MIT Address Bus - aka Memory Mapped
-analyze AddressBusTransactionPkg.vhd
-analyze AddressBusTransactionArrayPkg.vhd
-analyze AddressBusResponderTransactionPkg.vhd
-analyze AddressBusResponderTransactionArrayPkg.vhd
+# analyze AddressBusTransactionPkg.vhd
+if {$::osvvm::VhdlVersion >= 2019 && $::osvvm::Supports2019Interface}  {
+  analyze AddressBusTransactionPkg.vhd
+  analyze AddressBusTransactionArrayPkg.vhd
+  analyze AddressBusResponderTransactionPkg.vhd
+  analyze AddressBusResponderTransactionArrayPkg.vhd
+} else {
+  analyze deprecated/AddressBusTransactionPkg.vhd  
+  analyze deprecated/AddressBusTransactionArrayPkg.vhd
+  analyze deprecated/AddressBusResponderTransactionPkg.vhd
+  analyze deprecated/AddressBusResponderTransactionArrayPkg.vhd
+}
 analyze AddressBusVersionCompatibilityPkg.vhd
 
 # Interrupt

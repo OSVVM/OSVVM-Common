@@ -56,8 +56,8 @@ library OSVVM_AXI4 ;
   context OSVVM_AXI4.Axi4Context ; 
   use osvvm.ScoreboardPkg_slv.all ;
 
-library OSVVM_Common ;
-  context OSVVM_Common.OsvvmCommonContext ;
+library osvvm_common ;
+  context osvvm_common.OsvvmCommonContext ;
 
 entity TestCtrl is
   port (

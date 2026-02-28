@@ -38,5 +38,6 @@
 #  limitations under the License.
 #  
 include testbench
-RunTest TestCases/TbAb_Interrupt3.vhd [generic NUM_INTERRUPTS 2]
+RunTest TestCases/TbAb_InterruptBurst1.vhd
+RunTest TestCases/TbAb_InterruptBurst2.vhd
 

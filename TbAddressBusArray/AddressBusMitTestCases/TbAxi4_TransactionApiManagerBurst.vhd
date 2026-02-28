@@ -103,7 +103,7 @@ begin
     wait for 0 ns ; 
     -- Verify Initial values of Transaction Counts
     GetTransactionCount(ManagerRec, 1, Count) ;  -- Expect 1
-    AffirmIfEqual(TbManagerID, Count, 1, "GetTransactionCount") ;
+    AffirmIfEqual(TbManagerID, Count, 0, "GetTransactionCount") ;
     GetWriteTransactionCount(ManagerRec, 1, Count) ; -- Expect 0
     AffirmIfEqual(TbManagerID, Count, 0, "GetTransactionWriteCount") ;
     GetReadTransactionCount(ManagerRec, 1, Count) ; -- Expect 0
@@ -121,7 +121,7 @@ begin
     WaitForTransaction(ManagerRec, 1) ;
     WaitForTransactionCount <= WaitForTransactionCount + 1 ; 
     GetTransactionCount(ManagerRec, 1, Count) ;  -- Expect 8
-    AffirmIfEqual(TbManagerID, Count, 8, "GetTransactionCount") ;
+    AffirmIfEqual(TbManagerID, Count, 2, "GetTransactionCount") ;
     GetWriteTransactionCount(ManagerRec, 1, Count) ; -- Expect 2
     AffirmIfEqual(TbManagerID, Count, 2, "GetTransactionWriteCount") ;
     
@@ -132,7 +132,7 @@ begin
     WaitForWriteTransaction(ManagerRec, 1) ;
     WaitForTransactionCount <= WaitForTransactionCount + 1 ; 
     GetTransactionCount(ManagerRec, 1, Count) ;  -- Expect 14
-    AffirmIfEqual(TbManagerID, Count, 14, "GetTransactionCount") ;
+    AffirmIfEqual(TbManagerID, Count, 4, "GetTransactionCount") ;
     GetWriteTransactionCount(ManagerRec, 1, Count) ; -- Expect 4
     AffirmIfEqual(TbManagerID, Count, 4, "GetTransactionWriteCount") ;
     

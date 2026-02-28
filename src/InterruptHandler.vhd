@@ -99,6 +99,8 @@ begin
     TransRec.WriteBurstFifo <= VCRec.WriteBurstFifo ;
     TransRec.ReadBurstFifo  <= VCRec.ReadBurstFifo ;
     -- Create Burst FIFOs for InterruptRec
+    -- This requires the WriteBurstFifo and ReadBurstFifo field to be InOut and for 
+    -- this id to be > the ID assigned in the VC - hence maximum picks this one when driven
     InterruptRec.WriteBurstFifo <= NewID("WriteBurstFifo", ModelID, Search => PRIVATE_NAME) ;
     InterruptRec.ReadBurstFifo  <= NewID("ReadBurstFifo",  ModelID, Search => PRIVATE_NAME) ;
 
@@ -149,6 +151,8 @@ begin
           VCRec.AddrWidth       <=  InterruptRec.AddrWidth   ;
           VCRec.DataToModel     <=  InterruptRec.DataToModel ;
           VCRec.DataWidth       <=  InterruptRec.DataWidth   ;
+          -- This requires the WriteBurstFifo and ReadBurstFifo field to be InOut and for 
+          -- this id to be > the ID assigned in the VC - hence maximum picks this one when driven
           VCRec.WriteBurstFifo  <=  InterruptRec.WriteBurstFifo ; 
           VCRec.ReadBurstFifo   <=  InterruptRec.ReadBurstFifo ; 
           VCRec.StatusMsgOn     <=  InterruptRec.StatusMsgOn ;

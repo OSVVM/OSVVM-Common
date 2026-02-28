@@ -72,11 +72,13 @@ begin
     -- Wait for test to finish
     WaitForBarrier(TestDone, 35 ms) ;
     
+    
     TranscriptClose ; 
     -- Printing differs in different simulators due to differences in process order execution
     -- AffirmIfTranscriptsMatch(PATH_TO_VALIDATED_RESULTS) ;
 
     EndOfTestReports(ExternalErrors => (FAILURE => -1, ERROR => -1, WARNING => -1), TimeOut => (now >= 35 ms)) ; 
+
     std.env.stop ;
     wait ; 
   end process ControlProc ; 

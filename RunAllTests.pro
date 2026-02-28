@@ -37,19 +37,24 @@
 #  limitations under the License.
 #  
 
-## =============================================
-## Test StreamTransactionPkg and StreamTransactionArrayPkg
-include ./TbStream
-include ./TbStreamArray
+if {[DirectoryExists ../AXI4]} { 
+  ## =============================================
+  ## Test StreamTransactionPkg and StreamTransactionArrayPkg
+  ## Requires AxiStream
+  include ./TbStream
+  include ./TbStreamArray
 
-## =============================================
-## Test AddressBusTransactionPkg and AddressBusTransactionArrayPkg
-include ./TbAddressBus
-include ./TbAddressBusArray
+  ## =============================================
+  ## Test AddressBusTransactionPkg and AddressBusTransactionArrayPkg
+  ## Requires AXI4 Full
+  include ./TbAddressBus
+  include ./TbAddressBusArray
 
-## =============================================
-## Test InterruptHandler 
-include ./TbInterrupt   
+  ## =============================================
+  ## Test InterruptHandler 
+  ## Requires AXI4 Full
+  include ./TbInterrupt   
+}
 
 ## =============================================
 ## Test Params Pkg   

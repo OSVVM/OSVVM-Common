@@ -128,9 +128,11 @@ begin
   InterruptProc : process
     variable Data : integer := 0 ;    
   begin
-    WaitForClock(InterruptRec, 1) ; 
+    WaitForClock(InterruptRec, 0) ; 
     blankline(2) ; 
     log("Interrupt Handler Started") ; 
+    WaitForClock(InterruptRec, 1) ; 
+    log("Interrupt Handler: after WaitForClock") ; 
     ReadBurst(InterruptRec, X"1000_0000", 4) ;
     CheckBurstIncrement(InterruptRec.ReadBurstFifo, Data, 4, AXI_DATA_WIDTH) ;
     
